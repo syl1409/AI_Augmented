@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Competitive Landscape Matrix - Project Scout</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: #1e293b;
+            line-height: 1.5;
+            padding: 30px;
+            background-color: #f8fafc;
+        }
+        .header-container {
+            margin-bottom: 35px;
+            border-bottom: 3px solid #cbd5e1;
+            padding-bottom: 20px;
+        }
+        h1 {
+            color: #0f172a;
+            margin: 0 0 8px 0;
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+        }
+        p {
+            color: #64748b;
+            margin: 0;
+            font-size: 16px;
+        }
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            margin-bottom: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #ffffff;
+            text-align: left;
+        }
+        th, td {
+            padding: 16px 18px;
+            vertical-align: top;
+            border: 1px solid #e2e8f0;
+        }
+        th {
+            background-color: #1e293b;
+            color: #f8fafc;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .platform-type {
+            display: block;
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: none;
+            color: #94a3b8;
+            margin-top: 4px;
+            letter-spacing: 0;
+        }
+        .comp-link {
+            display: inline-block;
+            color: #38bdf8;
+            text-decoration: underline;
+            font-size: 11px;
+            text-transform: none;
+            margin-top: 6px;
+            letter-spacing: 0;
+            font-weight: normal;
+        }
+        th.scout-header {
+            background-color: #0d6efd;
+            color: #ffffff;
+        }
+        th.scout-header .platform-type {
+            color: #93c5fd;
+        }
+        th.scout-header .comp-link {
+            color: #ffffff;
+        }
+        tr:nth-child(even) td {
+            background-color: #f8fafc;
+        }
+        .scout-target-cell {
+            background-color: #f0fdf4 !important;
+            border-left: 2px solid #0d6efd;
+            border-right: 2px solid #0d6efd;
+        }
+        tr:last-child .scout-target-cell {
+            border-bottom: 3px solid #0d6efd;
+        }
+        .criterion-column {
+            font-weight: 700;
+            color: #0f172a;
+            font-size: 13.5px;
+            background-color: #f1f5f9 !important;
+            width: 14%;
+        }
+        .section-header-row {
+            background-color: #e2e8f0 !important;
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.05em;
+            color: #334155;
+            padding: 8px 18px;
+        }
+        ul {
+            margin: 0;
+            padding-left: 18px;
+        }
+        li {
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: #334155;
+        }
+        li:last-child {
+            margin-bottom: 0;
+        }
+        li strong {
+            color: #0f172a;
+        }
+        .scout-target-cell li {
+            color: #0f172a;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-container">
+        <h1>Adaptive Competitive Landscape Matrix</h1>
+        <p>Project Scout Structural Engineering Benchmarking against Consumer Portals and B2B Agentic Infrastructure</p>
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Evaluation Criteria</th>
+                    <th>Zillow
+                        <span class="platform-type">Consumer Web &amp; Mobile App</span>
+                        <a href="https://www.zillow.com/" target="_blank" class="comp-link">View Platform ↗</a>
+                    </th>
+                    <th>Redfin
+                        <span class="platform-type">Consumer Web &amp; Mobile App</span>
+                        <a href="https://www.redfin.com/" target="_blank" class="comp-link">View Platform ↗</a>
+                    </th>
+                    <th>Restb.ai
+                        <span class="platform-type">B2B Computer Vision API</span>
+                        <a href="https://restb.ai/" target="_blank" class="comp-link">View Platform ↗</a>
+                    </th>
+                    <th>HouseCanary
+                        <span class="platform-type">Enterprise Real Estate Analytics</span>
+                        <a href="https://www.housecanary.com/" target="_blank" class="comp-link">View Platform ↗</a>
+                    </th>
+                    <th class="scout-header">Scout (Target State)
+                        <span class="platform-type">High-Frequency Consumer App</span>
+                        <span class="comp-link" style="text-decoration:none; color:#f0fdf4;">Adaptive Variant</span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- LAYER A: MANDATORY FOUNDATIONS -->
+                <tr>
+                    <td colspan="6" class="section-header-row">Layer A: Mandatory Architectural Foundations</td>
+                </tr>
+                <tr>
+                    <td class="criterion-column">Core Functional Capability &amp; Execution Speed</td>
+                    <td>
+                        <ul>
+                            <li><strong>Speed:</strong> Manual browsing loop; average 20–30 mins spent evaluating single listing photos.</li>
+                            <li><strong>Latency:</strong> 4–6 hour refresh synchronization delay relative to structural MLS additions.</li>
+                            <li><strong>Risk Margin:</strong> Misses flash-bidding cycles entirely, locking buyers into secondary choices.</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <ul>
+                            <li><strong>Speed:</strong> Human processing. Relies on manual image scanning and virtual tour link executions.</li>
+                            <li><strong>Latency:</strong> 2–4 hour synchronization delay loop behind raw infrastructure entry.</li>
+                            <li><strong>Risk Margin:</strong> Suboptimal alignment with rapid close conditions; traps users in reactive cycles.</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <ul>
+                            <li><strong>Speed:</strong> Sub-second real-time batch computer vision processing for image metadata parsing.</li>
+                            <li><strong>Latency:</strong> Millisecond API response latency profiles upon ingestion of raw image assets.</li>
+                            <li><strong>Risk Margin:</strong> Pure code integration layer; lacks end-user orchestration or contextual interface mapping.</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <ul>
+                            <li><strong>Speed:</strong> Automated broad portfolio calculations running on rolling periodic data refreshes.</li>
+                            <li><strong>Latency:</strong> Daily or weekly bulk database modifications for macro index variables.</li>
+                            <li><strong>Risk Margin:</strong> Structurally separated from real-time micro-events at point of sale.</li>
+                        </ul>
+                    </td>
+                    <td class="scout-target-cell">
+                        <ul>
+                            <li><strong>Speed:</strong> **Sub-60 seconds per asset processing loop** via automated background summary maps.</li>
+                            <li><strong>Latency:</strong> Direct stream ingestion lowering systemic action delay down to **under 5 minutes**.</li>
+                            <li><strong>Risk Margin:</strong> Eradicates the "Velocity Gap" by matching institutional-grade agent performance thresholds.</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="criterion-column">Data Validation &amp; Quality Integrity</td>
+                    <td>
+                        <ul>
+                            <li><strong>Validation:</strong> Completely passive ingestion framework; displays all uploaded assets unconditionally.</li>
+                            <li><strong>Integrity:</strong> Zero validation filters against optical distortions or virtual staging manipulations.</li>
+                            <li><strong>Anomaly Audit:</strong> Left entirely to human spot checks; highly vulnerable to visual misinformation.</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <ul>
+                            <li><strong>Validation:</strong> Standard verification of public MLS structural listings without item condition inspection.</li>
+                            <li><strong>Integrity:</strong> Zero filtering against digital alterations or generative fill additions.</li>
+                            <li><strong>Anomaly Audit:</strong> Non-existent; relies completely on basic post-contract human inspector checks.</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <ul>
+                            <li><strong>Validation:</strong> Forensically trained neural networks catalog property conditions and watermark tags.</li>
+                            <li><strong>Integrity:</strong> Detects duplication anomalies and basic image processing standard policy violations.</li>
+                            <li><strong>Anomaly Audit:</strong> Highly capable, but serves to clean upstream database feeds for compliance entities.</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <ul>
+                            <li><strong>Validation:</strong> Multi-variable evaluation checks public registry documents against spatial record sets.</li>
+                            <li><strong>Integrity:</strong> Cleans structural tax, transactional histories, and loan record mismatches.</li>
+                            <li><strong>Anomaly Audit:</strong> Deep backend validation patterns, completely disconnected from active photo triage layers.</li>
+                        </ul>
+                    </td>
+                    <td class="scout-target-cell">
+                        <ul>
+                            <li><strong>Validation:</strong> Integrates an explicit **AI-Staging &amp; Forensic Smoothing Detector** pipeline.</li>
+                            <li><strong>Integrity:</strong> Strips away generative enhancements, background cleaning filters, and digital masks.</li>
+                            <li><strong>Anomaly Audit:</strong> Deploys a safe **Human-in-the-Loop checkpoint loop** to mitigate the $50k liability of missed cracks.</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="criterion-column">Logic Engine &amp; Architectural Depth</td>
+                    <td>
+                        <ul>
+                            <li><strong>Logic Layer:</strong> Rigid relational database filtering architecture bound strictly to hardnumeric metrics.</li>
+                            <li><strong>Routing Mechanics:</strong> Flat indexing based on zip codes, cost limits, and count fields.</li>
+                            <li><strong>System Depth:</strong> Flat static data tables completely unaware of subjective context.</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <ul>
+                            <li><strong>Logic Layer:</strong> Relational queries mapping user inputs against broker-provided keyword tags.</li>
+                            <li><strong>Routing Mechanics:</strong> Filter matches prone to broker keyword manipulation or omission.</li>
+                            <li><strong>System Depth:</strong> Relies on simple text match arrays without automated qualitative scoring logic.</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <ul>
+                            <li><strong>Logic Layer:</strong> Computer vision semantic categorization indexing object classes (e.g., specific counter styles).</li>
+                            <li><strong>Routing Mechanics:</strong> Returns structured metadata arrays via enterprise-facing API request protocols.</li>
+                            <li><strong>System Depth:</strong> Deep feature extraction layer, but lacks an interface to interpret raw consumer prompts.</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <ul>
+                            <li><strong>Logic Layer:</strong> Advanced valuation regression tracking macro property yield comparative models.</li>
+                            <li><strong>Routing Mechanics:</strong> Bulk asset data extraction schemas engineered for institutional portfolio optimization.</li>
+                            <li><strong>System Depth:</strong> Deep financial predictive analysis engine uncoupled from immediate qualitative variables.</li>
+                        </ul>
+                    </td>
+                    <td class="scout-target-cell">
+                        <ul>
+                            <li><strong>Logic Layer:</strong> **Multi-Dimensional Vector Space Mapping System** parsing unstructured data inputs.</li>
+                            <li><strong>Routing Mechanics:</strong> **Vibe-to-Data Match Engine** converting text to adaptive visual heatmaps.</li>
+                            <li><strong>System Depth:</strong> Continuously adjusts weights via the behavior-tracking **'Goldilocks' Persona Engine**.</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="criterion-column">Target Audience Focus &amp; Accessibility</td>
+                    <td>
+                        <ul>
+                            <li><strong>Core Focus:</strong> General consumer retail market mass volume audience acquisition.</li>
+                            <li><strong>Monetization:</strong> Agent lead generation fees, premier visibility ads, and click routing.</li>
+                            <li><strong>Access Path:</strong> Free public portal; deliberately avoids high-friction risk flags to protect click counts.</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <ul>
+                            <li><strong>Core Focus:</strong> Retail residential real estate consumers requiring transaction support.</li>
+                            <li><strong>Monetization:</strong> Transactional brokerage representation commission split cuts and title services.</li>
+                            <li><strong>Access Path:</strong> Free consumer access; financial incentive is bound to deal closing, not defect exposure.</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <ul>
+                            <li><strong>Core Focus:</strong> Enterprise MLS technology hubs, appraisal firms, and insurance software developers.</li>
+                            <li><strong>Monetization:</strong> Multi-year enterprise SaaS contracts and volumetric developer REST API call tiers.</li>
+                            <li><strong>Access Path:</strong> Strict corporate gatekeeping; impossible for an independent retail buyer to provision an account.</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <ul>
+                            <li><strong>Core Focus:</strong> Institutional asset funds, single-family aggregation funds, and mortgage banks.</li>
+                            <li><strong>Monetization:</strong> Multi-thousand dollar data distribution license models and corporate service retainers.</li>
+                            <li><strong>Access Path:</strong> Enterprise paywall infrastructure completely separating capabilities from everyday consumers.</li>
+                        </ul>
+                    </td>
+                    <td class="scout-target-cell">
+                        <ul>
+                            <li><strong>Core Focus:</strong> Engineered to **Democratize Institutional Intelligence** directly for "Defeated" consumer buyers.</li>
+                            <li><strong>Monetization:</strong> Transparent flat consumer subscription tiers or direct single-use transaction access tokens.</li>
+                            <li><strong>Access Path:</strong> High-fidelity consumer mobile experience optimized to overcome systemic market information asymmetry.</li>
+                        </ul>
+                    </td>
+                </tr>
+
+                <!-- LAYER B: PRD FEATURE EXTRACTION -->
+                <tr>
+                    <td colspan="6" class="section-header-row">Layer B: Ingested PRD Functional Core Feature Extractions</td>
+                </tr>
+                <tr>
+                    <td class="criterion-column">The Visual Auditor (Red-Flag Scanner)</td>
+                    <td>
+                        <ul>
+                            <li><strong>Capability:</strong> None. Images are static placeholders. User must spot defects with the naked eye.</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <ul>
+                            <li><strong>Capability:</strong> None. Retains marketing photo layouts without visual structural evaluations.</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <ul>
+                            <li><strong>Capability:</strong> High. Detects property classification values, structural items, and macro quality layers.</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <ul>
+                            <li><strong>Capability:</strong> Low. Focuses on broad neighborhood decay indices over dynamic image crack tracking.</li>
+                        </ul>
+                    </td>
+                    <td class="scout-target-cell">
+                        <ul>
+                            <li><strong>Capability:</strong> Automated visual forensic parsing highlighting foundation cracks, water stains, and DIY electrical faults directly over the listing assets.</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="criterion-column">The Leverage Calculator (Urgency Index)</td>
+                    <td>
+                        <ul>
+                            <li><strong>Capability:</strong> Basic. Lists simple historical data markers such as standard days on market and past price drops.</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <ul>
+                            <li><strong>Capability:</strong> Basic. Tracks historical pricing changes and standard public listing lifespan metrics.</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <ul>
+                            <li><strong>Capability:</strong> None. Engine maps visual data vectors rather than transaction history variables.</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <ul>
+                            <li><strong>Capability:</strong> Advanced. Sophisticated predictive price data models built for enterprise asset portfolios.</li>
+                        </ul>
+                    </td>
+                    <td class="scout-target-cell">
+                        <ul>
+                            <li><strong>Capability:</strong> Compiles an instant consumer-facing report pairing municipal tax history and pricing modifications with estimated seller urgency profiles.</li>
+                        </ul>
+                    </td>
+                </tr>
+
+                <!-- LAYER C: USER MANUAL CRITERIA -->
+                <tr>
+                    <td colspan="6" class="section-header-row">Layer C: User Custom Metrics &amp; Operational Layouts</td>
+                </tr>
+                <tr>
+                    <td class="criterion-column">Price &amp; Subscription Topology</td>
+                    <td>
+                        <ul>
+                            <li><strong>Model:</strong> Free to consumer.</li>
+                            <li><strong>Hidden Cost:</strong> Personal contact info is weaponized and sold directly to high-pressure broker networks.</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <ul>
+                            <li><strong>Model:</strong> Free to consumer.</li>
+                            <li><strong>Hidden Cost:</strong> Monetized downstream via internal transaction commission requirements.</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <ul>
+                            <li><strong>Model:</strong> High-cost enterprise SaaS.</li>
+                            <li><strong>Hidden Cost:</strong> Restricted to corporate contracts structured around high-volume developer API query blocks.</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <ul>
+                            <li><strong>Model:</strong> Institutional pricing matrices.</li>
+                            <li><strong>Hidden Cost:</strong> Accessible only via custom enterprise subscription rates targeting investment bank scales.</li>
+                        </ul>
+                    </td>
+                    <td class="scout-target-cell">
+                        <ul>
+                            <li><strong>Model:</strong> Transparent consumer utility architecture. Includes flat monthly subscription tiers or budget-friendly single-use analysis tokens.</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="criterion-column">Devices &amp; Native Deployments</td>
+                    <td>
+                        <ul>
+                            <li><strong>Deployment:</strong> Standard consumer web portals paired with native iOS and Android retail mobile apps.</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <ul>
+                            <li><strong>Deployment:</strong> Desktop cross-browser applications alongside standard consumer iOS/Android app suites.</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <ul>
+                            <li><strong>Deployment:</strong> Pure code layer. Walled within RESTful API endpoints and developer cloud software toolkits.</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <ul>
+                            <li><strong>Deployment:</strong> Web-based enterprise dashboards alongside programmatic custom developer API configurations.</li>
+                        </ul>
+                    </td>
+                    <td class="scout-target-cell">
+                        <ul>
+                            <li><strong>Deployment:</strong> Highly accessible native iOS and Android consumer mobile application environments optimized for fast cross-device field deployment.</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="criterion-column">AR (Augmented Reality) Capabilities</td>
+                    <td>
+                        <ul>
+                            <li><strong>AR Engine:</strong> Standard virtual staging visualizations or raw panoramic 360-degree rotation maps.</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <ul>
+                            <li><strong>AR Engine:</strong> Standard programmatic 3D walkthrough layouts mapping basic room transitions.</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <ul>
+                            <li><strong>AR Engine:</strong> None. Focuses on processing flat server-side images rather than managing frontend AR rendering modules.</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <ul>
+                            <li><strong>AR Engine:</strong> None. Operates entirely as a data table engine analyzing regional metrics databases.</li>
+                        </ul>
+                    </td>
+                    <td class="scout-target-cell">
+                        <ul>
+                            <li><strong>AR Engine:</strong> Deploys the interactive **'Truth Overlay'** mapping live real-time semantic visual heatmaps (such as exact light entry vectors) over live mobile camera frames.</li>
+                        </ul>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>
