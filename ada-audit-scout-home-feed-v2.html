@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ADA Accessibility Audit — Scout Home Feed v2</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #F1F5F9;
+  font-size: 14px;
+  color: #1e293b;
+  min-height: 100vh;
+}
+
+/* ── PAGE HEADER ── */
+.page-header {
+  background: #1D3461;
+  padding: 20px 32px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.ph-left h1 { font-size: 20px; font-weight: 700; color: white; letter-spacing: -0.3px; }
+.ph-left p  { font-size: 13px; color: rgba(255,255,255,0.55); margin-top: 4px; }
+.ph-badges  { display: flex; gap: 10px; align-items: center; }
+.ph-badge {
+  padding: 5px 12px; border-radius: 999px;
+  font-size: 12px; font-weight: 700;
+}
+.ph-total { background: #E91E8C; color: white; }
+.ph-hint  { font-size: 12px; color: rgba(255,255,255,0.45); font-style: italic; }
+
+/* ── SUMMARY BAR ── */
+.summary-bar {
+  background: white; border-bottom: 1px solid #E2E8F0;
+  padding: 10px 32px;
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+}
+.sb-item { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; }
+.sb-sep { color: #CBD5E1; }
+.sb-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.sb-sq  { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+
+/* ── MAIN LAYOUT ── */
+.layout {
+  display: flex; gap: 0; max-width: 1320px;
+  margin: 24px auto; padding: 0 24px;
+  align-items: flex-start;
+}
+
+/* ── LEFT: PHONE ── */
+.left-panel { flex-shrink: 0; width: 420px; position: sticky; top: 24px; }
+.phone-wrap-outer { display: flex; justify-content: center; }
+.phone-shell {
+  width: 390px;
+  border-radius: 48px;
+  background: #F2F4F8;
+  overflow: hidden;
+  box-shadow: 0 0 0 10px #2a2a2a, 0 0 0 11px rgba(255,255,255,0.08),
+              0 24px 48px rgba(0,0,0,0.35);
+  position: relative;
+}
+#screenWrap { position: relative; }
+
+/* Status bar */
+.mock-status {
+  background: #1D3461; display: flex; justify-content: space-between;
+  align-items: center; padding: 14px 24px 8px;
+}
+.mock-status .time { font-size: 15px; font-weight: 600; color: rgba(255,255,255,0.9); }
+.mock-status .icons { font-size: 12px; color: rgba(255,255,255,0.7); display: flex; gap: 4px; }
+
+/* Feed top */
+.mock-feed-top {
+  background: #1D3461; padding: 14px 20px 16px;
+}
+.mock-top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.mock-logo { font-size: 22px; font-weight: 800; color: white; }
+.mock-logo span { color: #E91E8C; }
+.mock-actions { display: flex; gap: 8px; }
+.mock-notif-btn {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; position: relative; cursor: pointer;
+}
+.mock-notif-dot {
+  position: absolute; top: 7px; right: 7px; width: 8px; height: 8px;
+  border-radius: 50%; background: #E91E8C; border: 1.5px solid #1D3461;
+}
+.mock-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: linear-gradient(135deg, #E91E8C, #CC0F75);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; color: white;
+}
+.mock-search {
+  display: flex; align-items: center; gap: 10px;
+  background: rgba(255,255,255,0.1); border-radius: 999px;
+  padding: 10px 16px; border: 1px solid rgba(255,255,255,0.12);
+}
+.mock-search span { font-size: 13px; color: rgba(255,255,255,0.45); }
+.mock-alert-strip {
+  margin-top: 10px; padding: 9px 13px; border-radius: 10px;
+  background: rgba(233,30,140,0.12); border: 1px solid rgba(233,30,140,0.3);
+  display: flex; align-items: center; gap: 8px;
+}
+.mock-pulse { width: 8px; height: 8px; border-radius: 50%; background: #E91E8C; flex-shrink: 0; }
+.mock-alert-strip p { font-size: 12px; color: rgba(255,255,255,0.85); }
+.mock-alert-strip p strong { color: #FFD6EA; }
+
+/* Feed body */
+.mock-feed-body { padding: 14px; background: #F2F4F8; }
+.mock-sec-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.mock-sec-title { font-size: 15px; font-weight: 700; color: #1E1E1E; }
+.mock-sec-link { font-size: 12px; color: #CC0F75; font-weight: 600; }
+
+.mock-chips { display: flex; gap: 8px; margin-bottom: 12px; overflow: hidden; }
+.mock-chip {
+  flex-shrink: 0; padding: 6px 13px; border-radius: 999px;
+  font-size: 12px; font-weight: 500; border: 1.5px solid #E5E5E5;
+  background: white; color: #373737;
+}
+.mock-chip.active { border-color: #E91E8C; background: #FFF0F7; color: #CC0F75; font-weight: 700; }
+
+/* Property card */
+.mock-pcard {
+  background: white; border-radius: 14px; border: 1px solid #E5E5E5;
+  overflow: hidden; margin-bottom: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+}
+.mock-photo {
+  height: 156px; position: relative; overflow: hidden;
+}
+.ph1 { background: linear-gradient(140deg, #2a1040 0%, #1D3461 100%); }
+.ph2 { background: linear-gradient(140deg, #3d1060 0%, #1a2850 100%); }
+.mock-photo-ovl {
+  position: absolute; inset: 0;
+  background: linear-gradient(to bottom, transparent 30%, rgba(0,0,0,0.55));
+}
+.mock-house { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); font-size: 48px; opacity: 0.12; }
+.mock-photo-top { position: absolute; top: 8px; left: 8px; right: 8px; display: flex; justify-content: space-between; align-items: flex-start; }
+.mock-tag-pink { background: #FFD6EA; color: #CC0F75; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 999px; }
+.mock-tag-amber { background: #FEF3C7; color: #92400E; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 999px; }
+.mock-ph-right { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
+.mock-time { background: rgba(0,0,0,0.45); color: white; font-size: 10px; font-weight: 500; padding: 2px 7px; border-radius: 999px; }
+.mock-heart { width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.85); display: flex; align-items: center; justify-content: center; font-size: 13px; }
+.match-pill {
+  position: absolute; bottom: 8px; right: 8px;
+  background: #E91E8C; color: white; font-size: 11px; font-weight: 800;
+  padding: 3px 9px; border-radius: 999px;
+}
+.mock-card-body { padding: 12px; }
+.mock-price { font-size: 18px; font-weight: 800; color: #1E1E1E; }
+.mock-addr  { font-size: 12px; color: #6B6B6B; margin-top: 2px; }
+.mock-stats { display: flex; gap: 12px; margin-top: 8px; }
+.mock-stat  { font-size: 12px; color: #6B6B6B; }
+.mock-flags { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+.badge-g { background: #D1FAE5; color: #065F46; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 999px; }
+.badge-p { background: #FFD6EA; color: #CC0F75; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 999px; }
+.badge-r { background: #FEE2E2; color: #991B1B; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 999px; }
+
+/* Bottom nav */
+.mock-bnav {
+  background: white; border-top: 1px solid #E5E5E5;
+  padding: 8px 0 20px; display: grid; grid-template-columns: repeat(5, 1fr);
+}
+.mock-bnav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 5px 0; position: relative; }
+.mock-bnav-icon { font-size: 20px; }
+.mock-bnav-lbl  { font-size: 9px; font-weight: 600; color: #9C9C9C; }
+.mock-bnav-item.active .mock-bnav-lbl { color: #E91E8C; }
+.mock-bnav-badge {
+  position: absolute; top: 3px; right: 16px;
+  background: #EF4444; color: white; font-size: 8px; font-weight: 700;
+  min-width: 14px; height: 14px; padding: 0 2px;
+  border-radius: 999px; border: 1.5px solid white;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ── ANNOTATION PINS ── */
+.pin {
+  position: absolute;
+  width: 22px; height: 22px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 800; color: white;
+  border: 2.5px solid white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.45);
+  cursor: pointer; z-index: 100;
+  transition: transform 0.15s ease;
+}
+.pin:hover { transform: scale(1.35); z-index: 200; }
+.pin.design { border-radius: 50%; }
+.pin.dev    { border-radius: 4px; }
+.pin.high   { background: #DC2626; }
+.pin.medium { background: #EA580C; }
+.pin.low    { background: #D97706; }
+
+/* Tooltips */
+.pin-tooltip {
+  display: none; position: absolute; top: -4px; left: 28px;
+  background: #1e293b; color: white; font-size: 11px; font-weight: 500;
+  padding: 6px 10px; border-radius: 6px; white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 300; line-height: 1.4;
+  pointer-events: none;
+}
+.pin-tooltip.left { left: auto; right: 28px; }
+.pin:hover .pin-tooltip { display: block; }
+.tt-criterion { font-size: 9px; color: rgba(255,255,255,0.6); display: block; margin-top: 2px; }
+.tt-owner { font-size: 9px; font-weight: 700; display: block; margin-top: 1px; }
+
+/* ── RIGHT: ISSUES PANEL ── */
+.right-panel { flex: 1; min-width: 0; }
+.rp-title {
+  font-size: 16px; font-weight: 700; color: #1e293b;
+  margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+}
+.rp-screen-tag {
+  background: #E2E8F0; color: #475569; font-size: 11px; font-weight: 600;
+  padding: 3px 9px; border-radius: 999px;
+}
+
+/* Accordion */
+.accordion { margin-bottom: 16px; border-radius: 12px; overflow: hidden; border: 1px solid #E2E8F0; }
+.acc-header {
+  width: 100%; display: flex; align-items: center; gap: 10px;
+  padding: 14px 16px; cursor: pointer; border: none; text-align: left;
+  font-family: inherit; transition: background 0.15s;
+}
+.acc-header:hover { filter: brightness(0.97); }
+.acc-header.design { background: #FFF7ED; border-bottom: 1px solid #FED7AA; }
+.acc-header.dev    { background: #EFF6FF; border-bottom: 1px solid #BFDBFE; }
+.acc-icon  { font-size: 18px; }
+.acc-title { font-size: 15px; font-weight: 700; color: #1e293b; flex: 1; }
+.acc-count {
+  font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 999px;
+}
+.acc-header.design .acc-count { background: #FFEDD5; color: #C2410C; }
+.acc-header.dev    .acc-count { background: #DBEAFE; color: #1D4ED8; }
+.acc-chevron { font-size: 14px; color: #94A3B8; font-weight: 700; }
+.acc-subtitle {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 6px 16px 0; background: white;
+}
+.acc-subtitle.design { color: #C2410C; background: #FFF7ED; border-bottom: 1px solid #FED7AA; padding-bottom: 6px; }
+.acc-subtitle.dev    { color: #1D4ED8; background: #EFF6FF; border-bottom: 1px solid #BFDBFE; padding-bottom: 6px; }
+.acc-body { background: white; padding: 14px; display: flex; flex-direction: column; gap: 14px; }
+
+/* Issue card */
+.issue-card {
+  background: white; border-radius: 10px; border: 1px solid #E2E8F0;
+  border-left-width: 4px; padding: 14px 16px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+.issue-card.high   { border-left-color: #DC2626; }
+.issue-card.medium { border-left-color: #EA580C; }
+.issue-card.low    { border-left-color: #D97706; }
+
+.ic-header { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 9px; }
+.ic-num {
+  width: 22px; height: 22px; display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 800; color: white; flex-shrink: 0;
+}
+.ic-num.design { border-radius: 50%; }
+.ic-num.dev    { border-radius: 4px; }
+.ic-num.high   { background: #DC2626; }
+.ic-num.medium { background: #EA580C; }
+.ic-num.low    { background: #D97706; }
+.ic-title { font-size: 14px; font-weight: 700; color: #1e293b; flex: 1; }
+.wcag-badge {
+  padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600;
+  background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE;
+}
+.prio-badge {
+  padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700;
+}
+.prio-badge.high   { background: #FEE2E2; color: #991B1B; }
+.prio-badge.medium { background: #FFEDD5; color: #C2410C; }
+.prio-badge.low    { background: #FEF3C7; color: #92400E; }
+.owner-badge {
+  padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700;
+  background: #F8FAFC; color: #475569; border: 1px solid #E2E8F0;
+}
+
+.ic-desc { font-size: 13px; line-height: 1.6; color: #475569; margin-bottom: 10px; }
+.ic-fix {
+  background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 8px;
+  padding: 10px 12px; margin-bottom: 8px;
+}
+.ic-fix-label { font-size: 10px; font-weight: 700; color: #166534; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 5px; }
+.ic-fix-text  { font-size: 12px; color: #166534; line-height: 1.55; }
+.ic-fix code  { background: #DCFCE7; border-radius: 3px; padding: 1px 4px; font-size: 11px; font-family: monospace; }
+.ic-wcag-ref  { font-size: 11px; color: #94A3B8; font-style: italic; }
+</style>
+</head>
+<body>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div class="ph-left">
+    <h1>ADA Accessibility Audit — Scout Home Feed v2</h1>
+    <p>Screen 2 of 6 · Pink/Blue design system · Source code analysis</p>
+  </div>
+  <div class="ph-badges">
+    <span class="ph-badge ph-total">11 Issues Found</span>
+    <span class="ph-hint">Hover pins for quick preview</span>
+  </div>
+</div>
+
+<!-- SUMMARY BAR -->
+<div class="summary-bar">
+  <span class="sb-item"><span class="sb-dot" style="background:#DC2626"></span> 4 High</span>
+  <span class="sb-sep">·</span>
+  <span class="sb-item"><span class="sb-dot" style="background:#EA580C"></span> 5 Medium</span>
+  <span class="sb-sep">·</span>
+  <span class="sb-item"><span class="sb-dot" style="background:#D97706"></span> 2 Low</span>
+  <span class="sb-sep">|</span>
+  <span class="sb-item"><span class="sb-dot" style="background:#C2410C"></span> 🎨 5 Design Issues</span>
+  <span class="sb-sep">·</span>
+  <span class="sb-item"><span class="sb-sq" style="background:#1D4ED8"></span> 💻 6 Development Issues</span>
+</div>
+
+<div class="layout">
+
+  <!-- LEFT PANEL — PHONE MOCKUP -->
+  <div class="left-panel">
+    <div class="phone-wrap-outer">
+      <div class="phone-shell">
+        <div id="screenWrap">
+
+          <!-- Status bar -->
+          <div class="mock-status">
+            <span class="time">9:41</span>
+            <div class="icons"><span>▓▓▓▓</span><span>⊟</span><span>▓</span></div>
+          </div>
+
+          <!-- Feed top -->
+          <div class="mock-feed-top">
+            <div class="mock-top-row">
+              <div class="mock-logo" id="logo">scout<span>.</span></div>
+              <div class="mock-actions">
+                <div class="mock-notif-btn" id="notifBtn">
+                  🔔
+                  <div class="mock-notif-dot" id="notifDot"></div>
+                </div>
+                <div class="mock-avatar" id="avatarBtn">MC</div>
+              </div>
+            </div>
+            <div class="mock-search" id="searchBar">
+              <span>🔍</span>
+              <span id="searchText">Search by vibe, area, or feature...</span>
+            </div>
+            <div class="mock-alert-strip" id="alertStrip">
+              <div class="mock-pulse"></div>
+              <p><strong>2 new matches</strong> in 78701 — last 90 minutes</p>
+            </div>
+          </div>
+
+          <!-- Feed body -->
+          <div class="mock-feed-body">
+            <div class="mock-sec-row">
+              <span class="mock-sec-title">For you</span>
+              <span class="mock-sec-link">Shortlist (3) →</span>
+            </div>
+            <!-- Filter chips -->
+            <div class="mock-chips" id="filterChips">
+              <div class="mock-chip active" id="chip-all">All matches</div>
+              <div class="mock-chip" id="chip-listed">⚡ Just listed</div>
+              <div class="mock-chip" id="chip-price">📉 Price cut</div>
+              <div class="mock-chip" id="chip-near">🗺 Near me</div>
+            </div>
+
+            <!-- Card 1 -->
+            <div class="mock-pcard">
+              <div class="mock-photo ph1" id="card1photo">
+                <div class="mock-house">🏠</div>
+                <div class="mock-photo-ovl"></div>
+                <div class="mock-photo-top">
+                  <span class="mock-tag-pink" id="justListedBadge">⚡ Just listed</span>
+                  <div class="mock-ph-right">
+                    <span class="mock-time">2h ago</span>
+                    <div class="mock-heart" id="heart1">🤍</div>
+                  </div>
+                </div>
+                <div class="match-pill" id="matchPill1">92 Match</div>
+              </div>
+              <div class="mock-card-body">
+                <div class="mock-price">$529,000</div>
+                <div class="mock-addr">1847 Cedar Hills Blvd, Austin TX</div>
+                <div class="mock-stats">
+                  <span class="mock-stat">🛏 3 bd</span>
+                  <span class="mock-stat">🚿 2 ba</span>
+                  <span class="mock-stat">📐 1,847 sqft</span>
+                </div>
+                <div class="mock-flags">
+                  <span class="badge-g" id="photosBadge1">✓ Photos clean</span>
+                  <span class="badge-p" id="urgentBadge1">↑ Seller urgent</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 2 (partial) -->
+            <div class="mock-pcard">
+              <div class="mock-photo ph2" id="card2photo">
+                <div class="mock-house">🏡</div>
+                <div class="mock-photo-ovl"></div>
+                <div class="mock-photo-top">
+                  <span class="mock-tag-amber" id="priceCutBadge">📉 Price cut</span>
+                  <div class="mock-ph-right">
+                    <span class="mock-time">8 days</span>
+                    <div class="mock-heart" id="heart2">🤍</div>
+                  </div>
+                </div>
+                <div class="match-pill" id="matchPill2">87 Match</div>
+              </div>
+              <div class="mock-card-body" id="card2body">
+                <div class="mock-price">$475,000 <span style="font-size:11px;color:#9C9C9C;text-decoration:line-through">$495k</span></div>
+                <div class="mock-addr">3210 S Lamar Blvd #4, Austin TX</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom nav -->
+          <div class="mock-bnav">
+            <div class="mock-bnav-item active" id="bnav-home"><span class="mock-bnav-icon">🏠</span><span class="mock-bnav-lbl" style="color:#E91E8C">Home</span></div>
+            <div class="mock-bnav-item" id="bnav-vibe"><span class="mock-bnav-icon">✨</span><span class="mock-bnav-lbl">Vibe</span></div>
+            <div class="mock-bnav-item" id="bnav-alerts">
+              <span class="mock-bnav-icon">🔔</span>
+              <span class="mock-bnav-lbl">Alerts</span>
+              <span class="mock-bnav-badge" id="bnavBadge">2</span>
+            </div>
+            <div class="mock-bnav-item" id="bnav-shortlist"><span class="mock-bnav-icon">🔖</span><span class="mock-bnav-lbl">Shortlist</span></div>
+            <div class="mock-bnav-item" id="bnav-profile"><span class="mock-bnav-icon">👤</span><span class="mock-bnav-lbl">Profile</span></div>
+          </div>
+
+          <!-- ANNOTATION PINS (positioned by JS) -->
+          <!-- DESIGN ISSUES: circles -->
+          <div class="pin design high" id="pin1" style="position:absolute">
+            1<div class="pin-tooltip right">
+              Color contrast — feed header text<br>
+              <span class="tt-criterion">WCAG 1.4.3 Contrast Minimum</span>
+              <span class="tt-owner">🎨 Design Issue</span>
+            </div>
+          </div>
+          <div class="pin design medium" id="pin2" style="position:absolute">
+            2<div class="pin-tooltip right">
+              Touch target — notification bell<br>
+              <span class="tt-criterion">WCAG 2.5.5 Target Size</span>
+              <span class="tt-owner">🎨 Design Issue</span>
+            </div>
+          </div>
+          <div class="pin design high" id="pin3" style="position:absolute">
+            3<div class="pin-tooltip right">
+              Color-only status badges<br>
+              <span class="tt-criterion">WCAG 1.4.1 Use of Color</span>
+              <span class="tt-owner">🎨 Design Issue</span>
+            </div>
+          </div>
+          <div class="pin design medium" id="pin4" style="position:absolute">
+            4<div class="pin-tooltip right">
+              Missing focus ring design<br>
+              <span class="tt-criterion">WCAG 2.4.7 Focus Visible</span>
+              <span class="tt-owner">🎨 Design Issue</span>
+            </div>
+          </div>
+          <div class="pin design low" id="pin5" style="position:absolute">
+            5<div class="pin-tooltip left">
+              Match score contrast on photo<br>
+              <span class="tt-criterion">WCAG 1.4.3 Contrast Minimum</span>
+              <span class="tt-owner">🎨 Design Issue</span>
+            </div>
+          </div>
+
+          <!-- DEV ISSUES: rounded squares -->
+          <div class="pin dev high" id="pin6" style="position:absolute">
+            6<div class="pin-tooltip right">
+              Alert strip missing live region<br>
+              <span class="tt-criterion">WCAG 4.1.3 Status Messages</span>
+              <span class="tt-owner">💻 Dev Issue</span>
+            </div>
+          </div>
+          <div class="pin dev high" id="pin7" style="position:absolute">
+            7<div class="pin-tooltip right">
+              Avatar has no accessible label<br>
+              <span class="tt-criterion">WCAG 1.1.1 Non-text Content</span>
+              <span class="tt-owner">💻 Dev Issue</span>
+            </div>
+          </div>
+          <div class="pin dev high" id="pin8" style="position:absolute">
+            8<div class="pin-tooltip right">
+              Filter chips missing radiogroup role<br>
+              <span class="tt-criterion">WCAG 4.1.2 Name, Role, Value</span>
+              <span class="tt-owner">💻 Dev Issue</span>
+            </div>
+          </div>
+          <div class="pin dev medium" id="pin9" style="position:absolute">
+            9<div class="pin-tooltip left">
+              Notification badge text-only<br>
+              <span class="tt-criterion">WCAG 1.1.1 Non-text Content</span>
+              <span class="tt-owner">💻 Dev Issue</span>
+            </div>
+          </div>
+          <div class="pin dev medium" id="pin10" style="position:absolute">
+            10<div class="pin-tooltip left">
+              Heart/save button context missing<br>
+              <span class="tt-criterion">WCAG 2.4.6 Headings and Labels</span>
+              <span class="tt-owner">💻 Dev Issue</span>
+            </div>
+          </div>
+          <div class="pin dev low" id="pin11" style="position:absolute">
+            11<div class="pin-tooltip right">
+              Bottom nav missing aria-current<br>
+              <span class="tt-criterion">WCAG 4.1.2 Name, Role, Value</span>
+              <span class="tt-owner">💻 Dev Issue</span>
+            </div>
+          </div>
+
+        </div><!-- /screenWrap -->
+      </div><!-- /phone-shell -->
+    </div>
+  </div><!-- /left-panel -->
+
+  <!-- RIGHT PANEL — ISSUE ACCORDIONS -->
+  <div class="right-panel">
+    <div class="rp-title">
+      Issues <span class="rp-screen-tag">Screen 2 — Home Feed</span>
+    </div>
+
+    <!-- ACCORDION 1: DESIGN -->
+    <div class="accordion" id="acc-design">
+      <button class="acc-header design" onclick="toggleAcc('design')" aria-expanded="true">
+        <span class="acc-icon">🎨</span>
+        <span class="acc-title">Design Issues</span>
+        <span class="acc-count">5 issues</span>
+        <span class="acc-chevron" id="chev-design">▾</span>
+      </button>
+      <div class="acc-subtitle design">Fix in Figma before handoff</div>
+      <div class="acc-body" id="body-design">
+
+        <!-- D1 -->
+        <div class="issue-card high">
+          <div class="ic-header">
+            <div class="ic-num design high">1</div>
+            <span class="ic-title">Search placeholder text — insufficient contrast</span>
+            <span class="wcag-badge">1.4.3</span>
+            <span class="prio-badge high">High</span>
+            <span class="owner-badge">🎨 Design</span>
+          </div>
+          <div class="ic-desc">The search bar placeholder "Search by vibe, area, or feature..." renders at <code>rgba(255,255,255,0.45)</code> (~2.3:1) against the blue <code>#1D3461</code> header. WCAG requires 4.5:1 for normal text. Users with low vision cannot read the search affordance.</div>
+          <div class="ic-fix">
+            <div class="ic-fix-label">Fix</div>
+            <div class="ic-fix-text">Increase placeholder opacity to at least <code>rgba(255,255,255,0.72)</code> (~4.6:1). In Figma update the placeholder token from <code>white/45%</code> → <code>white/72%</code>.</div>
+          </div>
+          <div class="ic-wcag-ref">WCAG 1.4.3 – Contrast Minimum (AA)</div>
+        </div>
+
+        <!-- D2 -->
+        <div class="issue-card medium">
+          <div class="ic-header">
+            <div class="ic-num design medium">2</div>
+            <span class="ic-title">Notification bell — touch target too small</span>
+            <span class="wcag-badge">2.5.5</span>
+            <span class="prio-badge medium">Medium</span>
+            <span class="owner-badge">🎨 Design</span>
+          </div>
+          <div class="ic-desc">The notification button is designed at 36×36px. WCAG 2.5.5 requires 44×44px minimum for pointer targets. iOS HIG also mandates 44pt. Users with motor impairments will frequently mis-tap and land on adjacent avatar.</div>
+          <div class="ic-fix">
+            <div class="ic-fix-label">Fix</div>
+            <div class="ic-fix-text">Increase the component frame in Figma to 44×44px. The visible icon can stay 36px — pad the invisible hit area. Alternatively increase the icon and button to 44px.</div>
+          </div>
+          <div class="ic-wcag-ref">WCAG 2.5.5 – Target Size (AA) / iOS HIG 44pt minimum</div>
+        </div>
+
+        <!-- D3 -->
+        <div class="issue-card high">
+          <div class="ic-header">
+            <div class="ic-num design high">3</div>
+            <span class="ic-title">Status badges convey meaning through color alone</span>
+            <span class="wcag-badge">1.4.1</span>
+            <span class="prio-badge high">High</span>
+            <span class="owner-badge">🎨 Design</span>
+          </div>
+          <div class="ic-desc">The "Photos clean" (green), "Seller urgent" (pink), and "AI flag" (red) badges in the property cards use only color to signal meaning. Users who are color-blind or using grayscale display cannot distinguish "Seller urgent" from "Photos clean".</div>
+          <div class="ic-fix">
+            <div class="ic-fix-label">Fix</div>
+            <div class="ic-fix-text">Each badge already has an emoji (✓, ↑, ⚠️) — good start. Ensure the emoji is never removed in edge cases. Add a distinct text prefix per type in the design spec (e.g. "Good · Photos clean", "Alert · Seller urgent") or use distinct icon shapes rather than relying only on emoji color.</div>
+          </div>
+          <div class="ic-wcag-ref">WCAG 1.4.1 – Use of Color (A)</div>
+        </div>
+
+        <!-- D4 -->
+        <div class="issue-card medium">
+          <div class="ic-header">
+            <div class="ic-num design medium">4</div>
+            <span class="ic-title">No focus ring style defined for interactive elements</span>
+            <span class="wcag-badge">2.4.7</span>
+            <span class="prio-badge medium">Medium</span>
+            <span class="owner-badge">🎨 Design</span>
+          </div>
+          <div class="ic-desc">The design system defines no `:focus-visible` state for chips, property cards, nav items, or buttons. Without a designed focus ring, developers default to the browser outline (inconsistent) or remove it entirely. Keyboard and switch-access users cannot see where they are on screen.</div>
+          <div class="ic-fix">
+            <div class="ic-fix-label">Fix</div>
+            <div class="ic-fix-text">Add a Focus/Selected variant to every interactive component in Figma: <code>outline: 3px solid #E91E8C; outline-offset: 2px</code> (use the Brand/Pink token). Document it in the design system page.</div>
+          </div>
+          <div class="ic-wcag-ref">WCAG 2.4.7 – Focus Visible (AA)</div>
+        </div>
+
+        <!-- D5 -->
+        <div class="issue-card low">
+          <div class="ic-header">
+            <div class="ic-num design low">5</div>
+            <span class="ic-title">Match score pill — low contrast on photo overlay</span>
+            <span class="wcag-badge">1.4.3</span>
+            <span class="prio-badge low">Low</span>
+            <span class="owner-badge">🎨 Design</span>
+          </div>
+          <div class="ic-desc">The "92 Match" pill sits over the dark gradient overlay on the property photo. White text on the pink (#E91E8C) pill reads at ~3.9:1 — below 4.5:1 for normal-weight text at 11px. Slightly smaller or thinner type will fail.</div>
+          <div class="ic-fix">
+            <div class="ic-fix-label">Fix</div>
+            <div class="ic-fix-text">Use <code>#CC0F75</code> (Brand/Pink Mid) for the pill background instead of <code>#E91E8C</code>, giving white text a 4.8:1 ratio. Or use <code>font-weight: 800</code> (large bold text, 3:1 threshold).</div>
+          </div>
+          <div class="ic-wcag-ref">WCAG 1.4.3 – Contrast Minimum (AA)</div>
+        </div>
+
+      </div>
+    </div><!-- /acc-design -->
+
+    <!-- ACCORDION 2: DEV -->
+    <div class="accordion" id="acc-dev">
+      <button class="acc-header dev" onclick="toggleAcc('dev')" aria-expanded="true">
+        <span class="acc-icon">💻</span>
+        <span class="acc-title">Development Issues</span>
+        <span class="acc-count">6 issues</span>
+        <span class="acc-chevron" id="chev-dev">▾</span>
+      </button>
+      <div class="acc-subtitle dev">Fix in code during implementation</div>
+      <div class="acc-body" id="body-dev">
+
+        <!-- Dev 6 -->
+        <div class="issue-card high">
+          <div class="ic-header">
+            <div class="ic-num dev high">6</div>
+            <span class="ic-title">Live alert strip not announced to screen readers</span>
+            <span class="wcag-badge">4.1.3</span>
+            <span class="prio-badge high">High</span>
+            <span class="owner-badge">💻 Dev</span>
+          </div>
+          <div class="ic-desc">The "2 new matches in 78701" strip updates dynamically when new listings arrive, but lacks <code>role="status"</code> or <code>aria-live</code>. VoiceOver/TalkBack users will never hear this real-time alert — defeating the core JTBD J1 (be first to know) for blind users.</div>
+          <div class="ic-fix">
+            <div class="ic-fix-label">Fix</div>
+            <div class="ic-fix-text"><code>&lt;div role="status" aria-live="polite" aria-atomic="true"&gt;</code> on the alert strip. Use <code>aria-live="assertive"</code> if the alert is time-critical (a new listing appearing in a competitive market typically is).</div>
+          </div>
+          <div class="ic-wcag-ref">WCAG 4.1.3 – Status Messages (AA)</div>
+        </div>
+
+        <!-- Dev 7 -->
+        <div class="issue-card high">
+          <div class="ic-header">
+            <div class="ic-num dev high">7</div>
+            <span class="ic-title">Avatar button has no accessible name</span>
+            <span class="wcag-badge">1.1.1</span>
+            <span class="prio-badge high">High</span>
+            <span class="owner-badge">💻 Dev</span>
+          </div>
+          <div class="ic-desc">The "MC" avatar renders as a decorative div without a button role or label. Screen readers announce it as unlabeled interactive element (or skip it). "MC" has no context — is it a menu, profile link, or logout button?</div>
+          <div class="ic-fix">
+            <div class="ic-fix-label">Fix</div>
+            <div class="ic-fix-text"><code>&lt;button aria-label="Maya Chen — open profile menu"&gt;MC&lt;/button&gt;</code>. Use <code>aria-label</code> not <code>title</code> — title is not reliably announced on mobile screen readers.</div>
+          </div>
+          <div class="ic-wcag-ref">WCAG 1.1.1 – Non-text Content (A) + WCAG 4.1.2 – Name, Role, Value (A)</div>
+        </div>
+
+        <!-- Dev 8 -->
+        <div class="issue-card high">
+          <div class="ic-header">
+            <div class="ic-num dev high">8</div>
+            <span class="ic-title">Filter chips have no accessible role or grouping</span>
+            <span class="wcag-badge">4.1.2</span>
+            <span class="prio-badge high">High</span>
+            <span class="owner-badge">💻 Dev</span>
+          </div>
+          <div class="ic-desc">The filter chips (All matches / Just listed / Price cut / Near me) are <code>&lt;div&gt;</code> elements. They behave as a single-select radio group but have no role, no keyboard interaction, and no announcement of selected state. Screen reader users cannot operate the filter.</div>
+          <div class="ic-fix">
+            <div class="ic-fix-label">Fix</div>
+            <div class="ic-fix-text">Wrap in <code>&lt;div role="radiogroup" aria-label="Filter listings"&gt;</code>. Each chip: <code>&lt;button role="radio" aria-checked="true/false"&gt;</code>. Active chip: <code>aria-checked="true"</code>. Handle arrow-key navigation per ARIA radio group pattern.</div>
+          </div>
+          <div class="ic-wcag-ref">WCAG 4.1.2 – Name, Role, Value (A)</div>
+        </div>
+
+        <!-- Dev 9 -->
+        <div class="issue-card medium">
+          <div class="ic-header">
+            <div class="ic-num dev medium">9</div>
+            <span class="ic-title">Notification badge "2" has no text alternative</span>
+            <span class="wcag-badge">1.1.1</span>
+            <span class="prio-badge medium">Medium</span>
+            <span class="owner-badge">💻 Dev</span>
+          </div>
+          <div class="ic-desc">The red badge showing "2" on the Alerts nav item and notification bell is a styled div. Screen readers read it as "2" without context — "2 what?" Blind users miss that there are 2 unread alerts.</div>
+          <div class="ic-fix">
+            <div class="ic-fix-label">Fix</div>
+            <div class="ic-fix-text">On the nav bell: <code>&lt;button aria-label="Notifications, 2 unread"&gt;</code>. Hide the visual badge from screen readers: <code>&lt;span aria-hidden="true"&gt;2&lt;/span&gt;</code> and add a visually-hidden sibling: <code>&lt;span class="sr-only"&gt;, 2 unread&lt;/span&gt;</code>.</div>
+          </div>
+          <div class="ic-wcag-ref">WCAG 1.1.1 – Non-text Content (A)</div>
+        </div>
+
+        <!-- Dev 10 -->
+        <div class="issue-card medium">
+          <div class="ic-header">
+            <div class="ic-num dev medium">10</div>
+            <span class="ic-title">Heart/save buttons lack property context in accessible name</span>
+            <span class="wcag-badge">2.4.6</span>
+            <span class="prio-badge medium">Medium</span>
+            <span class="owner-badge">💻 Dev</span>
+          </div>
+          <div class="ic-desc">Both save buttons announce as "🤍" (or "white heart"). Without the property address in the label, a screen reader user navigating by buttons hears "Heart, Heart" and cannot distinguish which listing they're saving.</div>
+          <div class="ic-fix">
+            <div class="ic-fix-label">Fix</div>
+            <div class="ic-fix-text"><code>&lt;button aria-label="Save 1847 Cedar Hills Blvd" aria-pressed="false"&gt;</code>. Toggle to <code>aria-label="Unsave 1847 Cedar Hills Blvd"</code> and <code>aria-pressed="true"</code> when saved. The emoji content can stay; add <code>aria-hidden="true"</code> to the emoji span.</div>
+          </div>
+          <div class="ic-wcag-ref">WCAG 2.4.6 – Headings and Labels (AA) + WCAG 4.1.2 – Name, Role, Value (A)</div>
+        </div>
+
+        <!-- Dev 11 -->
+        <div class="issue-card low">
+          <div class="ic-header">
+            <div class="ic-num dev low">11</div>
+            <span class="ic-title">Bottom nav active item missing aria-current</span>
+            <span class="wcag-badge">4.1.2</span>
+            <span class="prio-badge low">Low</span>
+            <span class="owner-badge">💻 Dev</span>
+          </div>
+          <div class="ic-desc">The "Home" tab is visually active (pink color + underline) but has no <code>aria-current="page"</code>. Screen readers cannot tell which tab is currently selected without audible confirmation — users may double-navigate trying to find where they are.</div>
+          <div class="ic-fix">
+            <div class="ic-fix-label">Fix</div>
+            <div class="ic-fix-text">Add <code>aria-current="page"</code> to the active nav item. In React/Vue, bind it dynamically: <code>aria-current={currentRoute === 'home' ? 'page' : undefined}</code>. Wrap the nav in <code>&lt;nav aria-label="Main navigation"&gt;</code>.</div>
+          </div>
+          <div class="ic-wcag-ref">WCAG 4.1.2 – Name, Role, Value (A)</div>
+        </div>
+
+      </div>
+    </div><!-- /acc-dev -->
+
+  </div><!-- /right-panel -->
+</div><!-- /layout -->
+
+<script>
+// ── ACCORDION TOGGLE ──
+function toggleAcc(id) {
+  const body = document.getElementById('body-' + id);
+  const chev = document.getElementById('chev-' + id);
+  const btn  = document.querySelector('#acc-' + id + ' .acc-header');
+  const open = body.style.display !== 'none' && body.style.display !== '';
+  body.style.display = open ? 'none' : 'block';
+  chev.textContent   = open ? '▸' : '▾';
+  btn.setAttribute('aria-expanded', String(!open));
+}
+
+// ── PIN PLACEMENT ──
+function positionAll() {
+  const wrap = document.getElementById('screenWrap');
+  if (!wrap) return;
+  const wR = wrap.getBoundingClientRect();
+
+  function place(pinId, targetId, ax, ay) {
+    const target = document.getElementById(targetId);
+    const pin    = document.getElementById(pinId);
+    if (!target || !pin) return;
+    const tR = target.getBoundingClientRect();
+    pin.style.left = (tR.left - wR.left + tR.width  * ax - 11) + 'px';
+    pin.style.top  = (tR.top  - wR.top  + tR.height * ay - 11) + 'px';
+  }
+
+  // Design issues (circles)
+  place('pin1',  'searchText',     0.5,  0.5);  // 1: search placeholder contrast
+  place('pin2',  'notifBtn',       0.5,  0.5);  // 2: notif bell size
+  place('pin3',  'urgentBadge1',   0.5,  0.5);  // 3: color-only badges
+  place('pin4',  'filterChips',    0.2,  0.5);  // 4: focus ring
+  place('pin5',  'matchPill1',     0.5,  0.5);  // 5: match pill contrast
+
+  // Dev issues (squares)
+  place('pin6',  'alertStrip',     0.5,  0.5);  // 6: live region
+  place('pin7',  'avatarBtn',      0.5,  0.5);  // 7: avatar label
+  place('pin8',  'chip-listed',    0.5,  0.5);  // 8: chip roles
+  place('pin9',  'bnavBadge',      0.5,  0.5);  // 9: badge text alt
+  place('pin10', 'heart1',         0.5,  0.5);  // 10: heart context
+  place('pin11', 'bnav-home',      0.5,  0.5);  // 11: aria-current
+}
+
+window.addEventListener('load', positionAll);
+window.addEventListener('resize', positionAll);
+setTimeout(positionAll, 300);
+setTimeout(positionAll, 900);
+</script>
+
+</body>
+</html>
