@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scout — App Prototype v2</title>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+<style>
+:root {
+  --pink:       #E91E8C;
+  --pink-mid:   #CC0F75;
+  --pink-light: #FFD6EA;
+  --pink-pale:  #FFF0F7;
+  --blue:       #1D3461;
+  --blue-700:   #132342;
+  --dark:       #1E1E1E;
+  --gray-600:   #4B5563;
+  --gray-500:   #6B7280;
+  --gray-400:   #9CA3AF;
+  --gray-300:   #D1D5DB;
+  --gray-200:   #E5E7EB;
+  --gray-100:   #F3F4F6;
+  --gray-50:    #F9FAFB;
+  --white:      #FFFFFF;
+  --green:      #10B981;
+  --green-bg:   #D1FAE5;
+  --green-txt:  #065F46;
+  --amber-bg:   #FEF3C7;
+  --amber-txt:  #92400E;
+  --red:        #EF4444;
+  --red-bg:     #FEE2E2;
+  --red-txt:    #991B1B;
+  --bg:         #F3F4F6;
+  --border:     #E5E7EB;
+  --text:       #111827;
+  --text-2:     #374151;
+  --text-3:     #6B7280;
+  --text-4:     #9CA3AF;
+  --font: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+  --r-sm: 8px; --r-md: 12px; --r-lg: 16px; --r-xl: 20px; --r-full: 9999px;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --shadow-xl: 0 24px 48px rgba(0,0,0,0.22);
+}
+
+/* ── MATERIAL ICONS ── */
+.mi {
+  font-family: 'Material Icons Round';
+  font-weight: normal; font-style: normal;
+  font-size: 22px; line-height: 1;
+  letter-spacing: normal; text-transform: none;
+  display: inline-block; white-space: nowrap;
+  direction: ltr; -webkit-font-smoothing: antialiased;
+  font-feature-settings: 'liga'; vertical-align: middle;
+  user-select: none;
+}
+.mi.xs { font-size: 14px; }
+.mi.sm { font-size: 16px; }
+.mi.md { font-size: 20px; }
+.mi.lg { font-size: 24px; }
+.mi.xl { font-size: 28px; }
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  font-family: var(--font); font-size: 15px;
+  background: #18181B; color: var(--text);
+  min-height: 100vh; -webkit-font-smoothing: antialiased;
+}
+
+/* ── PROTO NAV ── */
+.proto-nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  background: #0F0F10; border-bottom: 1px solid rgba(255,255,255,0.07);
+  padding: 10px 20px; display: flex; align-items: center; gap: 6px;
+  overflow-x: auto;
+}
+.proto-nav::-webkit-scrollbar { display: none; }
+.proto-lbl { font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,0.25); white-space: nowrap; margin-right: 4px; }
+.pnav-sep { width: 1px; height: 16px; background: rgba(255,255,255,0.08); flex-shrink: 0; }
+.pnav-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 12px; border-radius: var(--r-full);
+  font-size: 12px; font-weight: 500; white-space: nowrap; flex-shrink: 0;
+  cursor: pointer; border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.45);
+  transition: all .15s;
+}
+.pnav-btn:hover { color: white; background: rgba(255,255,255,0.09); }
+.pnav-btn.active { background: var(--pink); border-color: var(--pink); color: white; font-weight: 700; }
+.pnav-n {
+  width: 15px; height: 15px; border-radius: 50%;
+  background: rgba(255,255,255,0.12); font-size: 9px;
+  display: inline-flex; align-items: center; justify-content: center; font-weight: 700;
+}
+.pnav-btn.active .pnav-n { background: rgba(255,255,255,0.2); }
+
+/* ── PHONE SHELL ── */
+.phone-wrap {
+  padding-top: 64px; min-height: 100vh;
+  display: flex; justify-content: center; align-items: flex-start; padding-bottom: 48px;
+}
+.phone {
+  width: 390px; min-height: 844px; background: var(--bg);
+  border-radius: 50px; overflow: hidden; margin-top: 20px;
+  box-shadow: 0 0 0 10px #2C2C2E, 0 0 0 11px rgba(255,255,255,0.05), var(--shadow-xl);
+  display: flex; flex-direction: column; position: relative;
+}
+
+/* Status bar */
+.sbar {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 13px 24px 7px; flex-shrink: 0;
+}
+.sbar.blue  { background: var(--blue); }
+.sbar.white { background: var(--white); }
+.sbar.clear { background: transparent; position: absolute; top: 0; left: 0; right: 0; z-index: 10; }
+.sbar-time  { font-size: 15px; font-weight: 600; }
+.sbar-icons { display: flex; align-items: center; gap: 4px; }
+.sbar.blue  .sbar-time, .sbar.blue  .sbar-icons { color: rgba(255,255,255,0.9); }
+.sbar.white .sbar-time, .sbar.white .sbar-icons { color: var(--dark); }
+.sbar.clear .sbar-time, .sbar.clear .sbar-icons { color: white; }
+.sig { display: flex; align-items: flex-end; gap: 1.5px; height: 11px; }
+.sig b { display: block; width: 3px; border-radius: 1px; background: currentColor; }
+.sig b:nth-child(1){height:3px} .sig b:nth-child(2){height:5px}
+.sig b:nth-child(3){height:8px} .sig b:nth-child(4){height:11px}
+.batt { display: flex; align-items: center; }
+.batt-b { width: 19px; height: 9px; border: 1.5px solid currentColor; border-radius: 2px; position: relative; opacity: .85; }
+.batt-f { position: absolute; top: 1.5px; left: 1.5px; bottom: 1.5px; width: 68%; background: currentColor; border-radius: 1px; }
+.batt-t { width: 2px; height: 5px; background: currentColor; border-radius: 0 1px 1px 0; opacity: .6; }
+
+/* Screens */
+.screen { display: none; flex-direction: column; flex: 1; overflow: hidden; }
+.screen.active { display: flex; animation: fadeIn .16s ease; }
+.scroll { flex: 1; overflow-y: auto; overflow-x: hidden; }
+.scroll::-webkit-scrollbar { display: none; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+
+/* Bottom nav */
+.bnav {
+  background: white; border-top: 1px solid var(--gray-200);
+  padding: 6px 0 22px; display: grid; grid-template-columns: repeat(5,1fr); flex-shrink: 0;
+}
+.bni {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 5px 0; cursor: pointer; color: var(--gray-400);
+  transition: color .15s; position: relative;
+}
+.bni:hover { color: var(--pink-mid); }
+.bni.on { color: var(--pink); }
+.bni-lbl { font-size: 10px; font-weight: 600; }
+.bni.on .bni-lbl { font-weight: 700; }
+.bni-bar { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 20px; height: 2px; background: var(--pink); border-radius: 2px; }
+.bni-dot {
+  position: absolute; top: 3px; right: 14px;
+  background: var(--red); color: white; font-size: 9px; font-weight: 700;
+  min-width: 15px; height: 15px; padding: 0 3px;
+  border-radius: 99px; border: 1.5px solid white;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ── SHARED ── */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 12px 20px; border-radius: var(--r-full); font-size: 15px; font-weight: 700;
+  cursor: pointer; border: none; transition: all .15s; font-family: var(--font);
+}
+.btn-pink    { background: var(--pink); color: white; }
+.btn-pink:hover { background: var(--pink-mid); }
+.btn-outline { background: transparent; color: var(--pink-mid); border: 1.5px solid var(--pink); }
+.btn-outline:hover { background: var(--pink-pale); }
+.btn-full { width: 100%; justify-content: center; }
+.btn-sm   { padding: 8px 16px; font-size: 13px; }
+.btn-lg   { padding: 15px 28px; font-size: 16px; }
+
+.badge {
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 3px 8px; border-radius: var(--r-full);
+  font-size: 11px; font-weight: 600; white-space: nowrap;
+}
+.badge .mi { font-size: 13px; }
+.b-pink  { background: var(--pink-light); color: var(--pink-mid); }
+.b-blue  { background: #DBEAFE; color: #1D4ED8; }
+.b-green { background: var(--green-bg); color: var(--green-txt); }
+.b-amber { background: var(--amber-bg); color: var(--amber-txt); }
+.b-red   { background: var(--red-bg);   color: var(--red-txt); }
+.b-gray  { background: var(--gray-100); color: var(--gray-500); }
+
+.chip-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 2px; }
+.chip-row::-webkit-scrollbar { display: none; }
+.chip {
+  flex-shrink: 0; display: inline-flex; align-items: center; gap: 4px;
+  padding: 6px 13px; border-radius: var(--r-full);
+  font-size: 13px; font-weight: 500; cursor: pointer;
+  border: 1.5px solid var(--gray-300); background: white; color: var(--text-2);
+  transition: all .15s; white-space: nowrap;
+}
+.chip.on { border-color: var(--pink); background: var(--pink-pale); color: var(--pink-mid); font-weight: 700; }
+.chip .mi { font-size: 15px; }
+
+.inp { width: 100%; padding: 12px 16px; border: 1.5px solid var(--gray-300); border-radius: var(--r-full); font-size: 15px; font-family: var(--font); color: var(--text); background: white; outline: none; transition: border-color .15s; }
+.inp:focus { border-color: var(--pink); }
+.inp-lbl { font-size: 11px; font-weight: 700; color: var(--text-3); margin-bottom: 5px; letter-spacing: .07em; text-transform: uppercase; }
+.row-h { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.row-h .title { font-size: 16px; font-weight: 700; }
+.row-h .link  { font-size: 13px; color: var(--pink-mid); font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 2px; }
+.mbar-r { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+.mbar-l { font-size: 13px; color: var(--text-3); width: 88px; flex-shrink: 0; }
+.mbar-t { flex: 1; height: 5px; background: var(--gray-100); border-radius: 99px; overflow: hidden; }
+.mbar-f { height: 100%; border-radius: 99px; background: var(--pink); }
+.mbar-v { font-size: 12px; font-weight: 700; color: var(--pink-mid); width: 28px; text-align: right; flex-shrink: 0; }
+.stat-r { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; }
+.stat-r + .stat-r { border-top: 1px solid var(--gray-100); }
+
+.back-btn {
+  display: inline-flex; align-items: center; gap: 3px;
+  font-size: 14px; font-weight: 600; cursor: pointer; padding: 6px 12px 6px 8px;
+  border-radius: var(--r-full); color: var(--pink-mid); background: rgba(233,30,140,0.06);
+  transition: background .15s;
+}
+.back-btn:hover { background: rgba(233,30,140,0.12); }
+.back-btn.wh { color: white; background: rgba(255,255,255,0.12); }
+
+/* ────────────────────────────────────────
+   SCREEN 1 — ONBOARDING
+──────────────────────────────────────── */
+.onb-top { background: var(--blue); padding: 20px 24px 26px; flex-shrink: 0; }
+.logo { font-size: 24px; font-weight: 800; color: white; letter-spacing: -.5px; }
+.logo span { color: var(--pink); }
+.steps { display: flex; gap: 6px; margin-top: 16px; }
+.step { flex: 1; height: 4px; border-radius: 99px; background: rgba(255,255,255,.15); }
+.step.done   { background: var(--pink); }
+.step.active { background: rgba(233,30,140,.45); }
+.step-meta { font-size: 12px; color: rgba(255,255,255,.4); margin-top: 8px; }
+.step-meta strong { color: rgba(255,255,255,.85); }
+.onb-body { padding: 22px 22px 14px; background: white; }
+.onb-q   { font-size: 21px; font-weight: 700; color: var(--text); line-height: 1.3; margin-bottom: 5px; }
+.onb-sub { font-size: 14px; color: var(--text-3); line-height: 1.55; margin-bottom: 20px; }
+.opts { display: flex; flex-direction: column; gap: 10px; }
+.opt {
+  display: flex; align-items: center; gap: 12px;
+  padding: 13px 15px; border-radius: var(--r-md);
+  border: 1.5px solid var(--border); cursor: pointer; background: white;
+  transition: all .15s;
+}
+.opt.on { border-color: var(--pink); background: var(--pink-pale); }
+.opt-chk {
+  width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--gray-300);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all .15s;
+}
+.opt.on .opt-chk { border-color: var(--pink); background: var(--pink); }
+.opt-chk .mi { font-size: 13px; color: transparent; }
+.opt.on .opt-chk .mi { color: white; }
+.opt-main { font-size: 15px; font-weight: 500; }
+.opt-hint { font-size: 12px; color: var(--text-4); margin-top: 1px; }
+.onb-foot { padding: 14px 22px 30px; background: white; border-top: 1px solid var(--border); flex-shrink: 0; }
+
+/* ────────────────────────────────────────
+   SCREEN 2 — HOME FEED
+──────────────────────────────────────── */
+
+/* Flat top bar — just logo + icons, no backgrounds */
+.feed-bar {
+  background: var(--blue); padding: 12px 20px 14px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.feed-bar .logo { font-size: 22px; }
+.feed-actions { display: flex; align-items: center; gap: 16px; }
+.flat-icon-btn {
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: rgba(255,255,255,.8); padding: 4px;
+  transition: color .15s; position: relative; background: none; border: none;
+}
+.flat-icon-btn:hover { color: white; }
+.flat-icon-btn .mi { font-size: 24px; }
+.icon-dot {
+  position: absolute; top: 3px; right: 3px; width: 7px; height: 7px;
+  border-radius: 50%; background: var(--pink); border: 1.5px solid var(--blue);
+}
+.avatar-flat {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--pink), var(--pink-mid));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; color: white; cursor: pointer;
+}
+
+/* Search + alert below the bar — white background */
+.feed-below-bar {
+  background: white; border-bottom: 1px solid var(--gray-200);
+  padding: 12px 16px 10px; flex-shrink: 0;
+}
+.search-bar {
+  display: flex; align-items: center; gap: 10px;
+  border: 1.5px solid var(--gray-300); border-radius: var(--r-full);
+  padding: 10px 16px; cursor: pointer; background: var(--gray-50);
+  transition: border-color .15s;
+}
+.search-bar:hover { border-color: var(--gray-400); }
+.search-bar .mi { font-size: 18px; color: var(--gray-400); }
+.search-bar span { font-size: 14px; color: var(--text-4); }
+.alert-strip {
+  margin-top: 8px; padding: 8px 12px; border-radius: var(--r-md);
+  background: var(--pink-pale); border: 1px solid var(--pink-light);
+  display: flex; align-items: center; gap: 8px;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.4)} }
+.pulse { width: 7px; height: 7px; border-radius: 50%; background: var(--pink); animation: pulse 2s infinite; flex-shrink: 0; }
+.alert-strip p { font-size: 13px; font-weight: 500; color: var(--pink-mid); }
+.alert-strip p strong { color: var(--pink); }
+
+/* Feed content */
+.feed-body { padding: 14px 14px 8px; background: var(--bg); }
+.chips-row { margin-bottom: 14px; }
+
+/* Property card */
+.pcard {
+  background: white; border-radius: var(--r-lg); border: 1px solid var(--border);
+  overflow: hidden; box-shadow: var(--shadow-sm); margin-bottom: 12px;
+  cursor: pointer; transition: box-shadow .15s, transform .15s;
+}
+.pcard:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+.pcard-img { height: 192px; position: relative; overflow: hidden; }
+.pcard-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pcard-img-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,.5)); }
+.pcard-top { position: absolute; top: 10px; left: 10px; right: 10px; display: flex; justify-content: space-between; align-items: flex-start; }
+.pcard-time { background: rgba(0,0,0,.45); color: white; font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: var(--r-full); }
+/* Flat heart — no background pill */
+.heart-flat {
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: white; padding: 4px;
+  transition: all .15s; background: none; border: none;
+  filter: drop-shadow(0 1px 3px rgba(0,0,0,.4));
+}
+.heart-flat:hover { transform: scale(1.15); }
+.heart-flat .mi { font-size: 22px; }
+.heart-flat.saved .mi { color: var(--red); }
+.match-pill { position: absolute; bottom: 10px; right: 10px; background: var(--pink); color: white; font-size: 12px; font-weight: 800; padding: 3px 10px; border-radius: var(--r-full); }
+.pcard-body { padding: 13px 14px 12px; }
+.pcard-price { font-size: 19px; font-weight: 800; color: var(--text); letter-spacing: -.3px; }
+.pcard-addr  { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+.pcard-stats { display: flex; gap: 12px; margin-top: 9px; }
+.pcard-stat  { font-size: 13px; color: var(--text-3); display: flex; align-items: center; gap: 3px; }
+.pcard-stat .mi { font-size: 15px; color: var(--gray-400); }
+.pcard-flags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 9px; }
+
+/* ────────────────────────────────────────
+   SCREEN 3 — PROPERTY BRIEF
+──────────────────────────────────────── */
+.hero { height: 260px; position: relative; overflow: hidden; flex-shrink: 0; }
+.hero img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.hero-ovl { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,.25) 0%, transparent 35%, rgba(0,0,0,.7) 100%); }
+.hero-top  { position: absolute; top: 54px; left: 16px; right: 16px; display: flex; justify-content: space-between; }
+.hero-bot  { position: absolute; bottom: 0; left: 0; right: 0; padding: 16px 20px; }
+.hero-price { font-size: 26px; font-weight: 800; color: white; letter-spacing: -.4px; }
+.hero-addr  { font-size: 13px; color: rgba(255,255,255,.8); margin-top: 2px; }
+.hero-stats { display: flex; gap: 14px; margin-top: 7px; }
+.hero-stat  { font-size: 13px; color: rgba(255,255,255,.85); display: flex; align-items: center; gap: 3px; }
+.hero-stat .mi { font-size: 15px; opacity: .8; }
+.prop-body { padding: 15px; background: var(--bg); }
+.ai-card { background: var(--blue); border-radius: var(--r-lg); padding: 15px 17px; margin-bottom: 13px; }
+.ai-label { font-size: 10px; font-weight: 700; color: rgba(255,255,255,.45); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 7px; display: flex; align-items: center; gap: 6px; }
+.ai-tag { background: var(--pink); color: white; font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 5px; }
+.ai-text { font-size: 13px; line-height: 1.6; color: rgba(255,255,255,.85); }
+.ai-flags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 9px; }
+.ai-badge { padding: 3px 9px; border-radius: var(--r-full); font-size: 11px; font-weight: 600; display: inline-flex; align-items: center; gap: 3px; }
+.ai-badge.green { background: rgba(16,185,105,.18); color: #6EE7B7; }
+.ai-badge.pink  { background: rgba(233,30,140,.18); color: var(--pink-light); }
+.ai-badge.gray  { background: rgba(255,255,255,.1); color: rgba(255,255,255,.6); }
+.ai-badge .mi { font-size: 13px; }
+.wcard { background: white; border-radius: var(--r-lg); border: 1px solid var(--border); padding: 15px; margin-bottom: 13px; box-shadow: var(--shadow-sm); }
+.wcard-title { font-size: 14px; font-weight: 700; margin-bottom: 11px; }
+.photo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+.photo-th { border-radius: var(--r-sm); overflow: hidden; aspect-ratio: 4/3; position: relative; }
+.photo-th img { width: 100%; height: 100%; object-fit: cover; }
+.photo-badge { position: absolute; bottom: 4px; left: 4px; font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 4px; }
+
+/* ────────────────────────────────────────
+   SCREEN 4 — LEVERAGE
+──────────────────────────────────────── */
+.lev-hero { background: var(--blue); padding: 18px 20px 20px; flex-shrink: 0; }
+.lev-tag  { font-size: 11px; font-weight: 700; color: rgba(255,255,255,.4); text-transform: uppercase; letter-spacing: .08em; }
+.lev-row  { display: flex; align-items: center; gap: 15px; margin-top: 14px; }
+.lev-ring {
+  width: 78px; height: 78px; border-radius: 50%;
+  border: 4px solid var(--pink); background: rgba(233,30,140,.1);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.lev-num { font-size: 28px; font-weight: 800; color: white; line-height: 1; }
+.lev-max { font-size: 10px; color: rgba(255,255,255,.45); }
+.lev-info .lev-lbl { font-size: 11px; color: rgba(255,255,255,.5); text-transform: uppercase; letter-spacing: .07em; }
+.lev-info .lev-v   { font-size: 18px; font-weight: 700; color: white; margin-top: 2px; }
+.lev-info .lev-sub { font-size: 12px; color: rgba(255,255,255,.6); margin-top: 1px; line-height: 1.4; }
+.urg-bar-wrap { margin-top: 14px; }
+.urg-bar-lbl { font-size: 11px; color: rgba(255,255,255,.45); margin-bottom: 6px; }
+.urg-bar { height: 7px; background: rgba(255,255,255,.1); border-radius: 99px; overflow: hidden; }
+.urg-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--pink-light), var(--pink)); }
+.urg-ends { display: flex; justify-content: space-between; font-size: 10px; color: rgba(255,255,255,.35); margin-top: 3px; }
+.lev-body { padding: 15px; background: var(--bg); }
+.dcard { background: white; border-radius: var(--r-lg); border: 1px solid var(--border); padding: 15px; margin-bottom: 11px; box-shadow: var(--shadow-sm); }
+.dcard h4 { font-size: 14px; font-weight: 700; margin-bottom: 11px; }
+.offer-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+.offer-cell { padding: 11px 8px; border-radius: var(--r-md); text-align: center; }
+.offer-cell.rec { background: var(--pink-pale); border: 1.5px solid var(--pink-light); }
+.offer-cell.neu { background: var(--gray-50); border: 1px solid var(--gray-200); }
+.offer-lbl { font-size: 10px; color: var(--text-3); margin-bottom: 3px; }
+.offer-cell.rec .offer-lbl { color: var(--pink-mid); }
+.offer-val { font-size: 15px; font-weight: 800; }
+.offer-cell.rec .offer-val { color: var(--pink); }
+
+/* ────────────────────────────────────────
+   SCREEN 5 — SHORTLIST
+──────────────────────────────────────── */
+.sl-head { background: white; border-bottom: 1px solid var(--gray-200); padding: 15px 20px; flex-shrink: 0; }
+.sl-tabs { display: flex; margin-top: 12px; border-bottom: 2px solid var(--gray-200); }
+.sl-tab { padding: 7px 16px; font-size: 14px; font-weight: 600; color: var(--text-3); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all .15s; }
+.sl-tab.on { color: var(--pink); border-color: var(--pink); }
+.cmp-strip {
+  background: var(--blue); padding: 10px 18px;
+  display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+}
+.cmp-strip p { font-size: 12px; color: rgba(255,255,255,.75); }
+.cmp-strip strong { color: var(--pink-light); }
+.sl-body { padding: 14px; background: var(--bg); }
+.slcard { background: white; border-radius: var(--r-lg); border: 1px solid var(--border); overflow: hidden; box-shadow: var(--shadow-sm); margin-bottom: 11px; display: flex; cursor: pointer; }
+.slcard-img { width: 96px; flex-shrink: 0; position: relative; }
+.slcard-img img { width: 100%; height: 100%; object-fit: cover; }
+.slcard-score { position: absolute; bottom: 7px; right: 7px; background: var(--pink); color: white; font-size: 10px; font-weight: 800; padding: 1px 7px; border-radius: 99px; }
+.slcard-body { flex: 1; padding: 11px 12px; }
+.slcard-price { font-size: 16px; font-weight: 800; }
+.slcard-addr  { font-size: 12px; color: var(--text-3); margin-top: 1px; }
+.slcard-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 7px; }
+.slcard-chip { display: inline-flex; align-items: center; gap: 3px; background: var(--gray-100); border-radius: 6px; padding: 3px 8px; font-size: 11px; color: var(--text-2); }
+.slcard-chip.p { background: var(--pink-pale); color: var(--pink-mid); }
+.slcard-chip .mi { font-size: 13px; }
+
+/* ────────────────────────────────────────
+   SCREEN 6 — VIBE
+──────────────────────────────────────── */
+.vibe-top { background: var(--blue); padding: 18px 20px 0; flex-shrink: 0; }
+.vibe-top-row { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 14px; }
+.vibe-title { font-size: 22px; font-weight: 800; color: white; }
+.vibe-sub   { font-size: 13px; color: rgba(255,255,255,.5); margin-top: 3px; }
+.vibe-inp {
+  background: rgba(255,255,255,.1); border-radius: var(--r-full);
+  border: 1.5px solid rgba(255,255,255,.15); padding: 11px 16px;
+  display: flex; align-items: flex-start; gap: 9px;
+}
+.vibe-inp .mi { color: rgba(255,255,255,.45); flex-shrink: 0; margin-top: 2px; }
+.vibe-inp textarea { background: transparent; border: none; outline: none; font-family: var(--font); font-size: 14px; color: white; width: 100%; resize: none; min-height: 48px; line-height: 1.5; }
+.vibe-inp textarea::placeholder { color: rgba(255,255,255,.3); }
+.vibe-tags-row { display: flex; gap: 7px; padding: 11px 20px 15px; overflow-x: auto; background: var(--blue); }
+.vibe-tags-row::-webkit-scrollbar { display: none; }
+.vtag { flex-shrink: 0; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18); border-radius: var(--r-full); padding: 5px 12px; font-size: 12px; color: rgba(255,255,255,.8); cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all .15s; }
+.vtag:hover, .vtag.on { background: var(--pink); border-color: var(--pink); color: white; }
+.vtag .mi { font-size: 14px; }
+.vibe-body { padding: 15px; background: var(--bg); }
+.vsec-lbl { font-size: 11px; font-weight: 700; color: var(--text-4); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 10px; }
+.vres {
+  background: white; border-radius: var(--r-lg); border: 1px solid var(--border);
+  padding: 13px; margin-bottom: 9px; cursor: pointer;
+  display: flex; align-items: center; gap: 12px; box-shadow: var(--shadow-sm);
+}
+.vres-icon { width: 44px; height: 44px; border-radius: var(--r-md); background: var(--pink-pale); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--pink-mid); }
+.vres-icon .mi { font-size: 22px; }
+.vres-name { font-size: 14px; font-weight: 700; }
+.vres-desc { font-size: 12px; color: var(--text-3); margin-top: 1px; }
+.vres-score { font-size: 13px; font-weight: 700; color: var(--pink-mid); margin-left: auto; white-space: nowrap; }
+
+.sr-only { position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0; }
+</style>
+</head>
+<body>
+
+<!-- Proto nav -->
+<nav class="proto-nav">
+  <span class="proto-lbl">Scout v2</span>
+  <div class="pnav-sep"></div>
+  <button class="pnav-btn" onclick="goTo('onboarding')"><span class="pnav-n">1</span> Onboarding</button>
+  <button class="pnav-btn active" onclick="goTo('home')"><span class="pnav-n">2</span> Home Feed</button>
+  <button class="pnav-btn" onclick="goTo('property')"><span class="pnav-n">3</span> Property Brief</button>
+  <button class="pnav-btn" onclick="goTo('leverage')"><span class="pnav-n">4</span> Leverage Calc</button>
+  <button class="pnav-btn" onclick="goTo('shortlist')"><span class="pnav-n">5</span> Shortlist</button>
+  <button class="pnav-btn" onclick="goTo('vibe')"><span class="pnav-n">6</span> Vibe Search</button>
+</nav>
+
+<div class="phone-wrap"><div class="phone">
+
+<!-- ══ SCREEN 1 — ONBOARDING ══ -->
+<div class="screen" id="screen-onboarding">
+  <div class="sbar blue">
+    <span class="sbar-time">9:41</span>
+    <div class="sbar-icons">
+      <div class="sig"><b></b><b></b><b></b><b></b></div>
+      <span class="mi sm" style="color:rgba(255,255,255,.8)">wifi</span>
+      <div class="batt" style="color:rgba(255,255,255,.85)"><div class="batt-b"><div class="batt-f"></div></div><div class="batt-t"></div></div>
+    </div>
+  </div>
+  <div class="onb-top">
+    <div class="logo">scout<span>.</span></div>
+    <div class="steps"><div class="step done"></div><div class="step active"></div><div class="step"></div></div>
+    <div class="step-meta">Step <strong>2 of 3</strong> — Search preferences</div>
+  </div>
+  <div class="scroll">
+    <div class="onb-body">
+      <div class="onb-q">What matters most to you?</div>
+      <div class="onb-sub">Define your must-haves so Scout only alerts you to properties that genuinely match.</div>
+      <div class="opts">
+        <div class="opt on" onclick="toggleOpt(this)">
+          <div class="opt-chk"><span class="mi">check</span></div>
+          <div><div class="opt-main">Speed — get in first</div><div class="opt-hint">Alerts within 5 min of a new listing</div></div>
+        </div>
+        <div class="opt" onclick="toggleOpt(this)">
+          <div class="opt-chk"><span class="mi"></span></div>
+          <div><div class="opt-main">Neighbourhood feel</div><div class="opt-hint">Walkability, coffee shops, parks</div></div>
+        </div>
+        <div class="opt on" onclick="toggleOpt(this)">
+          <div class="opt-chk"><span class="mi">check</span></div>
+          <div><div class="opt-main">Negotiation leverage</div><div class="opt-hint">Seller urgency score before you offer</div></div>
+        </div>
+        <div class="opt" onclick="toggleOpt(this)">
+          <div class="opt-chk"><span class="mi"></span></div>
+          <div><div class="opt-main">Photo authenticity</div><div class="opt-hint">AI flags staged or enhanced photos</div></div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:18px 22px 0">
+      <div class="inp-lbl">PRICE RANGE</div>
+      <div style="display:flex;gap:10px;margin-bottom:18px">
+        <input class="inp" style="text-align:center" value="$400k">
+        <span style="display:flex;align-items:center;color:var(--text-3)">–</span>
+        <input class="inp" style="text-align:center" value="$600k">
+      </div>
+      <div class="inp-lbl">SEARCH AREA</div>
+      <input class="inp" value="Austin, TX (78701–78759)" style="margin-bottom:22px">
+    </div>
+  </div>
+  <div class="onb-foot">
+    <button class="btn btn-pink btn-full btn-lg" onclick="goTo('home')">Continue <span class="mi md">arrow_forward</span></button>
+  </div>
+</div>
+
+<!-- ══ SCREEN 2 — HOME FEED ══ -->
+<div class="screen active" id="screen-home">
+  <div class="sbar blue">
+    <span class="sbar-time">9:41</span>
+    <div class="sbar-icons">
+      <div class="sig"><b></b><b></b><b></b><b></b></div>
+      <span class="mi sm" style="color:rgba(255,255,255,.8)">wifi</span>
+      <div class="batt" style="color:rgba(255,255,255,.85)"><div class="batt-b"><div class="batt-f"></div></div><div class="batt-t"></div></div>
+    </div>
+  </div>
+
+  <!-- Flat blue top bar -->
+  <div class="feed-bar">
+    <div class="logo">scout<span>.</span></div>
+    <div class="feed-actions">
+      <button class="flat-icon-btn" aria-label="Notifications, 2 unread" onclick="goTo('home')">
+        <span class="mi">notifications</span>
+        <div class="icon-dot" aria-hidden="true"></div>
+      </button>
+      <div class="avatar-flat" aria-label="Maya Chen — profile">MC</div>
+    </div>
+  </div>
+
+  <!-- Search + alert below bar, white bg -->
+  <div class="feed-below-bar">
+    <button class="search-bar" style="width:100%;text-align:left;border:none;padding:0;background:none;cursor:pointer" onclick="goTo('vibe')" aria-label="Search by vibe, area, or feature">
+      <div class="search-bar" style="width:100%;pointer-events:none">
+        <span class="mi">search</span>
+        <span>Search by vibe, area, or feature…</span>
+      </div>
+    </button>
+    <div class="alert-strip" role="status" aria-live="polite">
+      <div class="pulse" aria-hidden="true"></div>
+      <p><strong>2 new matches</strong> in 78701 — last 90 min</p>
+    </div>
+  </div>
+
+  <div class="scroll">
+    <div class="feed-body">
+      <div class="row-h" style="margin-top:2px">
+        <span class="title">For you</span>
+        <span class="link" onclick="goTo('shortlist')">Shortlist (3) <span class="mi xs">arrow_forward</span></span>
+      </div>
+      <div class="chips-row">
+        <div class="chip-row" role="radiogroup" aria-label="Filter listings">
+          <button class="chip on" onclick="selChip(this)" role="radio" aria-checked="true">All</button>
+          <button class="chip" onclick="selChip(this)" role="radio" aria-checked="false"><span class="mi">bolt</span> Just listed</button>
+          <button class="chip" onclick="selChip(this)" role="radio" aria-checked="false"><span class="mi">trending_down</span> Price cut</button>
+          <button class="chip" onclick="selChip(this)" role="radio" aria-checked="false"><span class="mi">near_me</span> Near me</button>
+        </div>
+      </div>
+
+      <!-- Card 1 -->
+      <div class="pcard" onclick="goTo('property')" role="button" tabindex="0" aria-label="1847 Cedar Hills Blvd, $529,000, 92 match">
+        <div class="pcard-img">
+          <img src="https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&w=390&h=220&fit=crop&q=80" alt="1847 Cedar Hills Blvd exterior">
+          <div class="pcard-img-overlay"></div>
+          <div class="pcard-top">
+            <span class="badge b-pink"><span class="mi xs">bolt</span> Just listed</span>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+              <span class="pcard-time">2h ago</span>
+              <button class="heart-flat" onclick="event.stopPropagation()" aria-label="Save 1847 Cedar Hills Blvd" aria-pressed="false">
+                <span class="mi">favorite_border</span>
+              </button>
+            </div>
+          </div>
+          <div class="match-pill">92 Match</div>
+        </div>
+        <div class="pcard-body">
+          <div class="pcard-price">$529,000</div>
+          <div class="pcard-addr">1847 Cedar Hills Blvd, Austin TX</div>
+          <div class="pcard-stats">
+            <span class="pcard-stat"><span class="mi">bed</span> 3 bd</span>
+            <span class="pcard-stat"><span class="mi">shower</span> 2 ba</span>
+            <span class="pcard-stat"><span class="mi">square_foot</span> 1,847 sqft</span>
+          </div>
+          <div class="pcard-flags">
+            <span class="badge b-green"><span class="mi xs">check_circle</span> Photos clean</span>
+            <span class="badge b-pink"><span class="mi xs">arrow_upward</span> Seller urgent</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="pcard" onclick="goTo('property')" role="button" tabindex="0" aria-label="3210 S Lamar Blvd, $475,000, 87 match">
+        <div class="pcard-img">
+          <img src="https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&w=390&h=220&fit=crop&q=80" alt="3210 S Lamar Blvd exterior">
+          <div class="pcard-img-overlay"></div>
+          <div class="pcard-top">
+            <span class="badge b-amber"><span class="mi xs">trending_down</span> Price cut</span>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+              <span class="pcard-time">8 days</span>
+              <button class="heart-flat" onclick="event.stopPropagation()" aria-label="Save 3210 S Lamar Blvd" aria-pressed="false">
+                <span class="mi">favorite_border</span>
+              </button>
+            </div>
+          </div>
+          <div class="match-pill">87 Match</div>
+        </div>
+        <div class="pcard-body">
+          <div class="pcard-price">$475,000 <span style="font-size:12px;color:var(--text-4);text-decoration:line-through;font-weight:400">$495k</span></div>
+          <div class="pcard-addr">3210 S Lamar Blvd #4, Austin TX</div>
+          <div class="pcard-stats">
+            <span class="pcard-stat"><span class="mi">bed</span> 2 bd</span>
+            <span class="pcard-stat"><span class="mi">shower</span> 2 ba</span>
+            <span class="pcard-stat"><span class="mi">square_foot</span> 1,240 sqft</span>
+          </div>
+          <div class="pcard-flags">
+            <span class="badge b-amber"><span class="mi xs">trending_down</span> −$20k cut</span>
+            <span class="badge b-blue"><span class="mi xs">local_cafe</span> Walkable</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="pcard" onclick="goTo('property')" role="button" tabindex="0" aria-label="501 Barton Hills Dr, $612,000, 78 match, AI flag">
+        <div class="pcard-img">
+          <img src="https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&w=390&h=220&fit=crop&q=80" alt="501 Barton Hills Dr exterior">
+          <div class="pcard-img-overlay"></div>
+          <div class="pcard-top">
+            <span class="badge b-red"><span class="mi xs">warning</span> AI flag</span>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+              <span class="pcard-time">12 days</span>
+              <button class="heart-flat saved" onclick="event.stopPropagation()" aria-label="Unsave 501 Barton Hills Dr" aria-pressed="true">
+                <span class="mi">favorite</span>
+              </button>
+            </div>
+          </div>
+          <div class="match-pill">78 Match</div>
+        </div>
+        <div class="pcard-body">
+          <div class="pcard-price">$612,000</div>
+          <div class="pcard-addr">501 Barton Hills Dr, Austin TX</div>
+          <div class="pcard-stats">
+            <span class="pcard-stat"><span class="mi">bed</span> 4 bd</span>
+            <span class="pcard-stat"><span class="mi">shower</span> 3 ba</span>
+            <span class="pcard-stat"><span class="mi">square_foot</span> 2,205 sqft</span>
+          </div>
+          <div class="pcard-flags">
+            <span class="badge b-red"><span class="mi xs">warning</span> Staging detected</span>
+          </div>
+        </div>
+      </div>
+      <div style="height:8px"></div>
+    </div>
+  </div>
+
+  <nav class="bnav" aria-label="Main navigation">
+    <div class="bni on" aria-current="page" onclick="goTo('home')"><div class="bni-bar"></div><span class="mi md">home</span><span class="bni-lbl">Home</span></div>
+    <div class="bni" onclick="goTo('vibe')"><span class="mi md">auto_awesome</span><span class="bni-lbl">Vibe</span></div>
+    <div class="bni" onclick="goTo('home')" aria-label="Alerts, 2 unread"><span class="mi md">notifications</span><span class="bni-lbl">Alerts</span><span class="bni-dot" aria-hidden="true">2</span></div>
+    <div class="bni" onclick="goTo('shortlist')"><span class="mi md">bookmarks</span><span class="bni-lbl">Shortlist</span></div>
+    <div class="bni" onclick="goTo('onboarding')"><span class="mi md">person</span><span class="bni-lbl">Profile</span></div>
+  </nav>
+</div>
+
+<!-- ══ SCREEN 3 — PROPERTY BRIEF ══ -->
+<div class="screen" id="screen-property">
+  <div class="sbar clear">
+    <span class="sbar-time">9:41</span>
+    <div class="sbar-icons">
+      <div class="sig"><b></b><b></b><b></b><b></b></div>
+      <span class="mi sm">wifi</span>
+      <div class="batt"><div class="batt-b"><div class="batt-f"></div></div><div class="batt-t"></div></div>
+    </div>
+  </div>
+  <div class="hero">
+    <img src="https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&w=390&h=280&fit=crop&q=80" alt="1847 Cedar Hills Blvd">
+    <div class="hero-ovl"></div>
+    <div class="hero-top">
+      <button class="back-btn wh" onclick="goTo('home')"><span class="mi">arrow_back</span> Back</button>
+      <button class="heart-flat" style="color:white;filter:drop-shadow(0 1px 4px rgba(0,0,0,.5))" aria-label="Save 1847 Cedar Hills Blvd" aria-pressed="false"><span class="mi lg">favorite_border</span></button>
+    </div>
+    <div class="hero-bot">
+      <div class="hero-price">$529,000</div>
+      <div class="hero-addr">1847 Cedar Hills Blvd, Austin TX 78704</div>
+      <div class="hero-stats">
+        <span class="hero-stat"><span class="mi">bed</span> 3 bd</span>
+        <span class="hero-stat"><span class="mi">shower</span> 2 ba</span>
+        <span class="hero-stat"><span class="mi">square_foot</span> 1,847 sqft</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="scroll">
+    <div class="prop-body">
+      <div class="ai-card">
+        <div class="ai-label"><span class="ai-tag">AI</span> 60-Second Brief</div>
+        <div class="ai-text">Renovated 3-bed craftsman in Travis Heights. Updated kitchen with quartz counters, original hardwood floors. HOA-free. Seller relocated for work — high motivation to close quickly.</div>
+        <div class="ai-flags">
+          <span class="ai-badge green"><span class="mi xs">check_circle</span> Photos verified</span>
+          <span class="ai-badge pink"><span class="mi xs">arrow_upward</span> Seller urgent</span>
+          <span class="ai-badge gray"><span class="mi xs">schedule</span> 43 days listed</span>
+        </div>
+      </div>
+
+      <div class="wcard">
+        <div class="row-h"><span class="wcard-title">Match breakdown</span><span style="font-size:22px;font-weight:800;color:var(--pink)">92</span></div>
+        <div class="mbar-r"><span class="mbar-l">Location</span><div class="mbar-t"><div class="mbar-f" style="width:95%"></div></div><span class="mbar-v">95</span></div>
+        <div class="mbar-r"><span class="mbar-l">Price range</span><div class="mbar-t"><div class="mbar-f" style="width:88%"></div></div><span class="mbar-v">88</span></div>
+        <div class="mbar-r"><span class="mbar-l">Size & beds</span><div class="mbar-t"><div class="mbar-f" style="width:90%"></div></div><span class="mbar-v">90</span></div>
+        <div class="mbar-r"><span class="mbar-l">Walkability</span><div class="mbar-t"><div class="mbar-f" style="width:82%"></div></div><span class="mbar-v">82</span></div>
+      </div>
+
+      <div class="wcard">
+        <div class="row-h"><span class="wcard-title">Photo Analysis</span><span class="badge b-green"><span class="mi xs">verified</span> Authentic</span></div>
+        <div class="photo-grid">
+          <div class="photo-th"><img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&w=200&h=150&fit=crop&q=80" alt="Kitchen interior"><div class="photo-badge" style="background:var(--green-bg);color:var(--green-txt)">✓ Clean</div></div>
+          <div class="photo-th"><img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&w=200&h=150&fit=crop&q=80" alt="Living room"><div class="photo-badge" style="background:var(--green-bg);color:var(--green-txt)">✓ Clean</div></div>
+        </div>
+        <div style="margin-top:10px;font-size:12px;color:var(--text-3);line-height:1.5">No AI enhancement or digital staging detected. 4/4 photos verified authentic.</div>
+      </div>
+
+      <button class="btn btn-pink btn-full" onclick="goTo('leverage')" style="margin-bottom:10px">See Leverage Score <span class="mi md">arrow_forward</span></button>
+      <button class="btn btn-outline btn-full"><span class="mi md">calendar_today</span> Book a Viewing</button>
+      <div style="height:20px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SCREEN 4 — LEVERAGE ══ -->
+<div class="screen" id="screen-leverage">
+  <div class="sbar blue">
+    <span class="sbar-time">9:41</span>
+    <div class="sbar-icons">
+      <div class="sig"><b></b><b></b><b></b><b></b></div>
+      <span class="mi sm" style="color:rgba(255,255,255,.8)">wifi</span>
+      <div class="batt" style="color:rgba(255,255,255,.85)"><div class="batt-b"><div class="batt-f"></div></div><div class="batt-t"></div></div>
+    </div>
+  </div>
+  <div style="background:var(--blue);padding:12px 18px 14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+    <button class="back-btn wh" onclick="goTo('property')"><span class="mi">arrow_back</span> Back</button>
+    <span style="font-size:17px;font-weight:700;color:white">Leverage Score</span>
+    <div style="width:70px"></div>
+  </div>
+
+  <div class="scroll">
+    <div class="lev-hero">
+      <div class="lev-tag">1847 Cedar Hills Blvd</div>
+      <div class="lev-row">
+        <div class="lev-ring"><div class="lev-num">74</div><div class="lev-max">/100</div></div>
+        <div class="lev-info">
+          <div class="lev-lbl">Seller Urgency Score</div>
+          <div class="lev-v">High motivation</div>
+          <div class="lev-sub">Seller likely to accept below asking. Good position.</div>
+        </div>
+      </div>
+      <div class="urg-bar-wrap">
+        <div class="urg-bar-lbl">URGENCY LEVEL</div>
+        <div class="urg-bar"><div class="urg-fill" style="width:74%"></div></div>
+        <div class="urg-ends"><span>Low</span><span>High</span></div>
+      </div>
+    </div>
+
+    <div class="lev-body">
+      <div class="dcard">
+        <h4>Market signals</h4>
+        <div class="stat-r"><span style="font-size:14px;color:var(--text-3)">Days on market</span><span style="font-size:14px;font-weight:600;display:flex;align-items:center;gap:6px">43 days <span class="badge b-amber" style="font-size:10px"><span class="mi xs">schedule</span> Above avg</span></span></div>
+        <div class="stat-r"><span style="font-size:14px;color:var(--text-3)">Price reductions</span><span style="font-size:14px;font-weight:600">2 cuts — $24k total</span></div>
+        <div class="stat-r"><span style="font-size:14px;color:var(--text-3)">Original price</span><span style="font-size:14px;font-weight:600">$553,000</span></div>
+        <div class="stat-r"><span style="font-size:14px;color:var(--text-3)">Current ask</span><span style="font-size:14px;font-weight:600">$529,000</span></div>
+      </div>
+      <div class="dcard">
+        <h4>Suggested offer range</h4>
+        <div class="offer-grid">
+          <div class="offer-cell neu"><div class="offer-lbl">Conservative</div><div class="offer-val">$505k</div></div>
+          <div class="offer-cell rec"><div class="offer-lbl">Recommended</div><div class="offer-val">$514k</div></div>
+          <div class="offer-cell neu"><div class="offer-lbl">Competitive</div><div class="offer-val">$522k</div></div>
+        </div>
+        <div style="font-size:12px;color:var(--text-3);line-height:1.5">Based on 43 comparable sold listings within 1 mile, last 90 days.</div>
+      </div>
+      <button class="btn btn-pink btn-full" onclick="goTo('shortlist')"><span class="mi md">bookmarks</span> Add to Shortlist</button>
+      <div style="height:20px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SCREEN 5 — SHORTLIST ══ -->
+<div class="screen" id="screen-shortlist">
+  <div class="sbar white">
+    <span class="sbar-time">9:41</span>
+    <div class="sbar-icons">
+      <div class="sig" style="color:var(--dark)"><b></b><b></b><b></b><b></b></div>
+      <span class="mi sm" style="color:var(--dark)">wifi</span>
+      <div class="batt" style="color:var(--dark)"><div class="batt-b"><div class="batt-f"></div></div><div class="batt-t"></div></div>
+    </div>
+  </div>
+  <div class="sl-head">
+    <div class="row-h" style="margin-bottom:0">
+      <span class="title" style="font-size:20px">Shortlist</span>
+      <span class="badge b-pink"><span class="mi xs">bookmarks</span> 3 saved</span>
+    </div>
+    <div class="sl-tabs">
+      <div class="sl-tab on">Saved</div>
+      <div class="sl-tab">Compare</div>
+      <div class="sl-tab">History</div>
+    </div>
+  </div>
+  <div class="cmp-strip">
+    <p>Select <strong>2–3 properties</strong> to compare</p>
+    <button class="btn btn-pink btn-sm"><span class="mi sm">compare</span> Compare</button>
+  </div>
+  <div class="scroll">
+    <div class="sl-body">
+      <div class="slcard" onclick="goTo('property')" role="button" tabindex="0">
+        <div class="slcard-img"><img src="https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&w=120&h=120&fit=crop&q=80" alt="1847 Cedar Hills"><div class="slcard-score">92</div></div>
+        <div class="slcard-body">
+          <div class="slcard-price">$529,000</div>
+          <div class="slcard-addr">1847 Cedar Hills Blvd</div>
+          <div class="slcard-chips">
+            <div class="slcard-chip p"><span class="mi">arrow_upward</span> Urgent seller</div>
+            <div class="slcard-chip"><span class="mi">bed</span> 3 bd</div>
+          </div>
+          <span class="badge b-green" style="margin-top:7px;font-size:10px"><span class="mi xs">check_circle</span> Photos clean</span>
+        </div>
+      </div>
+      <div class="slcard" onclick="goTo('property')" role="button" tabindex="0">
+        <div class="slcard-img"><img src="https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&w=120&h=120&fit=crop&q=80" alt="3210 S Lamar"><div class="slcard-score">87</div></div>
+        <div class="slcard-body">
+          <div class="slcard-price">$475,000</div>
+          <div class="slcard-addr">3210 S Lamar Blvd #4</div>
+          <div class="slcard-chips">
+            <div class="slcard-chip p"><span class="mi">trending_down</span> −$20k</div>
+            <div class="slcard-chip"><span class="mi">bed</span> 2 bd</div>
+          </div>
+          <span class="badge b-blue" style="margin-top:7px;font-size:10px"><span class="mi xs">local_cafe</span> Walkable</span>
+        </div>
+      </div>
+      <div class="slcard" onclick="goTo('property')" role="button" tabindex="0">
+        <div class="slcard-img"><img src="https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&w=120&h=120&fit=crop&q=80" alt="501 Barton Hills"><div class="slcard-score">78</div></div>
+        <div class="slcard-body">
+          <div class="slcard-price">$612,000</div>
+          <div class="slcard-addr">501 Barton Hills Dr</div>
+          <div class="slcard-chips">
+            <div class="slcard-chip"><span class="mi">schedule</span> 12 days</div>
+            <div class="slcard-chip"><span class="mi">bed</span> 4 bd</div>
+          </div>
+          <span class="badge b-red" style="margin-top:7px;font-size:10px"><span class="mi xs">warning</span> Staging detected</span>
+        </div>
+      </div>
+      <div style="height:16px"></div>
+    </div>
+  </div>
+  <nav class="bnav" aria-label="Main navigation">
+    <div class="bni" onclick="goTo('home')"><span class="mi md">home</span><span class="bni-lbl">Home</span></div>
+    <div class="bni" onclick="goTo('vibe')"><span class="mi md">auto_awesome</span><span class="bni-lbl">Vibe</span></div>
+    <div class="bni" aria-label="Alerts, 2 unread"><span class="mi md">notifications</span><span class="bni-lbl">Alerts</span><span class="bni-dot" aria-hidden="true">2</span></div>
+    <div class="bni on" aria-current="page" onclick="goTo('shortlist')"><div class="bni-bar"></div><span class="mi md">bookmarks</span><span class="bni-lbl">Shortlist</span></div>
+    <div class="bni" onclick="goTo('onboarding')"><span class="mi md">person</span><span class="bni-lbl">Profile</span></div>
+  </nav>
+</div>
+
+<!-- ══ SCREEN 6 — VIBE ══ -->
+<div class="screen" id="screen-vibe">
+  <div class="sbar blue">
+    <span class="sbar-time">9:41</span>
+    <div class="sbar-icons">
+      <div class="sig"><b></b><b></b><b></b><b></b></div>
+      <span class="mi sm" style="color:rgba(255,255,255,.8)">wifi</span>
+      <div class="batt" style="color:rgba(255,255,255,.85)"><div class="batt-b"><div class="batt-f"></div></div><div class="batt-t"></div></div>
+    </div>
+  </div>
+  <div class="vibe-top">
+    <div class="vibe-top-row">
+      <div><div class="vibe-title">Vibe Search</div><div class="vibe-sub">Describe how you want to live</div></div>
+      <button class="flat-icon-btn" onclick="goTo('home')" aria-label="Close Vibe Search"><span class="mi">close</span></button>
+    </div>
+    <label class="sr-only" for="vibe-ta">Describe your ideal home</label>
+    <div class="vibe-inp">
+      <span class="mi">auto_awesome</span>
+      <textarea id="vibe-ta" placeholder="e.g. morning light, walkable to coffee, near trails…">morning light, walkable to coffee shops</textarea>
+    </div>
+  </div>
+  <div class="vibe-tags-row" role="group" aria-label="Vibe tags">
+    <button class="vtag on"><span class="mi">wb_sunny</span> Morning light</button>
+    <button class="vtag"><span class="mi">local_cafe</span> Coffee nearby</button>
+    <button class="vtag on"><span class="mi">park</span> Near trails</button>
+    <button class="vtag"><span class="mi">school</span> Good schools</button>
+    <button class="vtag"><span class="mi">volume_off</span> Quiet street</button>
+    <button class="vtag"><span class="mi">directions_bike</span> Bike-friendly</button>
+  </div>
+  <div class="scroll">
+    <div class="vibe-body">
+      <div class="vsec-lbl">3 matches for your vibe</div>
+      <div class="vres" onclick="goTo('property')" role="button" tabindex="0">
+        <div class="vres-icon"><span class="mi">home</span></div>
+        <div><div class="vres-name">1847 Cedar Hills Blvd</div><div class="vres-desc">East-facing · 4 coffee shops nearby</div></div>
+        <div class="vres-score">92 match</div>
+      </div>
+      <div class="vres" onclick="goTo('property')" role="button" tabindex="0">
+        <div class="vres-icon"><span class="mi">home</span></div>
+        <div><div class="vres-name">3210 S Lamar Blvd #4</div><div class="vres-desc">Walkable score 94 · 3-min to cafe</div></div>
+        <div class="vres-score">87 match</div>
+      </div>
+      <div class="vres" onclick="goTo('property')" role="button" tabindex="0">
+        <div class="vres-icon"><span class="mi">home</span></div>
+        <div><div class="vres-name">501 Barton Hills Dr</div><div class="vres-desc">Greenbelt trail 200m · Morning sun</div></div>
+        <div class="vres-score">78 match</div>
+      </div>
+      <div style="height:20px"></div>
+    </div>
+  </div>
+  <nav class="bnav" aria-label="Main navigation">
+    <div class="bni" onclick="goTo('home')"><span class="mi md">home</span><span class="bni-lbl">Home</span></div>
+    <div class="bni on" aria-current="page" onclick="goTo('vibe')"><div class="bni-bar"></div><span class="mi md">auto_awesome</span><span class="bni-lbl">Vibe</span></div>
+    <div class="bni" aria-label="Alerts, 2 unread"><span class="mi md">notifications</span><span class="bni-lbl">Alerts</span><span class="bni-dot" aria-hidden="true">2</span></div>
+    <div class="bni" onclick="goTo('shortlist')"><span class="mi md">bookmarks</span><span class="bni-lbl">Shortlist</span></div>
+    <div class="bni" onclick="goTo('onboarding')"><span class="mi md">person</span><span class="bni-lbl">Profile</span></div>
+  </nav>
+</div>
+
+</div></div>
+
+<script>
+const SCREENS = ['onboarding','home','property','leverage','shortlist','vibe'];
+function goTo(id) {
+  SCREENS.forEach(s => {
+    const el = document.getElementById('screen-' + s);
+    if (el) el.classList.toggle('active', s === id);
+  });
+  document.querySelectorAll('.pnav-btn').forEach((b, i) => b.classList.toggle('active', SCREENS[i] === id));
+}
+function toggleOpt(el) {
+  el.classList.toggle('on');
+  const mi = el.querySelector('.opt-chk .mi');
+  mi.textContent = el.classList.contains('on') ? 'check' : '';
+}
+function selChip(el) {
+  el.closest('.chip-row').querySelectorAll('.chip').forEach(c => { c.classList.remove('on'); c.setAttribute('aria-checked','false'); });
+  el.classList.add('on'); el.setAttribute('aria-checked','true');
+}
+document.addEventListener('keydown', e => {
+  if ((e.key==='Enter'||e.key===' ') && e.target.getAttribute('role')==='button') { e.preventDefault(); e.target.click(); }
+});
+</script>
+</body>
+</html>
