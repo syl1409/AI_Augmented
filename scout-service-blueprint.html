@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Service Blueprint — Scout App</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: #333;
+      line-height: 1.4;
+      padding: 20px;
+      background-color: #f9f9fb;
+    }
+
+    h1 { color: #0071dc; margin-bottom: 5px; }
+
+    p { color: #666; margin-top: 0; margin-bottom: 6px; }
+
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      margin-bottom: 24px;
+      margin-top: 10px;
+    }
+    .meta-chip {
+      background: #e8f1fb;
+      border: 1px solid #c2d9f5;
+      border-radius: 5px;
+      padding: 5px 11px;
+      font-size: 12px;
+      color: #0052a3;
+      font-weight: 600;
+    }
+
+    /* ── Priority badges ── */
+    .must   { display:inline-block; background:#dc3545; color:#fff; font-size:9px; font-weight:700; padding:2px 6px; border-radius:3px; letter-spacing:.04em; margin-left:4px; vertical-align:middle; }
+    .should { display:inline-block; background:#fd7e14; color:#fff; font-size:9px; font-weight:700; padding:2px 6px; border-radius:3px; letter-spacing:.04em; margin-left:4px; vertical-align:middle; }
+    .could  { display:inline-block; background:#6c757d; color:#fff; font-size:9px; font-weight:700; padding:2px 6px; border-radius:3px; letter-spacing:.04em; margin-left:4px; vertical-align:middle; }
+    .ai-tag { display:inline-block; background:#0071dc; color:#fff; font-size:9px; font-weight:700; padding:2px 6px; border-radius:3px; letter-spacing:.04em; margin-left:4px; vertical-align:middle; }
+
+    /* ── Persona labels ── */
+    .maya   { color: #0052a3; font-weight: 700; font-size: 10px; }
+    .jordan { color: #5a3e99; font-weight: 700; font-size: 10px; }
+
+    /* ── Table ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: #fff;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 15px;
+      text-align: left;
+      vertical-align: top;
+      border: 1px solid #e0e0e0;
+      font-size: 13px;
+    }
+    th {
+      background-color: #0071dc;
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .phase-num {
+      display: block;
+      font-size: 9px;
+      font-weight: 700;
+      opacity: 0.65;
+      letter-spacing: 0.1em;
+      margin-bottom: 3px;
+    }
+    .swimlane-label {
+      background-color: #f1f3f5;
+      font-weight: bold;
+      color: #495057;
+      width: 11%;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      vertical-align: middle;
+    }
+    .swimlane-icon {
+      display: block;
+      font-size: 18px;
+      margin-bottom: 6px;
+    }
+    .line-of-visibility {
+      background-color: #212529 !important;
+      color: #ffffff !important;
+      font-weight: bold;
+      text-align: center;
+      vertical-align: middle;
+      padding: 8px;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    /* ── Row tints ── */
+    .row-evidence  td:not(.swimlane-label) { background: #fafafa; }
+    .row-customer  td:not(.swimlane-label) { background: #f0f5ff; }
+    .row-front     td:not(.swimlane-label) { background: #f0fff6; }
+    .row-back      td:not(.swimlane-label) { background: #fff8f0; }
+    .row-support   td:not(.swimlane-label) { background: #faf0ff; }
+
+    ul { margin: 0; padding-left: 18px; }
+    li { margin-bottom: 8px; }
+    li:last-child { margin-bottom: 0; }
+    strong { color: #111; }
+
+    /* ── Job reference tags ── */
+    .job-ref {
+      display: inline-block;
+      background: #e8f1fb;
+      color: #0052a3;
+      font-size: 9px;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 3px;
+      margin-left: 3px;
+      vertical-align: middle;
+    }
+
+    /* ── North star / scope box ── */
+    .scope-box {
+      background: #e8f1fb;
+      border-left: 4px solid #0071dc;
+      border-radius: 0 6px 6px 0;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      font-size: 13px;
+      color: #0D0F1A;
+    }
+    .scope-box strong { color: #0071dc; }
+
+    /* ── Legend ── */
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-bottom: 18px;
+      font-size: 11px;
+      color: #666;
+    }
+    .legend span { display: flex; align-items: center; gap: 5px; }
+
+    /* ── Footer ── */
+    .footnote {
+      margin-top: 16px;
+      font-size: 11px;
+      color: #aaa;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Service Blueprint: Scout — AI-Native Homebuying App</h1>
+  <p>Framework context: Informed Interests (Sweet Spot) · High AI Knowledge · Low Stakes</p>
+
+  <div class="meta-row">
+    <div class="meta-chip">📍 5 Service Phases</div>
+    <div class="meta-chip">👩 Maya Chen — Defeated Hunter</div>
+    <div class="meta-chip">👨 Jordan Park — Vibe-First Buyer</div>
+    <div class="meta-chip">13 JTBD Jobs mapped</div>
+    <div class="meta-chip">Discovery Phase · July 2026</div>
+  </div>
+
+  <div class="scope-box">
+    <strong>North Star Goal:</strong> A user can vet 100 properties with the accuracy of an inspector in the time it takes to scroll through a single social media feed.<br>
+    <strong>MVP closes:</strong> Velocity Gap (alert latency 4–6 hrs → &lt;5 min) &amp; Information Asymmetry (vetting time 20–30 min → &lt;60 sec)
+  </div>
+
+  <div class="legend">
+    <span><span style="background:#dc3545;color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px">MUST</span> Must Have</span>
+    <span><span style="background:#fd7e14;color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px">SHOULD</span> Should Have</span>
+    <span><span style="background:#6c757d;color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px">COULD</span> Could Have</span>
+    <span><span style="background:#0071dc;color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px">AI</span> AI-generated step</span>
+    <span><span style="color:#0052a3;font-weight:700;font-size:11px">Maya</span> Primary persona</span>
+    <span><span style="color:#5a3e99;font-weight:700;font-size:11px">Jordan</span> Secondary persona</span>
+    <span><span style="background:#e8f1fb;color:#0052a3;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px">J#</span> JTBD job reference</span>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Swimlanes</th>
+        <th><span class="phase-num">Phase 01</span>Onboarding &amp; Profile Setup</th>
+        <th><span class="phase-num">Phase 02</span>Alert &amp; Discovery</th>
+        <th><span class="phase-num">Phase 03</span>Property Evaluation</th>
+        <th><span class="phase-num">Phase 04</span>Shortlisting &amp; Comparison</th>
+        <th><span class="phase-num">Phase 05</span>Offer Preparation</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <!-- ROW 1: PHYSICAL EVIDENCE -->
+      <tr class="row-evidence">
+        <td class="swimlane-label"><span class="swimlane-icon">🖥️</span>Physical Evidence</td>
+        <td>
+          <ul>
+            <li>App Store listing &amp; install screen</li>
+            <li>Goldilocks Profile setup form (must-haves, deal-breakers, price range)</li>
+            <li>Search area map selector</li>
+            <li>Notification permission prompt</li>
+            <li>"Setup complete — Scout is scanning" confirmation</li>
+          </ul>
+        </td>
+        <td>
+          <ul>
+            <li>Push notification: <em>"New listing matches your profile"</em></li>
+            <li>Property card with match score &amp; AI brief teaser</li>
+            <li>Vibe Search input field <span class="jordan">Jordan</span></li>
+            <li>Live feed of matching listings</li>
+          </ul>
+        </td>
+        <td>
+          <ul>
+            <li>60-second AI Property Brief screen</li>
+            <li>Seller Urgency Score / Leverage Calculator panel</li>
+            <li>Photo gallery with red flag annotation pins</li>
+            <li>"AI Enhanced" / "Authentic" badge on each photo</li>
+          </ul>
+        </td>
+        <td>
+          <ul>
+            <li>"Save to Shortlist" button on property card</li>
+            <li>Shortlist screen with saved properties</li>
+            <li>Side-by-side comparison view with AI score overlay</li>
+            <li>Price change alert notification on saved properties</li>
+          </ul>
+        </td>
+        <td>
+          <ul>
+            <li>Negotiation Brief screen</li>
+            <li>Comparable sales data view (map + table)</li>
+            <li>Suggested offer range confidence bar</li>
+            <li>Export / share brief to agent option</li>
+          </ul>
+        </td>
+      </tr>
+
+      <!-- ROW 2: CUSTOMER ACTIONS -->
+      <tr class="row-customer">
+        <td class="swimlane-label"><span class="swimlane-icon">👤</span>Customer Actions</td>
+        <td>
+          <ul>
+            <li>Downloads Scout app <span class="job-ref">J12</span><span class="must">MUST</span></li>
+            <li>Enters search preferences: price range, bedrooms, area <span class="job-ref">J4</span><span class="must">MUST</span></li>
+            <li>Defines must-haves &amp; deal-breakers</li>
+            <li>Enables push notifications &amp; location access</li>
+            <li>Completes setup in one sitting <span class="maya">Maya</span> <span class="jordan">Jordan</span></li>
+          </ul>
+        </td>
+        <td>
+          <ul>
+            <li>Receives real-time push notification &lt;5 min of listing going live <span class="job-ref">J1</span><span class="must">MUST</span> <span class="maya">Maya</span></li>
+            <li>Taps notification to open property brief</li>
+            <li>Types vibe query: <em>"morning light, walkable to coffee"</em> <span class="job-ref">J9</span><span class="must">MUST</span> <span class="jordan">Jordan</span></li>
+            <li>Swipes through listing cards, passes or explores</li>
+          </ul>
+        </td>
+        <td>
+          <ul>
+            <li>Opens AI Property Brief — decides in or out in 60 sec <span class="job-ref">J2</span><span class="must">MUST</span></li>
+            <li>Reviews Seller Urgency Score before deciding to offer <span class="job-ref">J3</span><span class="must">MUST</span> <span class="maya">Maya</span></li>
+            <li>Checks photo red flags &amp; AI staging detection <span class="job-ref">J6</span><span class="should">SHOULD</span> <span class="job-ref">J7</span><span class="should">SHOULD</span></li>
+            <li>Checks photo authenticity indicator <span class="job-ref">J10</span><span class="should">SHOULD</span> <span class="jordan">Jordan</span></li>
+            <li>Decides: book viewing or dismiss</li>
+          </ul>
+        </td>
+        <td>
+          <ul>
+            <li>Taps "Save" on properties worth tracking <span class="job-ref">J5</span><span class="must">MUST</span></li>
+            <li>Reviews saved shortlist</li>
+            <li>Selects 2–3 for side-by-side comparison <span class="job-ref">J13</span><span class="should">SHOULD</span></li>
+            <li>Reviews AI scores &amp; flags across compared properties</li>
+            <li>Decides which to prioritise for viewing</li>
+          </ul>
+        </td>
+        <td>
+          <ul>
+            <li>Requests Negotiation Brief for chosen property <span class="job-ref">J8</span><span class="could">COULD</span> <span class="maya">Maya</span></li>
+            <li>Reviews comparable sales &amp; seller urgency score together</li>
+            <li>Uses suggested offer range as anchor</li>
+            <li>Exports brief to share with agent</li>
+            <li>Exits Scout to make offer with agent</li>
+          </ul>
+        </td>
+      </tr>
+
+      <!-- ROW 3: FRONT OF STAGE -->
+      <tr class="row-front">
+        <td class="swimlane-label"><span class="swimlane-icon">📱</span>Front of Stage (App UI)</td>
+        <td>
+          <ul>
+            <li>Renders progress-bar onboarding flow (3 steps)</li>
+            <li>Validates preference inputs in real time</li>
+            <li>Converts map selection to search polygon</li>
+            <li>Shows estimated alert volume preview</li>
+            <li>Displays "Setup complete" confirmation</li>
+          </ul>
+        </td>
+        <td>
+          <ul>
+            <li>Delivers push notification within &lt;5 min of MLS listing <span class="ai-tag">AI</span></li>
+            <li>Renders property card with AI match score &amp; teaser</li>
+            <li>Displays Vibe Search input with auto-complete suggestions</li>
+            <li>Shows <em>"X new properties today matching your profile"</em> counter</li>
+          </ul>
+        </td>
+        <td>
+          <ul>
+            <li>Renders 60-second AI Property Brief: key facts, score, flags <span class="ai-tag">AI</span></li>
+            <li>Displays Leverage Calculator: days on market, price cuts, tax history <span class="ai-tag">AI</span></li>
+            <li>Overlays red flag annotation pins on listing photos <span class="ai-tag">AI</span></li>
+            <li>Shows "AI Enhanced" / "Authentic" badge on each photo <span class="ai-tag">AI</span></li>
+          </ul>
+        </td>
+        <td>
+          <ul>
+            <li>One-tap save to shortlist with animation confirmation</li>
+            <li>Renders shortlist with thumbnail, price, AI match score</li>
+            <li>Renders side-by-side comparison grid with AI metric overlay</li>
+            <li>Highlights differentiating factors between properties</li>
+            <li>Pushes price-change alert for saved properties</li>
+          </ul>
+        </td>
+        <td>
+          <ul>
+            <li>Renders Negotiation Brief: comps, urgency score, offer range <span class="ai-tag">AI</span></li>
+            <li>Shows comparable sold listings on map and table</li>
+            <li>Displays offer range confidence bar</li>
+            <li>Enables PDF export / share to agent</li>
+          </ul>
+        </td>
+      </tr>
+
+      <!-- LINE OF VISIBILITY -->
+      <tr>
+        <td class="line-of-visibility">👁 Line of Visibility</td>
+        <td class="line-of-visibility" colspan="5">— — — — — — — — — Everything below this line is invisible to the user — — — — — — — — —</td>
+      </tr>
+
+      <!-- ROW 4: BACK OF STAGE -->
+      <tr class="row-back">
+        <td class="swimlane-label"><span class="swimlane-icon">🤖</span>Back of Stage (AI Layer)</td>
+        <td>
+          <ul>
+            <li>Ingests Goldilocks Profile into user preference model</li>
+            <li>Translates lifestyle preferences into MLS filter parameters</li>
+            <li>Seeds real-time MLS alert subscription</li>
+            <li><em>No AI output visible to user yet</em></li>
+          </ul>
+        </td>
+        <td>
+          <ul>
+            <li>Monitors MLS feed in real time for new listings matching profile <span class="ai-tag">AI</span></li>
+            <li>Calculates AI match score per listing vs. Goldilocks Profile</li>
+            <li>Generates listing teaser for push notification body</li>
+            <li>Translates vibe query → MLS search params (NLP → geospatial + visual signals) <span class="ai-tag">AI</span></li>
+          </ul>
+        </td>
+        <td>
+          <ul>
+            <li>Generates full AI Property Brief from MLS data (key facts, flags, score) <span class="ai-tag">AI</span></li>
+            <li>Calculates Seller Urgency Score from days on market, price cut history, tax data <span class="ai-tag">AI</span></li>
+            <li>Runs computer vision model on listing photos: water stains, DIY wiring, cracks <span class="ai-tag">AI</span></li>
+            <li>Runs AI staging / de-staging detection (Generative Fill identifier) <span class="ai-tag">AI</span></li>
+          </ul>
+        </td>
+        <td>
+          <ul>
+            <li>Stores saved properties in user shortlist database</li>
+            <li>Generates comparison summary: highlights key differences across shortlisted properties <span class="ai-tag">AI</span></li>
+            <li>Refreshes AI scores when new market data arrives for saved properties</li>
+            <li>Triggers price-change or new-activity alert for shortlisted properties</li>
+          </ul>
+        </td>
+        <td>
+          <ul>
+            <li>Generates Negotiation Brief: comparable sales + seller urgency score + suggested offer range <span class="ai-tag">AI</span></li>
+            <li>Pulls comparable sold listings from MLS within radius &amp; time window</li>
+            <li>Synthesises PE-analyst-style offer recommendation</li>
+            <li><em>No direct offer submission — handoff to agent</em></li>
+          </ul>
+        </td>
+      </tr>
+
+      <!-- ROW 5: SUPPORT PROCESSES -->
+      <tr class="row-support">
+        <td class="swimlane-label"><span class="swimlane-icon">⚙️</span>Support Processes</td>
+        <td>
+          <ul>
+            <li>Auth service (OAuth2 / email)</li>
+            <li>User profile &amp; preferences database</li>
+            <li>Push notification service (FCM / APNs)</li>
+            <li>MLS API — initial subscription setup</li>
+          </ul>
+        </td>
+        <td>
+          <ul>
+            <li>MLS API (real-time webhook / polling &lt;5 min SLA)</li>
+            <li>NLP model — vibe-to-data query translation</li>
+            <li>Geospatial database (neighbourhood / walkability signals)</li>
+            <li>Push notification delivery service</li>
+          </ul>
+        </td>
+        <td>
+          <ul>
+            <li>LLM (Claude / Gemini) — property brief &amp; urgency score generation</li>
+            <li>Computer vision model — photo red flag detection</li>
+            <li>AI image detection model — staging / Generative Fill identifier</li>
+            <li>Property tax &amp; price history database</li>
+            <li>MLS property data API</li>
+          </ul>
+        </td>
+        <td>
+          <ul>
+            <li>User shortlist database</li>
+            <li>MLS price-change webhook (saved properties)</li>
+            <li>Push notification service (shortlist alerts)</li>
+          </ul>
+        </td>
+        <td>
+          <ul>
+            <li>MLS comparable sales API</li>
+            <li>LLM — negotiation brief generation</li>
+            <li>PDF / export service</li>
+            <li>Agent referral / partner API (optional, post-MVP)</li>
+            <li>Ethics review gate — seller data scoring <em>(required before launch)</em></li>
+          </ul>
+        </td>
+      </tr>
+
+    </tbody>
+  </table>
+
+  <p class="footnote">Project Scout · Service Blueprint · Discovery Phase · July 2026 · Personas: Maya Chen (Defeated Hunter) · Jordan Park (Vibe-First Buyer) · 13 JTBD jobs across 5 service phases</p>
+
+</body>
+</html>
