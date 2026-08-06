@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ADA Accessibility Audit — Multichannel Orders: Page Not Found</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #F1F5F9;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  .page-header {
+    background: #1E293B;
+    color: white;
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .page-header h1 { font-size: 17px; font-weight: 600; }
+  .issue-count {
+    background: #DC2626; color: white;
+    font-size: 12px; font-weight: 700;
+    padding: 3px 10px; border-radius: 20px;
+  }
+  .screen-name { font-size: 13px; color: #94A3B8; }
+  .hover-hint { font-size: 12px; color: #64748B; margin-left: auto; }
+
+  .main {
+    display: flex;
+    padding: 28px 28px 40px;
+    gap: 28px;
+    align-items: flex-start;
+  }
+
+  /* LEFT */
+  .phone-col {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .col-label {
+    font-size: 11px; font-weight: 600;
+    color: #64748B; text-transform: uppercase;
+    letter-spacing: 0.07em;
+  }
+
+  .phone-shell {
+    width: 375px;
+    background: #1A1A1A;
+    border-radius: 52px;
+    padding: 11px;
+    box-shadow: 0 24px 56px rgba(0,0,0,0.38), inset 0 0 0 1px rgba(255,255,255,0.08);
+  }
+  .phone-screen {
+    background: #F2F2F7;
+    border-radius: 42px;
+    overflow: hidden;
+  }
+
+  /* Status bar */
+  .status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 13px 22px 6px;
+    background: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    color: #000;
+  }
+  .status-right { display: flex; align-items: center; gap: 5px; }
+
+  /* App header */
+  .app-header {
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 18px 12px;
+    border-bottom: 1px solid #E5E5EA;
+  }
+  .app-title {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 19px; font-weight: 700; color: #000;
+    cursor: pointer;
+  }
+  .chevron { font-size: 13px; color: #666; margin-top: 2px; }
+  .info-btn {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 1.5px solid #8E8E93;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; color: #3C3C3E; cursor: pointer;
+    font-weight: 400;
+  }
+
+  /* Content */
+  .content-bg {
+    background: #F2F2F7;
+    padding: 14px;
+  }
+  .error-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 36px 20px 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .illus-circle {
+    width: 152px; height: 152px;
+    background: #EAF0FB;
+    border-radius: 50%;
+    display: flex; align-items: flex-end; justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+  .ground-shadow {
+    position: absolute; bottom: 10px;
+    width: 80px; height: 10px;
+    background: #C4CAD3; border-radius: 50%; opacity: 0.6;
+  }
+
+  .error-heading {
+    font-size: 21px; font-weight: 700; color: #000; text-align: center;
+  }
+  .error-subtext {
+    font-size: 14px; color: #8E8E93; text-align: center; line-height: 1.5;
+  }
+  .retry-btn {
+    background: #0071E3; color: #fff;
+    border: none; border-radius: 30px;
+    padding: 13px 46px;
+    font-size: 16px; font-weight: 600;
+    cursor: pointer; margin-top: 6px;
+  }
+
+  .spacer-bg { height: 100px; background: #F2F2F7; }
+
+  /* Bottom nav */
+  .bottom-nav {
+    background: #fff;
+    border-top: 1px solid #E5E5EA;
+    display: flex;
+    justify-content: space-around;
+    padding: 8px 0 18px;
+  }
+  .nav-item {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 2px; font-size: 10px; color: #8E8E93;
+    cursor: pointer; min-width: 52px; padding: 4px 6px;
+  }
+  .nav-item.active { color: #0071E3; }
+  .nav-icon { font-size: 20px; line-height: 1.1; }
+
+  /* Pins */
+  #screenWrap { position: relative; }
+
+  .pin {
+    position: absolute;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 2.5px solid #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700; color: #fff;
+    cursor: pointer; z-index: 100;
+    transition: transform 0.15s;
+  }
+  .pin:hover { transform: scale(1.3); z-index: 200; }
+  .pin.high   { background: #DC2626; }
+  .pin.medium { background: #EA580C; }
+  .pin.low    { background: #D97706; }
+
+  .pin .tip {
+    display: none;
+    position: absolute;
+    background: #0F172A;
+    color: #fff;
+    font-size: 11px; font-weight: 500;
+    padding: 6px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+    z-index: 300;
+    top: 50%; transform: translateY(-50%);
+    line-height: 1.5; pointer-events: none;
+  }
+  .pin .tip.r { left: 27px; }
+  .pin .tip.l { right: 27px; }
+  .pin .tip.r::before {
+    content:''; position:absolute;
+    left:-8px; top:50%; transform:translateY(-50%);
+    border:5px solid transparent; border-right-color:#0F172A;
+  }
+  .pin .tip.l::before {
+    content:''; position:absolute;
+    right:-8px; top:50%; transform:translateY(-50%);
+    border:5px solid transparent; border-left-color:#0F172A;
+  }
+  .pin:hover .tip { display: block; }
+
+  /* RIGHT */
+  .issues-col {
+    flex: 1; display: flex; flex-direction: column; gap: 14px;
+    min-width: 0;
+  }
+  .issues-col h2 {
+    font-size: 11px; font-weight: 700;
+    color: #64748B; text-transform: uppercase;
+    letter-spacing: 0.07em; margin-bottom: 2px;
+  }
+
+  .card {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    overflow: hidden;
+  }
+  .card.high   { border-left: 4px solid #DC2626; }
+  .card.medium { border-left: 4px solid #EA580C; }
+  .card.low    { border-left: 4px solid #D97706; }
+
+  .card-header {
+    display: flex; align-items: center; gap: 9px;
+    padding: 13px 15px 8px; flex-wrap: wrap;
+  }
+  .cnum {
+    width: 22px; height: 22px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: #fff; flex-shrink: 0;
+  }
+  .cnum.high   { background: #DC2626; }
+  .cnum.medium { background: #EA580C; }
+  .cnum.low    { background: #D97706; }
+
+  .ctitle { font-size: 13px; font-weight: 700; color: #1E293B; flex: 1; }
+
+  .badge {
+    font-size: 10px; font-weight: 600;
+    padding: 2px 7px; border-radius: 20px;
+  }
+  .badge.wcag { background:#EFF6FF; color:#1D4ED8; border:1px solid #BFDBFE; }
+  .badge.bh   { background:#FEF2F2; color:#DC2626; border:1px solid #FECACA; }
+  .badge.bm   { background:#FFF7ED; color:#EA580C; border:1px solid #FED7AA; }
+  .badge.bl   { background:#FFFBEB; color:#D97706; border:1px solid #FDE68A; }
+
+  .card-body { padding: 0 15px 13px; }
+  .cdesc {
+    font-size: 12px; color: #475569;
+    line-height: 1.65; margin-bottom: 9px;
+  }
+  .fix {
+    background: #F0FDF4; border: 1px solid #BBF7D0;
+    border-radius: 7px; padding: 9px 11px; margin-bottom: 7px;
+  }
+  .fix-lbl {
+    font-size: 10px; font-weight: 700; color: #166534;
+    text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 3px;
+  }
+  .fix-txt { font-size: 11px; color: #166534; line-height: 1.65; }
+  .fix-txt code {
+    background: #DCFCE7; padding: 1px 4px; border-radius: 3px;
+    font-family: 'SF Mono','Fira Code',monospace; font-size: 10.5px;
+  }
+  .wref { font-size: 10px; color: #94A3B8; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>ADA Accessibility Audit</h1>
+  <span class="issue-count">8 Issues Found</span>
+  <span class="screen-name">Multichannel Orders — Page Not Found</span>
+  <span class="hover-hint">Hover pins for details</span>
+</div>
+
+<div class="main">
+
+  <!-- PHONE -->
+  <div class="phone-col">
+    <div class="col-label">Screen Mockup</div>
+    <div class="phone-shell">
+      <div class="phone-screen">
+        <div id="screenWrap">
+
+          <!-- Status bar -->
+          <div class="status-bar">
+            <span>9:51</span>
+            <div class="status-right">
+              <!-- Signal bars -->
+              <svg width="16" height="11" viewBox="0 0 16 11"><rect x="0" y="5" width="2.5" height="6" rx=".4" fill="#000"/><rect x="3.5" y="3.5" width="2.5" height="7.5" rx=".4" fill="#000"/><rect x="7" y="1.5" width="2.5" height="9.5" rx=".4" fill="#000"/><rect x="10.5" y="0" width="2.5" height="11" rx=".4" fill="#000"/></svg>
+              <!-- WiFi -->
+              <svg width="15" height="11" viewBox="0 0 15 11"><path d="M7.5 8.5a1.1 1.1 0 110 2.2 1.1 1.1 0 010-2.2z" fill="#000"/><path d="M4.2 6.1a4.7 4.7 0 016.6 0l1-1A6.1 6.1 0 003.2 5z" fill="#000"/><path d="M1.2 3.1A9 9 0 0113.8 3l1-1A10.4 10.4 0 00.2 2z" fill="#000"/></svg>
+              <span style="font-size:11px;font-weight:700;">86%</span>
+            </div>
+          </div>
+
+          <!-- App header -->
+          <div class="app-header">
+            <div id="dropdownTrigger" class="app-title">
+              <span>Multichannel Orders</span>
+              <span class="chevron">⌄</span>
+            </div>
+            <div id="infoBtn" class="info-btn">ⓘ</div>
+          </div>
+
+          <!-- Main content -->
+          <div class="content-bg">
+            <div id="errorCard" class="error-card">
+
+              <div id="illustration" class="illus-circle">
+                <div class="ground-shadow"></div>
+                <svg width="110" height="125" viewBox="0 0 110 125" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <!-- Legs -->
+                  <path d="M50 82 L40 115 L47 115 L53 96 L59 115 L66 115 L58 80Z" fill="#1B2D44"/>
+                  <!-- Shoes -->
+                  <ellipse cx="43" cy="116" rx="7" ry="3.5" fill="#0D0D0D"/>
+                  <ellipse cx="62" cy="116" rx="7" ry="3.5" fill="#0D0D0D"/>
+                  <!-- Backpack -->
+                  <rect x="35" y="52" width="13" height="24" rx="5" fill="#5B7FA3"/>
+                  <rect x="37" y="54" width="9" height="7" rx="2.5" fill="#4A6A88"/>
+                  <!-- Body -->
+                  <rect x="42" y="50" width="28" height="34" rx="7" fill="#F0DDB5"/>
+                  <!-- Right arm extended (holding phone) -->
+                  <path d="M70 57 Q82 63 80 75" stroke="#F0DDB5" stroke-width="8" stroke-linecap="round" fill="none"/>
+                  <!-- Phone in hand -->
+                  <rect x="75" y="69" width="11" height="17" rx="2" fill="#2D3748"/>
+                  <rect x="77" y="71" width="7" height="12" rx="1" fill="#63B3ED"/>
+                  <!-- Head -->
+                  <ellipse cx="56" cy="38" rx="15" ry="16" fill="#7D5035"/>
+                  <!-- Hair -->
+                  <path d="M41 36 Q41 22 56 21 Q71 22 71 36 L68 31 Q63 24 56 24 Q49 24 44 31Z" fill="#1A1A1A"/>
+                  <!-- Eyes (looking down) -->
+                  <ellipse cx="51.5" cy="40" rx="1.8" ry="1.8" fill="#3A2010"/>
+                  <ellipse cx="60.5" cy="40" rx="1.8" ry="1.8" fill="#3A2010"/>
+                  <!-- Alert lines above head -->
+                  <line x1="65" y1="16" x2="65" y2="10" stroke="#FF6B35" stroke-width="2.2" stroke-linecap="round"/>
+                  <line x1="69" y1="18" x2="73" y2="13" stroke="#FF6B35" stroke-width="2.2" stroke-linecap="round"/>
+                  <line x1="61" y1="18" x2="57" y2="13" stroke="#FF6B35" stroke-width="2.2" stroke-linecap="round"/>
+                </svg>
+              </div>
+
+              <div id="errorHeading" class="error-heading">Page not found</div>
+              <div id="errorSubtext" class="error-subtext">This page doesn't seem to exist.</div>
+              <button id="retryBtn" class="retry-btn">Retry</button>
+
+            </div>
+            <div class="spacer-bg"></div>
+          </div>
+
+          <!-- Bottom nav -->
+          <div id="bottomNav" class="bottom-nav">
+            <div id="navHome" class="nav-item">
+              <div class="nav-icon">
+                <svg width="22" height="20" viewBox="0 0 22 20" fill="none"><path d="M1 8L11 1l10 7v11a1 1 0 01-1 1H14v-6H8v6H2a1 1 0 01-1-1V8z" stroke="#8E8E93" stroke-width="1.5" fill="none"/></svg>
+              </div>
+              <span>Home</span>
+            </div>
+            <div id="navInbox" class="nav-item">
+              <div class="nav-icon">
+                <svg width="22" height="18" viewBox="0 0 22 18" fill="none"><rect x="1" y="1" width="20" height="16" rx="2" stroke="#8E8E93" stroke-width="1.5" fill="none"/><path d="M1 5l10 7 10-7" stroke="#8E8E93" stroke-width="1.5"/></svg>
+              </div>
+              <span>Inbox</span>
+            </div>
+            <div id="navOrders" class="nav-item active">
+              <div class="nav-icon">
+                <svg width="22" height="20" viewBox="0 0 22 20" fill="none"><circle cx="9" cy="18" r="1.5" fill="#0071E3"/><circle cx="17" cy="18" r="1.5" fill="#0071E3"/><path d="M1 1h3l2.7 11h10l2.3-8H6" stroke="#0071E3" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </div>
+              <span>Orders</span>
+            </div>
+            <div id="navCatalog" class="nav-item">
+              <div class="nav-icon">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="1" y="1" width="18" height="18" rx="2" stroke="#8E8E93" stroke-width="1.5" fill="none"/><line x1="5" y1="6" x2="15" y2="6" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round"/><line x1="5" y1="10" x2="15" y2="10" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round"/><line x1="5" y1="14" x2="11" y2="14" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </div>
+              <span>Catalog</span>
+            </div>
+            <div id="navMenu" class="nav-item">
+              <div class="nav-icon">
+                <svg width="22" height="16" viewBox="0 0 22 16" fill="none"><line x1="1" y1="2" x2="21" y2="2" stroke="#8E8E93" stroke-width="2" stroke-linecap="round"/><line x1="1" y1="8" x2="21" y2="8" stroke="#8E8E93" stroke-width="2" stroke-linecap="round"/><line x1="1" y1="14" x2="21" y2="14" stroke="#8E8E93" stroke-width="2" stroke-linecap="round"/></svg>
+              </div>
+              <span>Menu</span>
+            </div>
+          </div>
+
+          <!-- PINS -->
+          <div id="p1" class="pin high">1<span class="tip r">#1 · Unlabeled icon button · WCAG 4.1.2</span></div>
+          <div id="p2" class="pin high">2<span class="tip r">#2 · Touch target too small · WCAG 2.5.5</span></div>
+          <div id="p3" class="pin medium">3<span class="tip r">#3 · Illustration missing alt text · WCAG 1.1.1</span></div>
+          <div id="p4" class="pin medium">4<span class="tip r">#4 · No live region for error state · WCAG 4.1.3</span></div>
+          <div id="p5" class="pin medium">5<span class="tip r">#5 · Ambiguous button label · WCAG 2.4.6</span></div>
+          <div id="p6" class="pin low">6<span class="tip r">#6 · Active tab — color only · WCAG 1.4.1</span></div>
+          <div id="p7" class="pin low">7<span class="tip l">#7 · Dropdown missing ARIA role · WCAG 4.1.2</span></div>
+          <div id="p8" class="pin low">8<span class="tip r">#8 · Subtext contrast risk · WCAG 1.4.3</span></div>
+
+        </div><!-- /screenWrap -->
+      </div>
+    </div>
+    <div class="col-label" style="margin-top:4px;">375 × 812pt · iOS</div>
+  </div>
+
+  <!-- ISSUES PANEL -->
+  <div class="issues-col">
+    <h2>8 Accessibility Issues</h2>
+
+    <!-- 1 -->
+    <div class="card high">
+      <div class="card-header">
+        <div class="cnum high">1</div>
+        <div class="ctitle">Unlabeled Icon Button — Info (ⓘ)</div>
+        <span class="badge wcag">WCAG 4.1.2</span>
+        <span class="badge bh">High</span>
+      </div>
+      <div class="card-body">
+        <p class="cdesc">The ⓘ icon in the top-right header has no accessible name. VoiceOver and TalkBack will announce it only as "button" — users cannot determine its purpose without sighted context. This is a complete barrier for blind and low-vision users trying to access additional information.</p>
+        <div class="fix">
+          <div class="fix-lbl">✅ Fix</div>
+          <div class="fix-txt">Add a descriptive label to the button element:<br>
+          <code>accessibilityLabel="More information about Multichannel Orders"</code><br>
+          Web: <code>aria-label="More information about Multichannel Orders"</code></div>
+        </div>
+        <div class="wref">WCAG 4.1.2 – Name, Role, Value (Level AA)</div>
+      </div>
+    </div>
+
+    <!-- 2 -->
+    <div class="card high">
+      <div class="card-header">
+        <div class="cnum high">2</div>
+        <div class="ctitle">Touch Target Too Small — Info Icon</div>
+        <span class="badge wcag">WCAG 2.5.5</span>
+        <span class="badge bh">High</span>
+      </div>
+      <div class="card-body">
+        <p class="cdesc">The ⓘ info button is approximately 28×28pt — well below the 44×44pt iOS HIG minimum and WCAG 2.5.5's 44×44px requirement. Users with motor impairments, tremors, or low dexterity will frequently miss-tap or be unable to activate it.</p>
+        <div class="fix">
+          <div class="fix-lbl">✅ Fix</div>
+          <div class="fix-txt">Expand the tap area with padding or a larger container:<br>
+          <code>style={{ padding: 10 }}</code> brings effective area to ~48×48pt ✓<br>
+          Or: wrap in a <code>44×44pt TouchableOpacity</code> with centered icon.</div>
+        </div>
+        <div class="wref">WCAG 2.5.5 – Target Size (Level AA) · Apple HIG: minimum 44×44pt</div>
+      </div>
+    </div>
+
+    <!-- 3 -->
+    <div class="card medium">
+      <div class="card-header">
+        <div class="cnum medium">3</div>
+        <div class="ctitle">Illustration Missing Text Alternative</div>
+        <span class="badge wcag">WCAG 1.1.1</span>
+        <span class="badge bm">Medium</span>
+      </div>
+      <div class="card-body">
+        <p class="cdesc">The illustration of a person distracted by their phone conveys the "lost / disconnected" metaphor of the error state. Without a text alternative, screen reader users receive no description and miss the contextual meaning. Non-decorative images must have a text alternative.</p>
+        <div class="fix">
+          <div class="fix-lbl">✅ Fix</div>
+          <div class="fix-txt">If meaningful, add a description:<br>
+          <code>accessibilityLabel="Illustration of a person distracted by their phone"</code><br>
+          If purely decorative: <code>accessibilityHidden={true}</code> (RN) or <code>alt=""</code> (web)</div>
+        </div>
+        <div class="wref">WCAG 1.1.1 – Non-text Content (Level A)</div>
+      </div>
+    </div>
+
+    <!-- 4 -->
+    <div class="card medium">
+      <div class="card-header">
+        <div class="cnum medium">4</div>
+        <div class="ctitle">Error State Lacks Live Region Announcement</div>
+        <span class="badge wcag">WCAG 4.1.3</span>
+        <span class="badge bm">Medium</span>
+      </div>
+      <div class="card-body">
+        <p class="cdesc">The "Page not found" state appears after a failed navigation — a dynamic content change. Without a live region, VoiceOver and TalkBack won't announce it. Users relying on a screen reader may have no idea the page failed to load unless they manually swipe through content.</p>
+        <div class="fix">
+          <div class="fix-lbl">✅ Fix</div>
+          <div class="fix-txt">Wrap the error container in a live region:<br>
+          React Native: <code>accessibilityLiveRegion="assertive"</code><br>
+          Web: <code>role="alert"</code> or <code>aria-live="assertive"</code></div>
+        </div>
+        <div class="wref">WCAG 4.1.3 – Status Messages (Level AA)</div>
+      </div>
+    </div>
+
+    <!-- 5 -->
+    <div class="card medium">
+      <div class="card-header">
+        <div class="cnum medium">5</div>
+        <div class="ctitle">Ambiguous Button Label: "Retry"</div>
+        <span class="badge wcag">WCAG 2.4.6</span>
+        <span class="badge bm">Medium</span>
+      </div>
+      <div class="card-body">
+        <p class="cdesc">"Retry" is ambiguous when read out of context — screen reader users navigating via a rotor or button list won't know what is being retried. Descriptive labels must convey purpose without relying on surrounding content for context.</p>
+        <div class="fix">
+          <div class="fix-lbl">✅ Fix</div>
+          <div class="fix-txt">Add a self-describing accessible label:<br>
+          <code>accessibilityLabel="Retry loading Multichannel Orders"</code><br>
+          Or update visible text to: <strong>"Try again"</strong> with clearer surrounding copy.</div>
+        </div>
+        <div class="wref">WCAG 2.4.6 – Headings and Labels (Level AA) · 2.4.9 Link Purpose (AAA)</div>
+      </div>
+    </div>
+
+    <!-- 6 -->
+    <div class="card low">
+      <div class="card-header">
+        <div class="cnum low">6</div>
+        <div class="ctitle">Active Tab Indicated by Color Alone</div>
+        <span class="badge wcag">WCAG 1.4.1</span>
+        <span class="badge bl">Low</span>
+      </div>
+      <div class="card-body">
+        <p class="cdesc">The "Orders" tab is highlighted in blue (#0071E3) while all others are gray — color is the sole visual indicator of the active state. Users with color blindness (deuteranopia, protanopia) or those on high-contrast / monochrome displays may not perceive which tab is selected.</p>
+        <div class="fix">
+          <div class="fix-lbl">✅ Fix</div>
+          <div class="fix-txt">Add a non-color indicator: a top/bottom active bar, bold label text, or filled vs. outline icon. Also add programmatic state:<br>
+          RN: <code>accessibilityState={{ selected: true }}</code><br>
+          Web: <code>aria-selected="true"</code> inside a <code>role="tablist"</code></div>
+        </div>
+        <div class="wref">WCAG 1.4.1 – Use of Color (Level A)</div>
+      </div>
+    </div>
+
+    <!-- 7 -->
+    <div class="card low">
+      <div class="card-header">
+        <div class="cnum low">7</div>
+        <div class="ctitle">Dropdown Trigger Missing ARIA Role &amp; State</div>
+        <span class="badge wcag">WCAG 4.1.2</span>
+        <span class="badge bl">Low</span>
+      </div>
+      <div class="card-body">
+        <p class="cdesc">The "Multichannel Orders ⌄" header trigger has no declared interactive role or expanded/collapsed state. Screen readers may read the chevron as a text character or skip the interactivity entirely, leaving users unaware they can switch channels.</p>
+        <div class="fix">
+          <div class="fix-lbl">✅ Fix</div>
+          <div class="fix-txt">Declare role and state on the trigger container:<br>
+          <code>accessibilityRole="button"</code><br>
+          <code>accessibilityLabel="Multichannel Orders — switch channel"</code><br>
+          <code>accessibilityState={{ expanded: false }}</code></div>
+        </div>
+        <div class="wref">WCAG 4.1.2 – Name, Role, Value (Level AA)</div>
+      </div>
+    </div>
+
+    <!-- 8 -->
+    <div class="card low">
+      <div class="card-header">
+        <div class="cnum low">8</div>
+        <div class="ctitle">Subtext Contrast Below AA Minimum</div>
+        <span class="badge wcag">WCAG 1.4.3</span>
+        <span class="badge bl">Low</span>
+      </div>
+      <div class="card-body">
+        <p class="cdesc">"This page doesn't seem to exist." appears in iOS system gray (#8E8E93) on white (#FFFFFF). This combination yields a contrast ratio of approximately 3.5:1 — below WCAG AA's 4.5:1 requirement for normal-sized text. Low-vision users and users in bright environments will struggle to read it.</p>
+        <div class="fix">
+          <div class="fix-lbl">✅ Fix</div>
+          <div class="fix-txt">Darken the subtitle color to meet the minimum:<br>
+          <code>color: #636366</code> → ~4.54:1 on white ✓ (just passes AA)<br>
+          <code>color: #48484A</code> → ~5.9:1 on white ✓ (comfortable margin)</div>
+        </div>
+        <div class="wref">WCAG 1.4.3 – Contrast Minimum (Level AA) · Required ratio: 4.5:1</div>
+      </div>
+    </div>
+
+  </div><!-- /issues-col -->
+</div>
+
+<script>
+function placePin(pinId, targetId, ax, ay) {
+  const wrap   = document.getElementById('screenWrap');
+  const target = document.getElementById(targetId);
+  const pin    = document.getElementById(pinId);
+  if (!wrap || !target || !pin) return;
+  const wR = wrap.getBoundingClientRect();
+  const tR = target.getBoundingClientRect();
+  pin.style.left = (tR.left - wR.left + tR.width  * ax - 11) + 'px';
+  pin.style.top  = (tR.top  - wR.top  + tR.height * ay - 11) + 'px';
+}
+
+function positionAll() {
+  placePin('p1', 'infoBtn',        0.5,  0.5);
+  placePin('p2', 'infoBtn',        1.2,  -0.2);
+  placePin('p3', 'illustration',   0.82, 0.1);
+  placePin('p4', 'errorHeading',   1.05, 0.5);
+  placePin('p5', 'retryBtn',       0.75, 0.5);
+  placePin('p6', 'navOrders',      0.5,  0.1);
+  placePin('p7', 'dropdownTrigger',0.9,  0.5);
+  placePin('p8', 'errorSubtext',   0.5,  1.3);
+}
+
+window.addEventListener('load',   positionAll);
+window.addEventListener('resize', positionAll);
+</script>
+</body>
+</html>

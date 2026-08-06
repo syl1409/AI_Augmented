@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prompt & Skill Repository</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --blue: #2B52FF;
+    --blue-d: #1A3EE8;
+    --blue-bg: #EEF1FF;
+    --dark: #0D0F1A;
+    --dark2: #171A2B;
+    --dark3: #1F2338;
+    --dark4: #252840;
+    --white: #FFFFFF;
+    --g1: #F7F8FC;
+    --g2: #ECEEF5;
+    --g3: #D5D9E8;
+    --g4: #9BA3BC;
+    --g6: #4A5068;
+    --g9: #0D0F1A;
+    --green: #00CC7A;
+    --green-bg: #E6FAF2;
+    --green-text: #006B40;
+    --red: #FF3B5C;
+    --orange: #FF8C42;
+    --yellow: #FFB830;
+  }
+  body { display: flex; height: 100vh; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--g1); color: var(--g9); overflow: hidden; }
+
+  /* ── Sidebar ── */
+  .sidebar { width: 264px; min-width: 264px; background: #EEF1FF; display: flex; flex-direction: column; overflow: hidden; border-right: 1px solid #D5DEFF; }
+  .sidebar-header { padding: 24px 20px 18px; border-bottom: 1px solid #D5DEFF; }
+  .sidebar-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+  .logo-dot { width: 32px; height: 32px; border-radius: 10px; background: var(--blue); display: grid; place-items: center; font-size: 15px; flex-shrink: 0; }
+  .sidebar-title { font-size: 15px; font-weight: 700; color: var(--dark); letter-spacing: -0.01em; }
+  .sidebar-subtitle { font-size: 11px; color: var(--g6); line-height: 1.5; margin-top: 8px; }
+  .sidebar-search { margin-top: 14px; position: relative; }
+  .sidebar-search input { width: 100%; background: var(--white); border: 1px solid #C8D0F5; border-radius: 10px; padding: 8px 10px 8px 32px; font-size: 12px; color: var(--dark); outline: none; transition: border-color .15s; }
+  .sidebar-search input::placeholder { color: var(--g4); }
+  .sidebar-search input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(43,82,255,0.12); }
+  .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 12px; color: var(--g4); pointer-events: none; }
+
+  .sidebar-nav { flex: 1; overflow-y: auto; padding: 10px; }
+  .sidebar-nav::-webkit-scrollbar { width: 0px; }
+  .nav-item { padding: 10px 12px; cursor: pointer; display: flex; align-items: center; gap: 10px; border-radius: 10px; margin-bottom: 2px; transition: all 0.12s; }
+  .nav-item:hover { background: #D5DEFF; }
+  .nav-item.active { background: var(--white); box-shadow: inset 3px 0 0 var(--blue), 0 1px 4px rgba(43,82,255,.1); }
+  .nav-item-icon { font-size: 15px; width: 22px; text-align: center; flex-shrink: 0; opacity: .55; }
+  .nav-item.active .nav-item-icon { opacity: 1; }
+  .nav-item:hover .nav-item-icon { opacity: .8; }
+  .nav-item-text { flex: 1; }
+  .nav-item-title { font-size: 13px; color: var(--g6); font-weight: 500; line-height: 1; }
+  .nav-item.active .nav-item-title { color: var(--blue); font-weight: 700; }
+  .nav-item:hover .nav-item-title { color: var(--dark); }
+  /* Badge: use dark text on tinted bg for contrast (blue on light-blue fails AA) */
+  .nav-item-badge { font-size: 10px; padding: 2px 6px; border-radius: 5px; background: #C8D0F5; color: var(--dark); font-weight: 700; flex-shrink: 0; letter-spacing: .02em; }
+  .nav-item.active .nav-item-badge { background: var(--blue); color: var(--white); }
+  .nav-item:hover .nav-item-badge { background: #B0BCEE; }
+
+  .sidebar-footer { padding: 14px 20px; border-top: 1px solid #D5DEFF; }
+  /* Use dark text instead of blue for count — blue on light-blue fails AA */
+  .sidebar-count { font-size: 11px; color: var(--g6); }
+  .sidebar-count span { color: var(--dark); font-weight: 700; }
+
+  /* ── Main ── */
+  .main { flex: 1; overflow-y: auto; padding: 32px 36px; }
+  .main::-webkit-scrollbar { width: 5px; }
+  .main::-webkit-scrollbar-track { background: transparent; }
+  .main::-webkit-scrollbar-thumb { background: var(--g3); border-radius: 3px; }
+
+  /* Empty state */
+  .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; }
+  .empty-icon { font-size: 52px; margin-bottom: 20px; opacity: 0.4; }
+  .empty-title { font-size: 20px; font-weight: 700; color: var(--g9); margin-bottom: 8px; }
+  .empty-body { font-size: 14px; color: var(--g4); max-width: 340px; line-height: 1.6; }
+
+  /* Detail view */
+  .detail { display: none; }
+  .detail.visible { display: block; }
+  .detail-header { margin-bottom: 28px; }
+  .detail-title { font-size: 30px; font-weight: 800; color: var(--dark); margin-bottom: 6px; line-height: 1.15; letter-spacing: -0.02em; }
+  .detail-when { font-size: 14px; color: var(--g6); line-height: 1.6; max-width: 680px; margin-bottom: 10px; }
+  .detail-meta { font-size: 12px; color: var(--g4); display: flex; align-items: center; gap: 10px; }
+  .meta-pill { display: inline-flex; align-items: center; gap: 5px; background: var(--g2); padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; color: var(--g6); }
+  .meta-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--g3); }
+
+  /* Cards grid — stacked rows */
+  .cards-grid { display: flex; flex-direction: column; gap: 14px; }
+
+  .card { background: var(--white); border-radius: 18px; border: 1px solid var(--g2); display: flex; flex-direction: row; overflow: hidden; box-shadow: 0 1px 4px rgba(13,15,26,.04); }
+  .card-head { width: 200px; min-width: 200px; padding: 24px 20px; background: #EEF1FF; border-right: 1px solid #D5DEFF; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+  .card-icon-wrap { width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; font-size: 20px; flex-shrink: 0; margin-bottom: 2px; }
+  /* card-label on #EEF1FF: var(--g6) #4A5068 = 6.2:1 ✓ */
+  .card-label { font-size: 10px; font-weight: 700; color: var(--g6); text-transform: uppercase; letter-spacing: 0.1em; }
+  .card-title { font-size: 14px; font-weight: 700; color: var(--dark); line-height: 1.3; }
+  .card-body { padding: 20px 24px; flex: 1; display: flex; flex-direction: column; }
+
+  /* Prompt card */
+  /* input-pill: blue on dark = ~3.8:1, fails AA. Use blue bg + white text instead (5.1:1 ✓) */
+  .input-pill { display: inline-flex; align-items: center; gap: 5px; background: var(--blue); color: var(--white); padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; margin-bottom: 12px; }
+  .prompt-box { background: var(--g1); border-radius: 10px; padding: 14px; font-size: 11.5px; color: var(--g6); font-family: 'Courier New', monospace; line-height: 1.75; white-space: pre-wrap; flex: 1; max-height: 190px; overflow-y: auto; border: 1px solid var(--g2); }
+  .prompt-box::-webkit-scrollbar { width: 4px; }
+  .prompt-box::-webkit-scrollbar-thumb { background: var(--g3); border-radius: 2px; }
+
+  /* Gemini card */
+  .gem-section-label { font-size: 11px; font-weight: 700; color: var(--g4); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 5px; }
+  .gem-url-box { background: var(--g1); border: 1px solid var(--g2); border-radius: 10px; padding: 10px 12px; font-size: 12px; color: var(--g6); word-break: break-all; display: flex; align-items: center; gap: 8px; }
+  .gem-url-icon { font-size: 14px; flex-shrink: 0; }
+  .gem-tag { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; background: var(--g2); color: var(--g6); }
+
+  /* Skill card */
+  .skill-preview-box { background: var(--dark); border-radius: 12px; padding: 14px 16px; flex: 1; }
+  /* skill-preview-name: #2B52FF on #0D0F1A = ~3.8:1, fails AA. Use #7DA4FF instead (8.2:1 ✓) */
+  .skill-preview-name { font-size: 13px; font-weight: 700; color: #7DA4FF; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+  .skill-preview-body { font-size: 11px; color: var(--g4); line-height: 1.6; }
+  .skill-preview-tag { display: inline-block; background: var(--dark3); color: var(--g4); padding: 2px 7px; border-radius: 4px; font-size: 10px; font-weight: 600; margin-right: 4px; margin-bottom: 4px; }
+  .skill-file-row { background: var(--g1); border: 1px solid var(--g2); border-radius: 10px; padding: 10px 12px; display: flex; align-items: center; gap: 8px; }
+  .skill-file-name { font-size: 12px; font-weight: 700; color: var(--dark); }
+  .skill-file-size { font-size: 10px; color: var(--g4); }
+
+  /* Buttons */
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 9px 18px; border-radius: 50px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: all 0.15s; text-decoration: none; white-space: nowrap; }
+  .btn-blue { background: var(--blue); color: var(--white); }
+  .btn-blue:hover { background: var(--blue-d); }
+  .btn-dark { background: var(--dark); color: var(--white); }
+  .btn-dark:hover { background: var(--dark2); }
+  .btn-ghost { background: transparent; color: var(--g6); border: 1.5px solid var(--g3); }
+  .btn-ghost:hover { background: var(--g2); border-color: var(--g4); }
+  .btn-green { background: var(--green-bg); color: var(--green-text); border-color: var(--green); }
+  .btn-sm { padding: 6px 14px; font-size: 12px; }
+  .btn-full { width: 100%; margin-top: 12px; }
+
+  /* Show Example button — outlined blue */
+  .btn-outline-blue { background: transparent; color: var(--blue); border: 1.5px solid var(--blue); }
+  .btn-outline-blue:hover { background: var(--blue-bg); }
+
+  /* Toast */
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(12px); background: var(--dark); color: var(--white); padding: 11px 20px; border-radius: 50px; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px; opacity: 0; transition: all 0.2s; pointer-events: none; z-index: 999; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+
+  /* Example side panel */
+  .panel-overlay { position: fixed; inset: 0; background: rgba(13,15,26,0.4); z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.22s; }
+  .panel-overlay.open { opacity: 1; pointer-events: all; }
+  .example-panel { position: fixed; top: 0; right: -440px; width: 420px; height: 100vh; background: var(--white); box-shadow: -8px 0 40px rgba(0,0,0,0.2); z-index: 101; display: flex; flex-direction: column; transition: right 0.26s cubic-bezier(.4,0,.2,1); border-left: 1px solid var(--g2); }
+  .example-panel.open { right: 0; }
+  .ep-head { padding: 20px 22px 18px; border-bottom: 1px solid #D5DEFF; background: #EEF1FF; display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; flex-shrink: 0; }
+  /* ep-label: #1A3EE8 on #EEF1FF = 5.9:1 ✓ */
+  .ep-label { font-size: 10px; font-weight: 700; color: #1A3EE8; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px; }
+  .ep-title { font-size: 16px; font-weight: 700; color: var(--dark); }
+  .ep-close { width: 30px; height: 30px; border-radius: 8px; background: #D5DEFF; border: none; cursor: pointer; display: grid; place-items: center; font-size: 12px; color: var(--g6); flex-shrink: 0; }
+  .ep-close:hover { background: #C8D0F5; color: var(--dark); }
+  .ep-badge { font-size: 10px; font-weight: 700; background: #D5DEFF; color: var(--dark); padding: 2px 8px; border-radius: 4px; margin-top: 6px; display: inline-block; }
+  .ep-body { flex: 1; overflow-y: auto; padding: 0; background: var(--g1); }
+  .ep-body::-webkit-scrollbar { width: 4px; }
+  .ep-body::-webkit-scrollbar-thumb { background: var(--g3); border-radius: 2px; }
+  .ep-placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 32px; text-align: center; }
+  .ep-placeholder-img { width: 80px; height: 80px; border-radius: 20px; background: var(--dark); display: grid; place-items: center; font-size: 36px; margin-bottom: 20px; }
+  .ep-placeholder-title { font-size: 16px; font-weight: 700; color: var(--dark); margin-bottom: 8px; }
+  .ep-placeholder-body { font-size: 13px; color: var(--g4); line-height: 1.6; }
+
+  /* Skill preview dialog */
+  .dialog-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 200; display: none; align-items: center; justify-content: center; }
+  .dialog-overlay.open { display: flex; }
+  .dialog { background: var(--white); border-radius: 20px; width: 640px; max-width: 92vw; max-height: 84vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 24px 64px rgba(0,0,0,0.4); }
+  .dialog-head { padding: 20px 24px; border-bottom: 1px solid #D5DEFF; background: #EEF1FF; display: flex; align-items: center; justify-content: space-between; }
+  .dialog-title { font-size: 15px; font-weight: 700; color: var(--dark); display: flex; align-items: center; gap: 8px; }
+  /* badge: white on blue = 5.1:1 ✓ */
+  .dialog-title-badge { font-size: 10px; background: var(--blue); color: var(--white); padding: 2px 8px; border-radius: 4px; font-weight: 700; }
+  .dialog-close { width: 30px; height: 30px; border-radius: 8px; background: #D5DEFF; border: none; cursor: pointer; display: grid; place-items: center; font-size: 12px; color: var(--g6); }
+  .dialog-close:hover { background: #C8D0F5; color: var(--dark); }
+  .dialog-body { flex: 1; overflow-y: auto; }
+  .skill-md-pre { background: var(--dark); color: #A8B2D0; font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.85; padding: 24px; white-space: pre-wrap; margin: 0; min-height: 100%; }
+  .dialog-footer { padding: 14px 20px; border-top: 1px solid var(--g2); display: flex; gap: 10px; justify-content: flex-end; background: var(--g1); }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">
+      <div class="logo-dot">📦</div>
+      <span class="sidebar-title">Prompt Repository</span>
+    </div>
+    <p class="sidebar-subtitle">Reusable prompts, Gems & Cowork skills from the AI Augmented sprint.</p>
+    <div class="sidebar-search">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="Search workflows…" oninput="filterNav(this.value)">
+    </div>
+  </div>
+
+  <nav class="sidebar-nav" id="sidebarNav">
+    <div class="nav-item" data-id="prd" onclick="selectExp('prd', this)">
+      <span class="nav-item-icon">📐</span>
+      <span class="nav-item-text"><span class="nav-item-title">PRD Generator</span></span>
+      <span class="nav-item-badge">01</span>
+    </div>
+    <div class="nav-item" data-id="opp" onclick="selectExp('opp', this)">
+      <span class="nav-item-icon">🗺️</span>
+      <span class="nav-item-text"><span class="nav-item-title">AI Opportunity Map</span></span>
+      <span class="nav-item-badge">02</span>
+    </div>
+    <div class="nav-item" data-id="discovery" onclick="selectExp('discovery', this)">
+      <span class="nav-item-icon">🔎</span>
+      <span class="nav-item-text"><span class="nav-item-title">UX Discovery Research</span></span>
+      <span class="nav-item-badge">03</span>
+    </div>
+    <div class="nav-item" data-id="jtbd" onclick="selectExp('jtbd', this)">
+      <span class="nav-item-icon">🎯</span>
+      <span class="nav-item-text"><span class="nav-item-title">JTBD MVP Scoping</span></span>
+      <span class="nav-item-badge">04</span>
+    </div>
+    <div class="nav-item" data-id="prototype" onclick="selectExp('prototype', this)">
+      <span class="nav-item-icon">📱</span>
+      <span class="nav-item-text"><span class="nav-item-title">App Prototype (HTML)</span></span>
+      <span class="nav-item-badge">05</span>
+    </div>
+    <div class="nav-item" data-id="ada" onclick="selectExp('ada', this)">
+      <span class="nav-item-icon">♿</span>
+      <span class="nav-item-text"><span class="nav-item-title">ADA Accessibility Audit</span></span>
+      <span class="nav-item-badge">06</span>
+    </div>
+    <div class="nav-item" data-id="brand" onclick="selectExp('brand', this)">
+      <span class="nav-item-icon">🎨</span>
+      <span class="nav-item-text"><span class="nav-item-title">Brand System (Figma)</span></span>
+      <span class="nav-item-badge">07</span>
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="sidebar-count"><span>7</span> workflows · <span>7</span> skills · <span>3</span> Gems</div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="empty-state" id="emptyState">
+    <div class="empty-icon">📂</div>
+    <div class="empty-title">Select a workflow</div>
+    <div class="empty-body">Choose a workflow from the sidebar to see its prompt template, Gemini Gem, and downloadable Cowork skill.</div>
+  </div>
+  <div id="detailArea"></div>
+</main>
+
+<!-- Toast -->
+<div class="toast" id="toast"><span class="toast-dot"></span><span id="toastMsg">Copied</span></div>
+
+<!-- Example side panel -->
+<div class="panel-overlay" id="panelOverlay" onclick="closeExample()"></div>
+<aside class="example-panel" id="examplePanel">
+  <div class="ep-head">
+    <div>
+      <div class="ep-label">Output Preview</div>
+      <div class="ep-title" id="epTitle">—</div>
+      <div class="ep-badge" id="epBadge">Placeholder</div>
+    </div>
+    <button class="ep-close" onclick="closeExample()">✕</button>
+  </div>
+  <div class="ep-body" id="epBody"></div>
+</aside>
+
+<!-- Skill preview dialog -->
+<div class="dialog-overlay" id="dialogOverlay" onclick="closeSkillDialog(event)">
+  <div class="dialog" onclick="event.stopPropagation()">
+    <div class="dialog-head">
+      <div class="dialog-title">⚡ <span id="dialogSkillName">SKILL.md</span> <span class="dialog-title-badge">SKILL</span></div>
+      <button class="dialog-close" onclick="closeSkillDialog()">✕</button>
+    </div>
+    <div class="dialog-body">
+      <pre class="skill-md-pre" id="dialogSkillContent"></pre>
+    </div>
+    <div class="dialog-footer">
+      <button class="btn btn-ghost btn-sm" id="dialogCopyBtn" onclick="copySkillMd()">📋 Copy</button>
+      <a class="btn btn-dark btn-sm" id="dialogDownloadBtn" download="SKILL.md">↓ Download</a>
+    </div>
+  </div>
+</div>
+
+<script>
+const experiments = {
+  prd: {
+    title: 'PRD Generator',
+    whenToUse: 'You have a brief idea but want to land your thoughts — turns a 2-line concept into a full 9-section product brief with a self-validation pass.',
+    tool: 'Gemini Gem', toolIcon: '✨',
+    inputLabel: 'Project name + 2-line description',
+    prompt: `You are a senior product manager. Given a brief project description, generate a full 9-section Product Requirements Document (PRD).
+
+Format each section clearly with a heading and content.
+
+SECTIONS:
+1. Background — market context and why this product exists
+2. Problem Statement — the specific pain being addressed
+3. Opportunity Size — estimated TAM/SAM/SOM with reasoning
+4. North Star Goal — the single metric that defines success
+5. Target Audience — primary and secondary user profiles
+6. Jobs to Be Done — what users are hiring this product to do
+7. Behavior Change — how this shifts existing user behavior
+8. Success Metrics — KPIs and how they are measured
+9. Research & Risks — open questions, ethical red zones, legal and bias considerations
+
+After generating the PRD, run a self-validation pass: grade each section (PASS / NEEDS WORK) and return a final READY or REVISE verdict.
+
+INPUT: [Project name] — [2-line description]`,
+    gemName: 'PRD Check Gem', gemUrl: 'https://gemini.google.com/gem/placeholder-prd-check',
+    gemDesc: 'Validates the generated PRD section by section and returns a READY verdict.',
+    gemTags: ['Gemini 1.5 Pro', 'Structured output', 'Validation step'],
+    skillName: 'prd-generator',
+    skillDesc: 'Generates a 9-section PRD from a 2-line brief. Includes a GEM validation pass that grades each section and flags gaps before discovery begins.',
+    skillTags: ['PRD', 'Gemini Gem', 'Structured output', 'Validation'],
+    exampleIcon: '📄', exampleOutput: 'prd',
+  },
+  opp: {
+    title: 'AI Opportunity Checker',
+    whenToUse: 'You have a PRD or feature list and want to know where AI actually makes sense — scores every feature on risk vs. value and assigns a Horizon tier.',
+    tool: 'Gemini', toolIcon: '✨',
+    inputLabel: 'PRD or product description (text)',
+    prompt: `You are an AI product strategist. Given a product PRD or description, generate a full AI Opportunity Map.
+
+Score each major feature on two axes (1–5 each):
+- Knowledge: How contextual or personal is the data required?
+- Stakes: How severe is the harm if AI makes a mistake?
+
+Plot each feature into one of 4 quadrants:
+🟢 Informed Interests (High Knowledge, Low Stakes) — The Sweet Spot
+🔴 Paramount Plans (High Knowledge, High Stakes) — Danger Zone: requires human oversight
+🟡 Simple Selections (Low Knowledge, Low Stakes) — Standard Utility
+🟠 Critical Choices (Low Knowledge, High Stakes) — Trust Trap: AI should not act alone
+
+Then assign each feature to an AI Horizon tier:
+🤝 Collaborative — AI as Sparring Partner (human holds 90% agency)
+🎯 Personalized — AI as Tailored Synthesizer (50/50 shared agency)
+⚡ Proactive — AI as Autonomous Agent (AI holds 90% agency, proceed only in Safe quadrant)
+
+Output a structured table followed by a 3-horizon roadmap.
+
+INPUT: [Paste PRD or product description]`,
+    gemName: 'Opp Map Gem', gemUrl: 'https://gemini.google.com/gem/placeholder-opp-map',
+    gemDesc: 'Maps product features onto the 2×2 Knowledge × Stakes matrix and generates the 3-Horizon roadmap.',
+    gemTags: ['Gemini 1.5 Pro', 'Multi-modal output', 'Risk analysis'],
+    skillName: 'ai-opportunity-map',
+    skillDesc: 'Scores product features on a Knowledge × Stakes matrix and assigns AI Horizon tiers (Collaborative / Personalized / Proactive). Outputs a risk chart and horizon roadmap.',
+    skillTags: ['Opportunity mapping', 'Risk analysis', 'AI strategy'],
+    exampleIcon: '🗺️', exampleOutput: 'opp',
+  },
+  discovery: {
+    title: 'UX Discovery Research',
+    whenToUse: 'You\'re starting a new product or feature and need to go from zero to cited research fast — market size, competitors, personas, and pain points in one pass.',
+    tool: 'Claude / Cowork', toolIcon: '🤖',
+    inputLabel: 'Product name + description (plain text)',
+    prompt: `You are a senior UX researcher. Given a product description, generate a comprehensive UX discovery research report as a self-contained HTML file.
+
+The HTML file must include all of the following sections with real, researched content:
+1. Executive Summary (2–3 sentences)
+2. Market Size & Opportunity (TAM/SAM/SOM with cited sources)
+3. Competitive Landscape (3 competitors: features, pricing, strengths, weaknesses)
+4. User Personas (2 detailed personas: name, role, goals, frustrations, behaviors, quote)
+5. Key Pain Points (5+ specific, user-voiced problems with supporting context)
+6. Research Gaps & Open Questions (what we still need to learn)
+7. Citations (all sources linked inline and numbered)
+
+Design the HTML as a clean, professional report. Use a white background with clear hierarchy and readable typography. All data points must have citations.
+
+OUTPUT: A complete, self-contained HTML file ready to open in a browser.
+
+INPUT: [Product name] — [Product description]`,
+    gemName: 'Research Gem', gemUrl: 'https://gemini.google.com/gem/placeholder-ux-research',
+    gemDesc: 'Generates a full cited discovery research report for any product brief.',
+    gemTags: ['Claude Sonnet', 'Web search', 'HTML output'],
+    skillName: 'ux-discovery',
+    skillDesc: 'Generates a full UX discovery research report (HTML) from a product brief — includes market data, competitive analysis, 2 personas, and 40+ cited sources. Output is ready to share via URL.',
+    skillTags: ['Discovery', 'Research', 'HTML output', 'Citations'],
+    exampleIcon: '🔎', exampleOutput: 'discovery',
+  },
+  jtbd: {
+    title: 'JTBD MVP Scoping',
+    whenToUse: 'You have research or a PRD and need to prioritize ruthlessly — translates user needs into ranked jobs-to-be-done with a clear MVP boundary and KPIs.',
+    tool: 'Claude / Cowork', toolIcon: '🤖',
+    inputLabel: 'Discovery research report or PRD (attach or paste)',
+    prompt: `You are a product strategist specialising in Jobs-to-Be-Done frameworks. Given a research report or PRD, generate a structured JTBD scoping document as a formatted Word document (.docx).
+
+The document must include:
+
+1. Persona Profiles
+   For each persona: name, role, context, goals, frustrations, current workarounds
+
+2. JTBD Cards
+   For each persona: functional job (what they need to do), emotional job (how they want to feel), social job (how they want to be perceived)
+
+3. Priority Tiers
+   - MUST HAVE (P0): Core value proposition — ship without these and the product fails
+   - SHOULD HAVE (P1): Enhance experience — include if time allows
+   - COULD HAVE (P2): Nice-to-have — defer to v2
+
+4. MVP Scope Statement
+   One clear paragraph defining what the MVP is and is not
+
+5. Success Metrics
+   1–2 measurable KPIs per JTBD (with baseline vs. target format)
+
+Use clear headings, tables for JTBD cards, and a visual priority tier layout.
+
+INPUT: [Attach research report PDF or paste PRD text]`,
+    gemName: 'JTBD Gem', gemUrl: 'https://gemini.google.com/gem/placeholder-jtbd',
+    gemDesc: 'Converts research or a PRD into a prioritized JTBD scoping document with MVP scope and success metrics.',
+    gemTags: ['Claude Sonnet', 'DOCX output', 'Docx skill'],
+    skillName: 'jtbd-scoping',
+    skillDesc: 'Converts discovery research or a PRD into a JTBD scoping .docx with prioritized jobs, MVP scope, and KPIs for each job-to-be-done.',
+    skillTags: ['JTBD', 'Product scoping', 'DOCX output', 'Prioritization'],
+    exampleIcon: '🎯', exampleOutput: 'jtbd',
+  },
+  prototype: {
+    title: 'App Prototype (Clickable HTML)',
+    whenToUse: 'You want something clickable to test or present before touching Figma — skip wireframing and go straight to a working HTML prototype from a screen list.',
+    tool: 'Claude / Cowork', toolIcon: '🤖',
+    inputLabel: 'JTBD doc or screen list + interactions',
+    prompt: `You are a senior front-end developer and UX designer. Given a JTBD document or a list of screens and interactions, generate a complete clickable HTML prototype.
+
+Requirements:
+- Single self-contained HTML file (embedded CSS + JS, no external dependencies)
+- Real JavaScript navigation between screens — no page reloads, no grey placeholder boxes
+- Interactive elements that work: buttons, toggles, selection chips, tab bars, modals
+- Mobile-first layout: 375px wide, centered on desktop with a device chrome wrapper
+- All content should feel real and representative of the product — use plausible data
+
+Include every screen listed in the input. For each screen, implement:
+- Visual layout matching the intended UX
+- Interactive state changes (selected, hover, loading, empty states)
+- Navigation to adjacent screens
+
+OUTPUT: A complete, self-contained HTML file ready to open in a browser.
+
+INPUT: [Attach JTBD document] OR [List screens and key interactions below]`,
+    gemName: 'Prototype Gem', gemUrl: 'https://gemini.google.com/gem/placeholder-prototype',
+    gemDesc: 'Generates fully interactive single-file HTML prototypes from a screen list or JTBD doc.',
+    gemTags: ['Claude Sonnet', 'HTML output', 'Single file'],
+    skillName: 'html-prototype',
+    skillDesc: 'Generates a clickable single-file HTML prototype from a JTBD doc or feature list. Real JS navigation, interactive states, mobile-first. Skips the Figma wireframing pass entirely.',
+    skillTags: ['Prototyping', 'HTML output', 'Interactive', 'No Figma needed'],
+    exampleIcon: '📱', exampleOutput: 'prototype',
+  },
+  ada: {
+    title: 'ADA Accessibility Audit',
+    whenToUse: 'You have a screen — live, designed, or described — and need WCAG issues surfaced with numbered pins and specific fixes, ready to share with a dev.',
+    tool: 'Claude / Cowork Skill', toolIcon: '🤖',
+    inputLabel: 'Screenshot, URL, Figma frame link, or text description',
+    prompt: `You are an expert accessibility auditor with deep knowledge of WCAG 2.1 AA standards and assistive technologies.
+
+Given a UI screen (screenshot, URL, Figma frame link, or text description), produce a complete, self-contained HTML accessibility audit file.
+
+The HTML file must include:
+1. A pixel-accurate visual recreation of the screen using HTML + CSS
+2. Numbered annotation pins (●) overlaid on each issue, positioned accurately
+3. A side panel (right column) with issue cards for each pin:
+   - Pin number
+   - Severity: HIGH / MEDIUM / LOW
+   - WCAG 2.1 criterion violated (e.g., 1.4.3 Contrast Minimum)
+   - Clear description of the problem
+   - Specific recommended fix
+   - Component affected
+
+Color coding: HIGH = #DC2626 (red), MEDIUM = #EA580C (orange), LOW = #D97706 (amber)
+
+Sort issues: HIGH first, then MEDIUM, then LOW.
+
+OUTPUT: A complete, self-contained HTML file ready to share.
+
+INPUT: [Upload screenshot] OR [Paste URL] OR [Paste Figma frame link] OR [Describe the screen]`,
+    gemName: 'ADA Audit Gem', gemUrl: 'https://gemini.google.com/gem/placeholder-ada-audit',
+    gemDesc: 'Runs a WCAG 2.1 AA audit on any UI screen and returns an annotated HTML report.',
+    gemTags: ['Claude Sonnet', 'Cowork skill', 'HTML output', 'WCAG 2.1'],
+    skillName: 'ada-audit',
+    skillDesc: 'Runs a full WCAG 2.1 AA accessibility audit on any UI screen. Works with screenshots, URLs, Figma frames, or text descriptions. Outputs a self-contained HTML file with numbered annotation pins and fix cards.',
+    skillTags: ['Accessibility', 'WCAG 2.1', 'HTML output', 'Any input type'],
+    exampleIcon: '♿', exampleOutput: 'ada',
+  },
+  brand: {
+    title: 'Brand System (Figma MCP)',
+    whenToUse: 'You have hex codes and a font and want a full design system built directly in Figma — color styles, text styles, and component swatches in one session.',
+    tool: 'Claude + Figma MCP', toolIcon: '🎨',
+    inputLabel: 'Figma file URL + brand brief (colors, fonts, personality)',
+    prompt: `You are a brand designer and Figma expert. Given a Figma file and a brand brief, build a complete design system directly inside the Figma file using the Figma MCP connector.
+
+The design system must include:
+
+COLOR STYLES (named and organized):
+- Primary palette (brand main colors + tints)
+- Neutral palette (grays from 50–900)
+- Semantic colors (success, warning, error, info)
+
+TEXT STYLES (named and sized):
+- Display: 48px, 36px (Bold)
+- Heading: 28px, 22px, 18px (Semi Bold)
+- Body: 16px, 14px (Regular, Medium)
+- Label: 12px, 11px (Bold)
+
+COMPONENT FRAMES (on canvas):
+- Color swatch grid with hex values
+- Typography scale specimen
+- Brand personality summary card
+- Primary UI component examples (button, input, badge)
+
+Use async/await pattern. Load fonts before creating text nodes.
+
+IMPORTANT: Inter font styles use spaces — 'Semi Bold' not 'SemiBold', 'Extra Bold' not 'ExtraBold'.
+
+INPUT: [Figma file URL] + Brand brief: primary color [HEX], secondary [HEX], font [name], personality [3 adjectives]`,
+    gemName: 'Figma Brand Gem', gemUrl: 'https://gemini.google.com/gem/placeholder-figma-brand',
+    gemDesc: 'Builds a complete Figma design system (color styles, text styles, components) via MCP.',
+    gemTags: ['Claude Sonnet', 'Figma MCP', 'Design system'],
+    skillName: 'figma-brand-system',
+    skillDesc: 'Builds a complete brand design system directly in Figma via MCP — color styles, text styles, and component frames in one session. Requires Figma MCP connector.',
+    skillTags: ['Figma', 'Brand system', 'Design tokens', 'MCP connector'],
+    exampleIcon: '🎨', exampleOutput: 'brand',
+  },
+};
+
+let currentExp = null;
+
+function selectExp(id, el) {
+  currentExp = id;
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('emptyState').style.display = 'none';
+  renderDetail(id);
+}
+
+function renderDetail(id) {
+  const e = experiments[id];
+  const area = document.getElementById('detailArea');
+  const skillMd = buildSkillMd(id);
+  const skillBlob = URL.createObjectURL(new Blob([skillMd], { type: 'text/markdown' }));
+
+  area.innerHTML = `
+    <div class="detail visible">
+      <div class="detail-header">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
+          <div style="flex:1">
+            <div class="detail-title">${e.title}</div>
+            <div class="detail-when">${e.whenToUse}</div>
+            <div class="detail-meta">
+              <span class="meta-pill">${e.toolIcon} ${e.tool}</span>
+              <span class="meta-dot"></span>
+              <span style="font-size:12px;color:var(--g4)">Input: ${e.inputLabel}</span>
+            </div>
+          </div>
+          <button class="btn btn-outline-blue btn-sm" style="flex-shrink:0;margin-top:6px" onclick="showExample('${id}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            Show Example
+          </button>
+        </div>
+      </div>
+
+      <div class="cards-grid">
+
+        <!-- Card 1: Prompt -->
+        <div class="card">
+          <div class="card-head">
+            <div class="card-icon-wrap" style="background:rgba(43,82,255,0.12)">📝</div>
+            <div class="card-label">Prompt Template</div>
+            <div class="card-title">Reusable Prompt</div>
+          </div>
+          <div class="card-body">
+            <div class="input-pill">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+              Input: ${e.inputLabel}
+            </div>
+            <div class="prompt-box">${e.prompt}</div>
+            <button class="btn btn-dark btn-full" id="copyPromptBtn_${id}" onclick="copyPrompt('${id}')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copy Prompt
+            </button>
+          </div>
+        </div>
+
+        <!-- Card 2: Gemini Gem -->
+        <div class="card">
+          <div class="card-head">
+            <div class="card-icon-wrap" style="background:rgba(255,184,48,0.15)">✨</div>
+            <div class="card-label">Gemini Gem</div>
+            <div class="card-title">${e.gemName}</div>
+          </div>
+          <div class="card-body">
+            <div style="display:flex;gap:24px;flex:1">
+              <div style="flex:1">
+                <div class="gem-section-label" style="margin-bottom:5px">Description</div>
+                <p style="font-size:13px;color:var(--g6);line-height:1.55;margin-bottom:14px">${e.gemDesc}</p>
+                <div class="gem-section-label" style="margin-bottom:5px">Gem URL</div>
+                <div class="gem-url-box">
+                  <span class="gem-url-icon">🔗</span>
+                  <span style="flex:1;font-size:11.5px;color:var(--g4)">${e.gemUrl}</span>
+                </div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px">
+                  ${e.gemTags.map(t => `<span class="gem-tag">${t}</span>`).join('')}
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:8px;justify-content:flex-end;min-width:130px">
+                <a class="btn btn-blue" href="${e.gemUrl}" target="_blank">Open Gem ↗</a>
+                <button class="btn btn-ghost" id="copyGemBtn_${id}" onclick="copyGemUrl('${id}')">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                  Copy URL
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3: Cowork Skill -->
+        <div class="card">
+          <div class="card-head">
+            <div class="card-icon-wrap" style="background:rgba(0,204,122,0.12)">⚡</div>
+            <div class="card-label">Cowork Skill</div>
+            <div class="card-title">${e.skillName}</div>
+          </div>
+          <div class="card-body">
+            <div style="display:flex;gap:20px;flex:1">
+              <div class="skill-preview-box">
+                <div class="skill-preview-name">⚡ ${e.skillName}.skill</div>
+                <p class="skill-preview-body">${e.skillDesc}</p>
+                <div style="margin-top:10px">${e.skillTags.map(t => `<span class="skill-preview-tag">${t}</span>`).join('')}</div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:8px;justify-content:flex-end;min-width:130px">
+                <div class="skill-file-row">
+                  <span style="font-size:20px">📄</span>
+                  <div>
+                    <div class="skill-file-name">SKILL.md</div>
+                    <div class="skill-file-size">Ready to install</div>
+                  </div>
+                </div>
+                <button class="btn btn-ghost btn-sm" onclick="showSkillDialog('${id}')">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  Preview
+                </button>
+                <a class="btn btn-dark btn-sm" style="justify-content:center" href="${skillBlob}" download="SKILL.md">↓ Download</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  `;
+}
+
+function buildSkillMd(id) {
+  const e = experiments[id];
+  return `# ${e.skillName}\n\nSkill for: ${e.title}\nTool: ${e.tool}\n\n## Description\n${e.skillDesc}\n\n## When to Use\n${e.whenToUse}\n\n## Tags\n${e.skillTags.join(', ')}\n\n## Input\n${e.inputLabel}\n\n## Gem\nName: ${e.gemName}\nURL: ${e.gemUrl}\n\n## Prompt\n\`\`\`\n${e.prompt}\n\`\`\`\n`;
+}
+
+// ── Copy with affordance ───────────────────────────────────────────────────
+function copyPrompt(id) {
+  navigator.clipboard.writeText(experiments[id].prompt).then(() => {
+    flashBtn(`copyPromptBtn_${id}`, 'Copied ✓');
+    showToast('Prompt copied');
+  });
+}
+
+function copyGemUrl(id) {
+  navigator.clipboard.writeText(experiments[id].gemUrl).then(() => {
+    flashBtn(`copyGemBtn_${id}`, 'Copied ✓');
+    showToast('URL copied');
+  });
+}
+
+function flashBtn(btnId, label) {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+  const original = btn.innerHTML;
+  btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> ${label}`;
+  btn.classList.add('btn-green');
+  btn.classList.remove('btn-dark', 'btn-ghost');
+  btn.style.borderColor = 'var(--green)';
+  setTimeout(() => {
+    btn.innerHTML = original;
+    btn.classList.remove('btn-green');
+    btn.classList.add(btnId.startsWith('copyPromptBtn') ? 'btn-dark' : 'btn-ghost');
+    btn.style.borderColor = '';
+  }, 2200);
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ── Example output previews — generic/format-focused, not project-specific ─
+const SAMPLE_BANNER = `<div style="background:#EEF1FF;border:1px solid #D5DEFF;border-radius:8px;padding:8px 12px;margin-bottom:16px;display:flex;align-items:center;gap:8px;font-size:11px;color:#1A3EE8;font-weight:600"><span>💡</span> Sample output — structure varies by your input, not by this project</div>`;
+
+const exampleOutputs = {
+  prd: {
+    title: 'PRD Generator', badge: 'Document output · Gemini',
+    html: `<div style="font-family:system-ui,sans-serif;padding:20px">
+      ${SAMPLE_BANNER}
+      <!-- Doc header -->
+      <div style="background:#0D0F1A;border-radius:12px;padding:16px 18px;margin-bottom:16px">
+        <div style="font-size:10px;font-weight:700;color:#2B52FF;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px">Product Requirements Document</div>
+        <div style="font-size:16px;font-weight:800;color:#fff;margin-bottom:4px">HomeChef — Meal Planning App</div>
+        <div style="font-size:11px;color:#9BA3BC">Recipe discovery & weekly meal planner · Draft v1</div>
+        <div style="background:#1F2338;border-radius:6px;padding:6px 10px;margin-top:10px;display:inline-flex;align-items:center;gap:6px">
+          <div style="width:8px;height:8px;border-radius:50%;background:#00CC7A"></div>
+          <span style="font-size:11px;font-weight:700;color:#00CC7A">READY — 9/9 sections passed</span>
+        </div>
+      </div>
+      ${[['1','Background','Home cooking is at an all-time high but meal planning remains fragmented across recipe blogs, spreadsheets, and grocery apps.','PASS','#00CC7A','#E6FAF2'],['2','Problem Statement','People spend 45 min/week deciding what to cook and fail to use ingredients before they expire — causing food waste and decision fatigue.','PASS','#00CC7A','#E6FAF2'],['3','Opportunity Size','TAM $2.1B · SAM $420M · SOM $18M (Y1)','PASS','#00CC7A','#E6FAF2'],['4','North Star Goal','Users plan ≥4 meals/week after 30 days (baseline: 1.2)','PASS','#00CC7A','#E6FAF2'],['5','Target Audience','Home cooks aged 25–45 (primary) · Nutrition-conscious parents (secondary)','PASS','#00CC7A','#E6FAF2'],['6','Jobs to Be Done','Browse recipes → build weekly plan → generate shopping list → track pantry','PASS','#00CC7A','#E6FAF2'],['7','Behavior Change','Replaces ad-hoc Pinterest searches and last-minute grocery trips with structured weekly prep','PASS','#00CC7A','#E6FAF2'],['8','Success Metrics','Weekly plan completion rate ≥60%, avg sessions/week ≥3, 90-day retention ≥40%','PASS','#00CC7A','#E6FAF2'],['9','Research & Risks','Dietary restriction accuracy · Integration with grocery APIs · Recipe IP ownership','NEEDS WORK','#FF8C42','#FFF4ED']].map(([n,s,d,v,vc,vbg])=>`
+      <div style="background:#fff;border:1px solid #ECEEF5;border-radius:10px;padding:10px 14px;margin-bottom:8px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
+          <div style="flex:1">
+            <div style="font-size:10px;color:#9BA3BC;margin-bottom:2px">SECTION ${n}</div>
+            <div style="font-size:13px;font-weight:700;color:#0D0F1A;margin-bottom:2px">${s}</div>
+            <div style="font-size:11px;color:#4A5068;line-height:1.4">${d}</div>
+          </div>
+          <span style="background:${vbg};color:${vc};font-size:10px;font-weight:700;padding:3px 8px;border-radius:5px;flex-shrink:0">${v}</span>
+        </div>
+      </div>`).join('')}
+    </div>`
+  },
+  opp: {
+    title: 'AI Opportunity Map', badge: 'Matrix output · Gemini',
+    html: `<div style="font-family:system-ui,sans-serif;padding:20px">
+      ${SAMPLE_BANNER}
+      <div style="background:#0D0F1A;border-radius:12px;padding:14px 18px;margin-bottom:16px">
+        <div style="font-size:10px;font-weight:700;color:#2B52FF;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px">AI Opportunity Map</div>
+        <div style="font-size:15px;font-weight:800;color:#fff">MediTrack — Medication Reminder App</div>
+        <div style="font-size:11px;color:#9BA3BC;margin-top:3px">Knowledge × Stakes matrix · 8 features scored</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:16px">
+        ${[['🟢 Sweet Spot','High Knowledge · Low Stakes','#E6FAF2','#006B40','#DCFCE7',['Dose reminders','Refill alerts','Adherence streaks']],['🔴 Danger Zone','High Knowledge · High Stakes','#FEE2E2','#991B1B','#FECACA',['Drug interaction check','Dosage adjustment']],['🟡 Standard Utility','Low Knowledge · Low Stakes','#FEF9C3','#92400E','#FEF08A',['General health tips','Symptom lookup']],['🟠 Trust Trap','Low Knowledge · High Stakes','#FEF3C7','#78350F','#FDE68A',['Auto-prescription refill']]].map(([title,sub,bg,tc,pillbg,items])=>`
+        <div style="background:${bg};border-radius:10px;padding:12px">
+          <div style="font-size:11px;font-weight:700;color:${tc};margin-bottom:2px">${title}</div>
+          <div style="font-size:9px;color:${tc};opacity:.7;margin-bottom:8px">${sub}</div>
+          ${items.map(f=>`<div style="background:#fff;border-radius:5px;padding:4px 8px;font-size:10px;color:#0D0F1A;font-weight:600;margin-bottom:4px">${f}</div>`).join('')}
+        </div>`).join('')}
+      </div>
+      <div style="font-size:10px;font-weight:700;color:#9BA3BC;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">3-Horizon Roadmap</div>
+      ${[['🤝','Collaborative','Now','AI suggests reminders — user confirms timing and doses.','#2B52FF'],['🎯','Personalized','3–6 mo','Reminders adapt to user sleep patterns and daily routine.','#8B5CF6'],['⚡','Proactive','12 mo+','Proactive refills for Sweet Spot features only — never for high-stakes dosage decisions.','#00CC7A']].map(([e,h,t,d,c])=>`
+      <div style="background:#fff;border:1px solid #ECEEF5;border-radius:10px;padding:10px 14px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start">
+        <div style="width:36px;height:36px;border-radius:10px;background:${c}20;display:grid;place-items:center;font-size:16px;flex-shrink:0">${e}</div>
+        <div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">
+            <span style="font-size:13px;font-weight:700;color:#0D0F1A">${h}</span>
+            <span style="background:${c}20;color:${c};font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px">${t}</span>
+          </div>
+          <div style="font-size:11px;color:#4A5068">${d}</div>
+        </div>
+      </div>`).join('')}
+    </div>`
+  },
+  discovery: {
+    title: 'UX Discovery Research', badge: 'HTML report output · Claude',
+    html: `<div style="font-family:system-ui,sans-serif;padding:20px">
+      ${SAMPLE_BANNER}
+      <div style="background:#0D0F1A;border-radius:12px;padding:16px 18px;margin-bottom:14px">
+        <div style="font-size:10px;font-weight:700;color:#2B52FF;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px">UX Discovery Report</div>
+        <div style="font-size:16px;font-weight:800;color:#fff;margin-bottom:2px">BikePath — Urban Cycling App</div>
+        <div style="font-size:11px;color:#9BA3BC">Urban Mobility · Consumer · 38 citations</div>
+      </div>
+      <div style="background:#fff;border:1px solid #ECEEF5;border-radius:10px;padding:12px 14px;margin-bottom:10px">
+        <div style="font-size:10px;font-weight:700;color:#9BA3BC;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Executive Summary</div>
+        <div style="font-size:12px;color:#0D0F1A;line-height:1.6">Urban cyclists are underserved by navigation tools built for cars. 68% of commuter cyclists abandon routes due to safety concerns that apps fail to flag. BikePath targets this gap with real-time hazard data and community-verified routing.</div>
+      </div>
+      <div style="background:#fff;border:1px solid #ECEEF5;border-radius:10px;padding:12px 14px;margin-bottom:10px">
+        <div style="font-size:10px;font-weight:700;color:#9BA3BC;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Market Size <span style="color:#2B52FF;font-weight:700;font-size:9px;margin-left:6px">↗ Cited</span></div>
+        ${[['TAM','$2.8B','100%'],['SAM','$520M','58%'],['SOM','$31M','16%']].map(([l,v,w])=>`
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:7px">
+          <div style="width:28px;font-size:10px;font-weight:700;color:#9BA3BC">${l}</div>
+          <div style="flex:1;background:#F7F8FC;border-radius:4px;height:7px;overflow:hidden"><div style="height:100%;background:#2B52FF;width:${w};border-radius:4px"></div></div>
+          <div style="font-size:12px;font-weight:700;color:#0D0F1A;width:40px">${v}</div>
+        </div>`).join('')}
+      </div>
+      <div style="background:#fff;border:1px solid #ECEEF5;border-radius:10px;padding:12px 14px;margin-bottom:10px">
+        <div style="font-size:10px;font-weight:700;color:#9BA3BC;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Competitive Landscape</div>
+        ${[['Strava','Free / $8mo','Activity tracking. No real-time hazard data.'],['Google Maps','Free','Car-first routing. Bike mode lacks detail.'],['Komoot','$4/mo','Tour planning focus. Not commuter-oriented.']].map(([n,p,d])=>`
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid #F7F8FC">
+          <div style="font-size:12px;font-weight:700;color:#0D0F1A;min-width:90px">${n}</div>
+          <div style="font-size:11px;color:#4A5068;flex:1">${d}</div>
+          <div style="font-size:11px;font-weight:700;color:#2B52FF;white-space:nowrap">${p}</div>
+        </div>`).join('')}
+      </div>
+      <div style="background:#fff;border:1px solid #ECEEF5;border-radius:10px;padding:12px 14px">
+        <div style="font-size:10px;font-weight:700;color:#9BA3BC;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Key Pain Points</div>
+        ${['"Google Maps tells me to take roads I\'d never cycle on at night."','"I wish I could see which intersections are actually dangerous before I get there."','"Strava tracks my rides but doesn\'t help me plan a safe commute."'].map(q=>`
+        <div style="background:#F7F8FC;border-radius:7px;padding:9px 10px;margin-bottom:7px;font-size:11px;color:#0D0F1A;line-height:1.5;border-left:3px solid #2B52FF">${q}</div>`).join('')}
+      </div>
+    </div>`
+  },
+  jtbd: {
+    title: 'JTBD MVP Scoping', badge: 'Word document output · Claude',
+    html: `<div style="font-family:system-ui,sans-serif;padding:20px">
+      ${SAMPLE_BANNER}
+      <div style="background:#0D0F1A;border-radius:12px;padding:14px 18px;margin-bottom:14px">
+        <div style="font-size:10px;font-weight:700;color:#2B52FF;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px">JTBD Scoping Document</div>
+        <div style="font-size:15px;font-weight:800;color:#fff">Budgeto — Personal Finance App</div>
+        <div style="font-size:11px;color:#9BA3BC;margin-top:3px">2 personas · 6 jobs · P0–P2 priority tiers</div>
+      </div>
+      <div style="background:#fff;border:1px solid #ECEEF5;border-radius:10px;padding:12px 14px;margin-bottom:10px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <div style="width:36px;height:36px;border-radius:50%;background:#2B52FF;display:grid;place-items:center;font-size:16px;flex-shrink:0">👩‍💼</div>
+          <div>
+            <div style="font-size:13px;font-weight:700;color:#0D0F1A">Priya, Young Professional</div>
+            <div style="font-size:11px;color:#9BA3BC">28 · First job · Student debt · Renting</div>
+          </div>
+        </div>
+        ${[['🛠','Functional','Know exactly how much I can spend without overdrafting'],['💪','Emotional','Feel in control of money instead of anxious about it'],['⭐','Social','Be the friend who has their finances together']].map(([e,t,d])=>`
+        <div style="display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-top:1px solid #F7F8FC">
+          <span style="font-size:15px;flex-shrink:0">${e}</span>
+          <div>
+            <div style="font-size:10px;font-weight:700;color:#9BA3BC;text-transform:uppercase;letter-spacing:.06em">${t}</div>
+            <div style="font-size:11px;color:#0D0F1A;margin-top:1px">${d}</div>
+          </div>
+        </div>`).join('')}
+      </div>
+      <div style="font-size:10px;font-weight:700;color:#9BA3BC;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">Priority Tiers</div>
+      ${[['P0 MUST HAVE','#FF3B5C','#FFF0F3',['Real-time spending balance ("safe to spend")','Auto-categorize transactions','Monthly budget setup']],['P1 SHOULD HAVE','#FF8C42','#FFF4ED',['Bill payment reminders','Savings goal tracker']],['P2 COULD HAVE','#9BA3BC','#F7F8FC',['Shared household budgets','Investment overview']]].map(([l,c,bg,items])=>`
+      <div style="background:${bg};border-radius:10px;padding:10px 14px;margin-bottom:8px">
+        <div style="font-size:10px;font-weight:700;color:${c};margin-bottom:6px">${l}</div>
+        ${items.map(it=>`<div style="font-size:11px;color:#0D0F1A;margin-bottom:3px;display:flex;align-items:center;gap:6px"><span style="width:5px;height:5px;border-radius:50%;background:${c};flex-shrink:0;display:inline-block"></span>${it}</div>`).join('')}
+      </div>`).join('')}
+    </div>`
+  },
+  prototype: {
+    title: 'App Prototype (HTML)', badge: 'Single-file HTML · Claude',
+    html: `<div style="font-family:system-ui,sans-serif;padding:20px;display:flex;flex-direction:column;align-items:center">
+      ${SAMPLE_BANNER}
+      <div style="font-size:11px;color:#9BA3BC;margin-bottom:16px;text-align:center">Clickable HTML prototype — mobile (375px) — 5 screens</div>
+      <div style="width:240px;background:#0D0F1A;border-radius:28px;padding:10px;box-shadow:0 12px 40px rgba(0,0,0,0.35)">
+        <div style="background:#111827;border-radius:20px;overflow:hidden">
+          <div style="background:#0D0F1A;padding:10px 16px 6px;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:9px;color:#9BA3BC;font-weight:600">9:41</span>
+            <div style="width:60px;height:6px;background:#1F2338;border-radius:3px"></div>
+            <span style="font-size:9px;color:#9BA3BC">●●●</span>
+          </div>
+          <div style="background:#2B52FF;padding:12px 16px 14px">
+            <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.6);letter-spacing:.08em;margin-bottom:4px">TASKLY</div>
+            <div style="font-size:15px;font-weight:800;color:#fff;line-height:1.2">Good morning,<br>Priya 👋</div>
+            <div style="background:rgba(0,0,0,.2);border-radius:8px;padding:6px 10px;margin-top:10px;display:flex;justify-content:space-between">
+              <div style="text-align:center"><div style="font-size:14px;font-weight:800;color:#fff">7</div><div style="font-size:8px;color:rgba(255,255,255,.6)">Tasks due</div></div>
+              <div style="width:1px;background:rgba(255,255,255,.15)"></div>
+              <div style="text-align:center"><div style="font-size:14px;font-weight:800;color:#fff">3</div><div style="font-size:8px;color:rgba(255,255,255,.6)">Overdue</div></div>
+              <div style="width:1px;background:rgba(255,255,255,.15)"></div>
+              <div style="text-align:center"><div style="font-size:14px;font-weight:800;color:#fff">82%</div><div style="font-size:8px;color:rgba(255,255,255,.6)">This week</div></div>
+            </div>
+          </div>
+          <div style="padding:10px 12px;background:#111827">
+            <div style="font-size:9px;color:#4A5068;margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:.06em">Today</div>
+            ${[['Finalize Q3 report','Design','09:00','#2B52FF','In Progress'],['Review onboarding flow','Product','11:00','#FF8C42','Up Next'],['Team sync','All hands','14:00','#1F2338','Scheduled']].map(([t,cat,time,c,status])=>`
+            <div style="background:#1A1D2B;border-radius:10px;padding:8px 10px;margin-bottom:6px;border-left:3px solid ${c}">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div style="font-size:10px;font-weight:700;color:#fff">${t}</div>
+                <span style="font-size:8px;color:${c};font-weight:700;background:${c}20;padding:2px 6px;border-radius:4px">${status}</span>
+              </div>
+              <div style="font-size:8px;color:#4A5068;margin-top:2px">${cat} · ${time}</div>
+            </div>`).join('')}
+          </div>
+          <div style="background:#0D0F1A;padding:8px 12px;display:flex;justify-content:space-around;border-top:1px solid #1F2338">
+            ${[['🏠','Home',true],['✅','Tasks',false],['📊','Stats',false],['👤','Me',false]].map(([e,l,a])=>`
+            <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+              <span style="font-size:14px;opacity:${a?1:.4}">${e}</span>
+              <span style="font-size:7px;color:${a?'#2B52FF':'#4A5068'};font-weight:${a?700:400}">${l}</span>
+            </div>`).join('')}
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:16px;background:#fff;border:1px solid #ECEEF5;border-radius:10px;padding:10px 14px;width:100%;text-align:center">
+        <div style="font-size:11px;font-weight:600;color:#0D0F1A;margin-bottom:3px">Single HTML file · No dependencies</div>
+        <div style="font-size:10px;color:#9BA3BC">JS navigation · 5 screens · Works offline</div>
+      </div>
+    </div>`
+  },
+  ada: {
+    title: 'ADA Accessibility Audit', badge: 'HTML audit output · Claude',
+    html: `<div style="font-family:system-ui,sans-serif;padding:20px">
+      ${SAMPLE_BANNER}
+      <div style="background:#0D0F1A;border-radius:12px;padding:14px 18px;margin-bottom:14px">
+        <div style="font-size:10px;font-weight:700;color:#2B52FF;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px">WCAG 2.1 AA Audit</div>
+        <div style="font-size:15px;font-weight:800;color:#fff">Generic Sign In Screen</div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <span style="background:#FF3B5C20;color:#FF3B5C;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px">2 HIGH</span>
+          <span style="background:#FF8C4220;color:#FF8C42;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px">1 MEDIUM</span>
+          <span style="background:#FFB83020;color:#FFB830;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px">1 LOW</span>
+        </div>
+      </div>
+      <!-- Mock screen with pins -->
+      <div style="background:#F7F8FC;border:1px solid #ECEEF5;border-radius:12px;padding:14px;margin-bottom:14px;position:relative">
+        <div style="background:#4B5563;border-radius:8px;padding:9px 12px;margin-bottom:8px;display:flex;gap:8px;align-items:center;position:relative">
+          <span style="font-size:11px;color:#fff;font-weight:600;flex:1">Sign In</span>
+          <div style="position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:#FF3B5C;display:grid;place-items:center;font-size:8px;font-weight:800;color:#fff;box-shadow:0 2px 4px rgba(255,59,92,.4)">1</div>
+        </div>
+        <div style="background:#fff;border-radius:8px;padding:12px;border:1px solid #ECEEF5">
+          <div style="font-size:10px;color:#9BA3BC;margin-bottom:5px;display:flex;align-items:center;gap:6px;position:relative">
+            Email address
+            <div style="width:16px;height:16px;border-radius:50%;background:#FF8C42;display:grid;place-items:center;font-size:8px;font-weight:800;color:#fff">2</div>
+          </div>
+          <div style="background:#F7F8FC;border-radius:6px;padding:7px 9px;font-size:10px;color:#9BA3BC;margin-bottom:10px;border:1px solid #ECEEF5">Enter your email</div>
+          <div style="font-size:10px;color:#9BA3BC;margin-bottom:5px">Password</div>
+          <div style="background:#F7F8FC;border-radius:6px;padding:7px 9px;font-size:10px;color:#9BA3BC;margin-bottom:10px;border:1px solid #ECEEF5">••••••••</div>
+          <div style="background:#6B7280;border-radius:6px;padding:9px;text-align:center;font-size:11px;color:#D1D5DB;font-weight:600;position:relative">
+            Sign In
+            <div style="position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:#FF3B5C;display:grid;place-items:center;font-size:8px;font-weight:800;color:#fff;box-shadow:0 2px 4px rgba(255,59,92,.4)">3</div>
+          </div>
+          <div style="text-align:center;margin-top:8px;position:relative;display:inline-block;width:100%">
+            <span style="font-size:10px;color:#9BA3BC">Forgot password?</span>
+            <div style="position:absolute;top:-4px;right:60px;width:16px;height:16px;border-radius:50%;background:#FFB830;display:grid;place-items:center;font-size:8px;font-weight:800;color:#fff">4</div>
+          </div>
+        </div>
+      </div>
+      <!-- Issue cards -->
+      ${[['1','HIGH','#FF3B5C','#FF3B5C15','1.4.3 Contrast Minimum','Header: #fff on #4B5563 = 3.8:1 — fails AA (min 4.5:1). Fix: darken background to #374151.'],['2','MEDIUM','#FF8C42','#FF8C4215','1.3.1 Info & Relationships','Email label not linked via htmlFor / aria-labelledby. Screen readers cannot associate the label.'],['3','HIGH','#FF3B5C','#FF3B5C15','4.1.2 Name, Role, Value','Submit button has no accessible name. Add aria-label="Sign in to your account".'],['4','LOW','#FFB830','#FFB83015','2.4.7 Focus Visible','outline:none on link — keyboard users lose focus indicator. Remove the override.']].map(([n,sev,c,bg,crit,desc])=>`
+      <div style="background:${bg};border-radius:10px;padding:10px 12px;margin-bottom:8px;border-left:3px solid ${c}">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+          <div style="width:20px;height:20px;border-radius:50%;background:${c};display:grid;place-items:center;font-size:9px;font-weight:800;color:#fff;flex-shrink:0">${n}</div>
+          <span style="font-size:10px;font-weight:700;color:${c}">${sev}</span>
+          <span style="font-size:10px;color:#4A5068;font-family:monospace">${crit}</span>
+        </div>
+        <div style="font-size:11px;color:#0D0F1A;line-height:1.5">${desc}</div>
+      </div>`).join('')}
+    </div>`
+  },
+  brand: {
+    title: 'Brand System (Figma)', badge: 'Built in Figma via MCP · Claude',
+    html: `<div style="font-family:system-ui,sans-serif;padding:20px">
+      ${SAMPLE_BANNER}
+      <div style="background:#0D0F1A;border-radius:12px;padding:14px 18px;margin-bottom:14px">
+        <div style="font-size:10px;font-weight:700;color:#2B52FF;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px">Design System</div>
+        <div style="font-size:15px;font-weight:800;color:#fff">Bloom — Wellness App Brand</div>
+        <div style="font-size:11px;color:#9BA3BC;margin-top:3px">Created in Figma via MCP · 10 color styles · 6 text styles · 4 components</div>
+      </div>
+      <div style="background:#fff;border:1px solid #ECEEF5;border-radius:12px;padding:14px;margin-bottom:12px">
+        <div style="font-size:10px;font-weight:700;color:#9BA3BC;text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px">Color Styles</div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px">
+          ${[['#1A1040','Plum','Primary'],['#2D1A6E','Plum 700','Dark'],['#A78BFA','Violet','Accent'],['#7C3AED','Violet Mid','Hover'],['#EDE9FE','Violet Lt','Surface'],['#F5F3FF','Gray 100','BG'],['#E5E7EB','Gray 200','Border'],['#9CA3AF','Gray 400','Muted'],['#374151','Gray 700','Body'],['#111827','Gray 900','Head']].map(([hex,name])=>`
+          <div style="text-align:center">
+            <div style="aspect-ratio:1;border-radius:10px;background:${hex};border:1px solid rgba(0,0,0,.06);margin-bottom:4px"></div>
+            <div style="font-size:8px;font-weight:700;color:#0D0F1A;line-height:1.2">${name}</div>
+            <div style="font-size:7px;color:#9BA3BC">${hex}</div>
+          </div>`).join('')}
+        </div>
+      </div>
+      <div style="background:#fff;border:1px solid #ECEEF5;border-radius:12px;padding:14px;margin-bottom:12px">
+        <div style="font-size:10px;font-weight:700;color:#9BA3BC;text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px">Text Styles</div>
+        ${[['Display XL','48px','Extra Bold',900,1.4],['Display','36px','Bold',700,1],['Heading 1','28px','Semi Bold',600,0.9],['Body','16px','Regular',400,0.7],['Label','12px','Bold',700,0.6]].map(([name,size,weight,fw,scale])=>`
+        <div style="display:flex;align-items:baseline;justify-content:space-between;padding:6px 0;border-bottom:1px solid #F7F8FC">
+          <span style="font-size:${Math.min(28*scale,28)}px;font-weight:${fw};color:#0D0F1A;line-height:1.2">${name}</span>
+          <span style="font-size:10px;color:#9BA3BC;white-space:nowrap">${size} · ${weight}</span>
+        </div>`).join('')}
+      </div>
+      <div style="background:#fff;border:1px solid #ECEEF5;border-radius:12px;padding:14px">
+        <div style="font-size:10px;font-weight:700;color:#9BA3BC;text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px">Component Examples</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+          <div style="background:#1A1040;color:#A78BFA;padding:8px 16px;border-radius:20px;font-size:11px;font-weight:700">Primary Button</div>
+          <div style="background:#fff;color:#1A1040;padding:7px 15px;border-radius:20px;font-size:11px;font-weight:700;border:1.5px solid #E5E7EB">Secondary</div>
+          <div style="background:#EDE9FE;color:#5B21B6;padding:3px 9px;border-radius:5px;font-size:10px;font-weight:700">Badge</div>
+          <div style="background:#F5F3FF;border-radius:8px;padding:7px 10px;font-size:11px;color:#9CA3AF;flex:1;min-width:120px">Input field…</div>
+        </div>
+      </div>
+    </div>`
+  }
+};
+
+// ── Example panel ──────────────────────────────────────────────────────────
+function showExample(id) {
+  const ex = exampleOutputs[id];
+  if (!ex) return;
+  document.getElementById('epTitle').textContent = ex.title;
+  document.getElementById('epBadge').textContent = ex.badge;
+  document.getElementById('epBody').innerHTML = ex.html;
+  document.getElementById('examplePanel').classList.add('open');
+  document.getElementById('panelOverlay').classList.add('open');
+}
+
+function closeExample() {
+  document.getElementById('examplePanel').classList.remove('open');
+  document.getElementById('panelOverlay').classList.remove('open');
+}
+
+// ── Skill dialog ───────────────────────────────────────────────────────────
+let _currentSkillMd = '';
+
+function showSkillDialog(id) {
+  const md = buildSkillMd(id);
+  _currentSkillMd = md;
+  const e = experiments[id];
+  document.getElementById('dialogSkillName').textContent = `${e.skillName}`;
+  document.getElementById('dialogSkillContent').textContent = md;
+  const blob = URL.createObjectURL(new Blob([md], { type: 'text/markdown' }));
+  document.getElementById('dialogDownloadBtn').href = blob;
+  document.getElementById('dialogOverlay').classList.add('open');
+}
+
+function closeSkillDialog(e) {
+  if (e && e.target !== document.getElementById('dialogOverlay')) return;
+  document.getElementById('dialogOverlay').classList.remove('open');
+}
+
+function copySkillMd() {
+  navigator.clipboard.writeText(_currentSkillMd).then(() => {
+    const btn = document.getElementById('dialogCopyBtn');
+    const orig = btn.innerHTML;
+    btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Copied`;
+    btn.classList.add('btn-green');
+    btn.classList.remove('btn-ghost');
+    setTimeout(() => { btn.innerHTML = orig; btn.classList.remove('btn-green'); btn.classList.add('btn-ghost'); }, 2200);
+    showToast('SKILL.md copied');
+  });
+}
+
+function filterNav(query) {
+  const q = query.toLowerCase();
+  document.querySelectorAll('.nav-item').forEach(item => {
+    const title = item.querySelector('.nav-item-title').textContent.toLowerCase();
+    item.style.display = title.includes(q) ? '' : 'none';
+  });
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    closeExample();
+    document.getElementById('dialogOverlay').classList.remove('open');
+  }
+});
+</script>
+</body>
+</html>
