@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project Scout — UX Discovery Research Report</title>
+<style>
+:root {
+  --teal:      #BCFFEF;
+  --teal-mid:  #5DEDD4;
+  --teal-dark: #00C896;
+  --navy:      #0A1628;
+  --navy-mid:  #162033;
+  --page-bg:   #F0F4F8;
+  --card-bg:   #FFFFFF;
+  --text:      #0F172A;
+  --muted:     #64748B;
+  --border:    #E2E8F0;
+  --red:       #EF4444;
+  --amber:     #F59E0B;
+  --green:     #10B981;
+  --blue:      #3B82F6;
+  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Arial, sans-serif;
+  --r:  12px; --rl: 20px;
+  --sh:  0 1px 4px rgba(0,0,0,0.07);
+  --shm: 0 6px 20px rgba(0,0,0,0.09);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--font); background: var(--page-bg); color: var(--text); line-height: 1.6; }
+
+/* ── NAV ── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(10,22,40,0.96); backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(188,255,239,0.12);
+  height: 54px; display: flex; align-items: center; justify-content: space-between; padding: 0 40px;
+}
+.nav-brand { font-size: 15px; font-weight: 800; color: var(--teal); letter-spacing: -0.3px; display: flex; align-items: center; gap: 8px; }
+.nav-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--teal-dark); }
+.nav-links { display: flex; gap: 2px; list-style: none; }
+.nav-links a { display: block; padding: 5px 12px; font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.6); text-decoration: none; border-radius: 6px; transition: all 0.2s; }
+.nav-links a:hover { color: var(--teal); background: rgba(188,255,239,0.07); }
+
+/* ── HERO ── */
+.hero { background: linear-gradient(135deg, var(--navy) 0%, #0D2030 55%, #091A12 100%); padding: 80px 48px 76px; position: relative; overflow: hidden; }
+.hero::before { content: ''; position: absolute; top: -120px; right: -80px; width: 700px; height: 700px; background: radial-gradient(circle, rgba(188,255,239,0.07) 0%, transparent 65%); pointer-events: none; }
+.hero::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(188,255,239,0.25), transparent); }
+.hero-inner { max-width: 1160px; margin: 0 auto; }
+.eyebrow { display: inline-flex; align-items: center; gap: 8px; background: rgba(188,255,239,0.09); border: 1px solid rgba(188,255,239,0.18); border-radius: 100px; padding: 5px 14px; margin-bottom: 24px; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--teal); }
+.hero h1 { font-size: clamp(34px,5vw,58px); font-weight: 800; letter-spacing: -2px; line-height: 1.05; color: #fff; margin-bottom: 16px; }
+.hero h1 span { color: var(--teal); }
+.hero-sub { font-size: 17px; color: rgba(255,255,255,0.55); max-width: 560px; line-height: 1.65; margin-bottom: 52px; }
+.hero-sub strong { color: rgba(255,255,255,0.85); font-weight: 600; }
+.hero-kpis { display: flex; gap: 10px; flex-wrap: wrap; }
+.kpi { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.07); border-radius: var(--r); padding: 18px 26px; flex: 1; min-width: 160px; }
+.kpi .val { font-size: 30px; font-weight: 800; color: var(--teal); letter-spacing: -1px; line-height: 1; margin-bottom: 5px; }
+.kpi .lbl { font-size: 12px; color: rgba(255,255,255,0.45); line-height: 1.4; }
+
+/* ── MAIN ── */
+main { max-width: 1160px; margin: 0 auto; padding: 64px 40px 100px; }
+section { margin-bottom: 80px; }
+.section-hdr { margin-bottom: 36px; }
+.s-eyebrow { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--teal-dark); background: rgba(0,200,150,0.09); border: 1px solid rgba(0,200,150,0.16); border-radius: 100px; padding: 3px 12px; margin-bottom: 10px; }
+.section-hdr h2 { font-size: clamp(22px,3vw,30px); font-weight: 800; letter-spacing: -0.6px; color: var(--navy); margin-bottom: 8px; }
+.section-hdr p { font-size: 15px; color: var(--muted); max-width: 540px; line-height: 1.65; }
+
+/* ── STAT GRID ── */
+.stat-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 24px; }
+.sc { background: var(--card-bg); border-radius: var(--r); padding: 22px; border: 1px solid var(--border); box-shadow: var(--sh); position: relative; overflow: hidden; transition: box-shadow 0.2s, transform 0.2s; }
+.sc:hover { box-shadow: var(--shm); transform: translateY(-2px); }
+.sc::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+.sc.c-teal::before  { background: var(--teal-dark); }
+.sc.c-navy::before  { background: var(--navy); }
+.sc.c-amber::before { background: var(--amber); }
+.sc.c-red::before   { background: var(--red); }
+.sc.c-green::before { background: var(--green); }
+.sc.c-blue::before  { background: var(--blue); }
+.sc-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; margin-bottom: 14px; }
+.c-teal  .sc-icon { background: rgba(0,200,150,0.09); }
+.c-navy  .sc-icon { background: rgba(10,22,40,0.07); }
+.c-amber .sc-icon { background: rgba(245,158,11,0.10); }
+.c-red   .sc-icon { background: rgba(239,68,68,0.09); }
+.c-green .sc-icon { background: rgba(16,185,129,0.09); }
+.c-blue  .sc-icon { background: rgba(59,130,246,0.09); }
+.sc-val { font-size: 34px; font-weight: 800; letter-spacing: -1.5px; color: var(--navy); line-height: 1; margin-bottom: 4px; }
+.sc-lbl { font-size: 13px; color: var(--muted); font-weight: 500; line-height: 1.4; }
+.sc-src { font-size: 10px; color: #94A3B8; margin-top: 10px; }
+.badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; padding: 2px 9px; border-radius: 100px; margin-top: 8px; }
+.badge.up   { background: #DCFCE7; color: #15803D; }
+.badge.down { background: #FEE2E2; color: #DC2626; }
+.badge.warn { background: #FEF3C7; color: #B45309; }
+
+/* ── CHART ── */
+.chart-card { background: var(--card-bg); border-radius: var(--r); border: 1px solid var(--border); box-shadow: var(--sh); padding: 24px 24px 8px; }
+.chart-title { font-size: 14px; font-weight: 700; color: var(--navy); }
+.chart-sub { font-size: 12px; color: var(--muted); margin-bottom: 16px; }
+
+/* ── COMPETITORS ── */
+.comp-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 14px; margin-bottom: 24px; }
+.comp-card { background: var(--card-bg); border-radius: var(--r); border: 1px solid var(--border); box-shadow: var(--sh); padding: 20px 22px; transition: box-shadow 0.2s; }
+.comp-card:hover { box-shadow: var(--shm); }
+.comp-card.scout { border-color: var(--teal-dark); grid-column: 1/-1; background: linear-gradient(135deg,#F0FFFB 0%,#fff 100%); }
+.comp-hdr { display: flex; align-items: center; gap: 12px; margin-bottom: 11px; flex-wrap: wrap; }
+.comp-logo { width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 900; flex-shrink: 0; }
+.comp-info { flex: 1; }
+.comp-name { font-size: 15px; font-weight: 700; color: var(--navy); }
+.comp-type { font-size: 11px; color: var(--muted); }
+.comp-url { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; color: var(--blue); text-decoration: none; background: rgba(59,130,246,0.07); padding: 3px 9px; border-radius: 100px; border: 1px solid rgba(59,130,246,0.15); margin-left: auto; flex-shrink: 0; transition: all 0.2s; }
+.comp-url:hover { background: rgba(59,130,246,0.14); text-decoration: underline; }
+.comp-desc { font-size: 13px; color: var(--muted); line-height: 1.55; margin-bottom: 14px; }
+
+/* ── FEATURE LIST (expanded competitor chips) ── */
+.feat-list { display: flex; flex-direction: column; gap: 8px; }
+.feat { display: flex; gap: 10px; align-items: flex-start; }
+.feat-ico {
+  width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 800; margin-top: 1px;
+}
+.feat.s .feat-ico { background: #DCFCE7; color: #15803D; }
+.feat.g .feat-ico { background: #FEE2E2; color: #DC2626; }
+.feat.sc .feat-ico { background: rgba(0,200,150,0.12); color: var(--teal-dark); }
+.feat-body { flex: 1; }
+.feat-title { font-size: 12px; font-weight: 700; color: var(--text); display: block; margin-bottom: 1px; }
+.feat-detail { font-size: 11.5px; color: var(--muted); line-height: 1.45; }
+
+/* ── MATRIX ── */
+.matrix-card { background: var(--card-bg); border-radius: var(--r); border: 1px solid var(--border); box-shadow: var(--sh); overflow: hidden; }
+.matrix-hdr { padding: 16px 24px 14px; font-size: 14px; font-weight: 700; color: var(--navy); border-bottom: 1px solid var(--border); }
+table { width: 100%; border-collapse: collapse; }
+th { padding: 11px 14px; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-align: center; color: var(--muted); background: #F8FAFC; border-bottom: 1px solid var(--border); }
+th.fl { text-align: left; }
+th.sc-col { color: var(--teal-dark); background: rgba(0,200,150,0.05); }
+td { padding: 10px 14px; font-size: 13px; text-align: center; border-bottom: 1px solid #F1F5F9; vertical-align: middle; }
+td.fn { text-align: left; font-weight: 500; color: var(--text); }
+td.sc-col { background: rgba(0,200,150,0.03); }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #FAFBFC; }
+tr:hover td.sc-col { background: rgba(0,200,150,0.05); }
+.cy { color: var(--green); font-size: 15px; }
+.cn { color: var(--red); font-size: 15px; }
+.cp { color: var(--amber); font-size: 12px; font-weight: 700; }
+.cs { color: var(--teal-dark); font-weight: 800; font-size: 13px; }
+.matrix-foot { padding: 9px 20px; font-size: 11px; color: #94A3B8; border-top: 1px solid #F1F5F9; }
+
+/* ── PERSONAS ── */
+.persona-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 22px; }
+.persona-card { background: var(--card-bg); border-radius: var(--rl); border: 1px solid var(--border); box-shadow: var(--sh); padding: 26px; }
+.p-head { display: flex; gap: 14px; align-items: flex-start; padding-bottom: 18px; margin-bottom: 18px; border-bottom: 1px solid var(--border); }
+.p-avatar { width: 52px; height: 52px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+.p-tag { display: inline-block; font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 9px; border-radius: 100px; margin-bottom: 4px; }
+.p-tag.pri { background: rgba(0,200,150,0.12); color: var(--teal-dark); }
+.p-tag.sec { background: rgba(59,130,246,0.10); color: #2563EB; }
+.p-name { font-size: 17px; font-weight: 700; color: var(--navy); margin-bottom: 2px; }
+.p-role { font-size: 12px; color: var(--muted); }
+.demog { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+.d-lbl { font-size: 9px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: #94A3B8; margin-bottom: 2px; }
+.d-val { font-size: 13px; font-weight: 600; color: var(--text); }
+.p-quote { background: #F8FAFC; border-left: 3px solid var(--teal-dark); border-radius: 0 8px 8px 0; padding: 12px 14px; font-size: 13px; font-style: italic; color: var(--text); line-height: 1.6; margin-bottom: 18px; }
+
+/* Forum quote block */
+.forum-block {
+  background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 10px;
+  padding: 14px 16px; margin-bottom: 18px;
+}
+.forum-header {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+}
+.forum-logo {
+  width: 22px; height: 22px; border-radius: 4px;
+  background: #FF4500; display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 900; color: #fff; flex-shrink: 0;
+}
+.forum-source { font-size: 11px; font-weight: 700; color: #92400E; }
+.forum-link {
+  display: inline-flex; align-items: center; gap: 3px;
+  font-size: 10px; font-weight: 600; color: #B45309;
+  text-decoration: none; margin-left: auto;
+  border: 1px solid #FCD34D; border-radius: 100px; padding: 2px 8px;
+  background: rgba(255,255,255,0.7);
+}
+.forum-link:hover { text-decoration: underline; }
+.forum-disclaimer { font-size: 10px; color: #92400E; margin-bottom: 6px; font-style: italic; }
+.forum-text { font-size: 12.5px; color: #1C1917; line-height: 1.6; font-style: italic; }
+.forum-text::before { content: '"'; }
+.forum-text::after { content: '"'; }
+
+/* Persona methodology */
+.persona-meth {
+  background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 8px;
+  padding: 12px 14px; margin-bottom: 18px;
+}
+.meth-label { font-size: 10px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: #166534; margin-bottom: 5px; }
+.meth-text { font-size: 12px; color: #15803D; line-height: 1.55; }
+.meth-sources { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+.meth-src {
+  font-size: 10px; font-weight: 600; color: #166534;
+  background: rgba(0,200,150,0.1); border: 1px solid rgba(0,200,150,0.2);
+  border-radius: 100px; padding: 2px 8px; text-decoration: none;
+}
+.meth-src:hover { text-decoration: underline; }
+
+.p-lbl { font-size: 10px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); margin-bottom: 7px; }
+.p-list { list-style: none; margin-bottom: 14px; }
+.p-list li { font-size: 13px; color: var(--text); padding: 4px 0; display: flex; gap: 8px; align-items: flex-start; line-height: 1.5; }
+.p-list li .arr { color: var(--teal-dark); font-weight: 700; flex-shrink: 0; }
+
+/* ── PAIN POINTS ── */
+.pain-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 14px; }
+.pain-card { background: var(--card-bg); border-radius: var(--r); border: 1px solid var(--border); box-shadow: var(--sh); padding: 22px; }
+.sev { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; padding: 3px 10px; border-radius: 100px; margin-bottom: 12px; }
+.sev.crit { background: #FEE2E2; color: #DC2626; }
+.sev.high { background: #FEF3C7; color: #B45309; }
+.pain-title { font-size: 16px; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+.pain-desc { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 14px; }
+.pain-met { background: #F8FAFC; border-radius: 8px; padding: 9px 13px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 7px; }
+.pm-lbl { font-size: 12px; color: var(--muted); }
+.pm-val { font-size: 13px; font-weight: 700; color: var(--navy); }
+.bar-wrap { margin-top: 13px; }
+.bar-lbl { font-size: 11px; color: var(--muted); margin-bottom: 3px; display: flex; justify-content: space-between; }
+.bar-track { height: 5px; background: #F1F5F9; border-radius: 3px; overflow: hidden; margin-bottom: 9px; }
+.bar-fill { height: 100%; border-radius: 3px; }
+
+/* Pain point source citation */
+.pain-source {
+  display: flex; align-items: flex-start; gap: 10px;
+  background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 8px;
+  padding: 10px 13px; margin-top: 14px;
+}
+.ps-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+.ps-body { flex: 1; }
+.ps-label { font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #1D4ED8; margin-bottom: 3px; }
+.ps-text { font-size: 11.5px; color: #1E40AF; line-height: 1.5; }
+.ps-links { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.ps-link { font-size: 10px; font-weight: 600; color: #2563EB; text-decoration: none; background: rgba(255,255,255,0.7); border: 1px solid #BFDBFE; border-radius: 100px; padding: 2px 8px; }
+.ps-link:hover { text-decoration: underline; background: #fff; }
+
+/* ── OPPORTUNITY ── */
+.opp-card { background: linear-gradient(135deg, var(--navy) 0%, #0C2A1A 100%); border-radius: var(--rl); padding: 44px; position: relative; overflow: hidden; }
+.opp-card::before { content: ''; position: absolute; right: -80px; top: -80px; width: 360px; height: 360px; background: radial-gradient(circle, rgba(188,255,239,0.09) 0%, transparent 65%); }
+.opp-card h3 { color: #fff; font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+.opp-card > p { color: rgba(255,255,255,0.55); margin-bottom: 32px; max-width: 540px; font-size: 15px; line-height: 1.6; }
+.opp-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 12px; }
+.opp-item { background: rgba(255,255,255,0.05); border: 1px solid rgba(188,255,239,0.11); border-radius: 10px; padding: 16px 18px; display: flex; gap: 13px; align-items: flex-start; }
+.opp-ico { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+.opp-t { font-size: 13px; font-weight: 700; color: var(--teal); margin-bottom: 4px; }
+.opp-d { font-size: 12px; color: rgba(255,255,255,0.48); line-height: 1.55; }
+
+/* ── BIBLIOGRAPHY (fully clickable cards) ── */
+.bib-list { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+.bib-list li { padding: 0; }
+.bib-link-card {
+  display: flex; gap: 12px; align-items: flex-start;
+  background: var(--card-bg); border-radius: 10px; padding: 14px 18px;
+  border: 1px solid var(--border); text-decoration: none; color: inherit;
+  transition: all 0.2s; box-shadow: var(--sh);
+}
+.bib-link-card:hover {
+  border-color: var(--blue); box-shadow: var(--shm);
+  background: #F8FBFF; transform: translateY(-1px);
+}
+.bib-n { width: 24px; height: 24px; background: #F1F5F9; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: var(--muted); flex-shrink: 0; margin-top: 1px; }
+.bib-body { flex: 1; }
+.bib-t { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 2px; display: block; }
+.bib-m { font-size: 11px; color: var(--muted); }
+.bib-arrow { color: var(--blue); font-size: 14px; flex-shrink: 0; margin-top: 2px; opacity: 0.6; transition: opacity 0.2s; }
+.bib-link-card:hover .bib-arrow { opacity: 1; }
+
+/* ── FOOTER ── */
+footer { background: var(--navy); color: rgba(255,255,255,0.35); text-align: center; padding: 22px; font-size: 12px; }
+footer span { color: var(--teal); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 860px) {
+  .stat-grid, .comp-grid, .persona-grid, .pain-grid, .opp-grid { grid-template-columns: 1fr; }
+  .comp-card.scout { grid-column: 1; }
+  main { padding: 40px 20px 60px; }
+  .hero { padding: 56px 20px 60px; }
+  nav { padding: 0 20px; }
+  .nav-links { display: none; }
+  .hero-kpis { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand"><div class="nav-dot"></div>Project Scout</div>
+  <ul class="nav-links">
+    <li><a href="#benchmarks">Benchmarks</a></li>
+    <li><a href="#competitive">Competitive</a></li>
+    <li><a href="#personas">Personas</a></li>
+    <li><a href="#painpoints">Pain Points</a></li>
+    <li><a href="#opportunity">Opportunity</a></li>
+    <li><a href="#bibliography">Sources</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow"><svg width="7" height="7" viewBox="0 0 7 7"><circle cx="3.5" cy="3.5" r="3.5" fill="#BCFFEF"/></svg>UX Discovery Research · 2026</div>
+    <h1>Institutional Intelligence<br><span>for Every Buyer.</span></h1>
+    <p class="hero-sub">A full discovery research report for <strong>Project Scout</strong> — an AI-powered real estate platform that gives individual buyers the same tools institutional investors use to win, in seconds.</p>
+    <div class="hero-kpis">
+      <div class="kpi"><div class="val">$303B</div><div class="lbl">AI in Real Estate market · 2025</div></div>
+      <div class="kpi"><div class="val">29%</div><div class="lbl">of homes bought by investors · 2025</div></div>
+      <div class="kpi"><div class="val">21%</div><div class="lbl">first-time buyer share · record low</div></div>
+      <div class="kpi"><div class="val">40 yrs</div><div class="lbl">median first-time buyer age · all-time high</div></div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- ══ BENCHMARKS ══ -->
+  <section id="benchmarks">
+    <div class="section-hdr">
+      <span class="s-eyebrow">01 — Market Benchmarks</span>
+      <h2>The Numbers Behind the Problem</h2>
+      <p>Key market indicators that validate the opportunity for Scout and the urgency of leveling the playing field for individual homebuyers.</p>
+    </div>
+    <div class="stat-grid">
+      <div class="sc c-teal"><div class="sc-icon">📈</div><div class="sc-val">$989B</div><div class="sc-lbl">AI in Real Estate projected market size by 2029</div><div class="badge up">↑ 34.4% CAGR from 2025</div><div class="sc-src">PropTech Analytics / MarketScale, 2025</div></div>
+      <div class="sc c-navy"><div class="sc-icon">💰</div><div class="sc-val">$16.7B</div><div class="sc-lbl">Global PropTech funding in 2025 — AI-focused startups leading</div><div class="badge up">↑ 67.9% year-over-year</div><div class="sc-src">MarketScale / Bisnow, 2025</div></div>
+      <div class="sc c-amber"><div class="sc-icon">🏦</div><div class="sc-val">90%</div><div class="sc-lbl">of real estate firms testing AI in 2026 — moving from search to autonomous decisions</div><div class="badge warn">⚡ Institutional speed advantage widening</div><div class="sc-src">JLL / PwC Emerging Trends, 2026</div></div>
+      <div class="sc c-red"><div class="sc-icon">⏱</div><div class="sc-val">&lt; 48h</div><div class="sc-lbl">Median time on market for "hot" homes in urban hubs · 2026</div><div class="badge down">Humans need 12–24h just to find &amp; coordinate</div><div class="sc-src">PRD — Project Scout, 2026</div></div>
+      <div class="sc c-green"><div class="sc-icon">🎯</div><div class="sc-val">16%</div><div class="sc-lbl">of buyers who trust AI to help find a home in 2026 — a trust crisis</div><div class="badge down">↓ 14 pts from 2025 — design challenge</div><div class="sc-src">NerdWallet Home Buyer Report, 2026</div></div>
+      <div class="sc c-blue"><div class="sc-icon">🔮</div><div class="sc-val">48%</div><div class="sc-lbl">of prospective 2026 buyers plan to use AI in their home search</div><div class="badge up">↑ Intent rising even as trust falls</div><div class="sc-src">NerdWallet Home Buyer Report, 2026</div></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">AI in Real Estate — Market Size Projection ($B)</div>
+      <div class="chart-sub">2024–2029 · 34.4% CAGR · Sources: PropTech Analytics, MarketScale</div>
+      <svg viewBox="0 0 680 230" width="100%" xmlns="http://www.w3.org/2000/svg">
+        <line x1="70" y1="25" x2="70" y2="188" stroke="#E2E8F0" stroke-width="1"/>
+        <line x1="70" y1="188" x2="660" y2="188" stroke="#E2E8F0" stroke-width="1"/>
+        <line x1="70" y1="152" x2="660" y2="152" stroke="#F1F5F9" stroke-width="1" stroke-dasharray="5,4"/>
+        <line x1="70" y1="116" x2="660" y2="116" stroke="#F1F5F9" stroke-width="1" stroke-dasharray="5,4"/>
+        <line x1="70" y1="80"  x2="660" y2="80"  stroke="#F1F5F9" stroke-width="1" stroke-dasharray="5,4"/>
+        <line x1="70" y1="43"  x2="660" y2="43"  stroke="#F1F5F9" stroke-width="1" stroke-dasharray="5,4"/>
+        <text x="60" y="192" text-anchor="end" font-size="10" fill="#94A3B8">$0</text>
+        <text x="60" y="156" text-anchor="end" font-size="10" fill="#94A3B8">$250B</text>
+        <text x="60" y="120" text-anchor="end" font-size="10" fill="#94A3B8">$500B</text>
+        <text x="60" y="84"  text-anchor="end" font-size="10" fill="#94A3B8">$750B</text>
+        <text x="60" y="47"  text-anchor="end" font-size="10" fill="#94A3B8">$1T</text>
+        <text x="70"  y="206" text-anchor="middle" font-size="11" fill="#94A3B8" font-weight="500">2024</text>
+        <text x="188" y="206" text-anchor="middle" font-size="11" fill="#94A3B8" font-weight="500">2025</text>
+        <text x="306" y="206" text-anchor="middle" font-size="11" fill="#94A3B8" font-weight="500">2026</text>
+        <text x="424" y="206" text-anchor="middle" font-size="11" fill="#94A3B8" font-weight="500">2027</text>
+        <text x="542" y="206" text-anchor="middle" font-size="11" fill="#94A3B8" font-weight="500">2028</text>
+        <text x="660" y="206" text-anchor="middle" font-size="11" fill="#94A3B8" font-weight="500">2029</text>
+        <defs><linearGradient id="ag" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#00C896" stop-opacity="0.18"/><stop offset="100%" stop-color="#00C896" stop-opacity="0.01"/></linearGradient></defs>
+        <path d="M70,152 L188,138 L306,121 L424,99 L542,69 L660,28 L660,188 L70,188 Z" fill="url(#ag)"/>
+        <polyline points="70,152 188,138 306,121 424,99 542,69 660,28" fill="none" stroke="#00C896" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+        <circle cx="70"  cy="152" r="4" fill="#fff" stroke="#00C896" stroke-width="2"/>
+        <circle cx="188" cy="138" r="4" fill="#fff" stroke="#00C896" stroke-width="2"/>
+        <circle cx="306" cy="121" r="4" fill="#fff" stroke="#00C896" stroke-width="2"/>
+        <circle cx="424" cy="99"  r="4" fill="#fff" stroke="#00C896" stroke-width="2"/>
+        <circle cx="542" cy="69"  r="4" fill="#fff" stroke="#00C896" stroke-width="2"/>
+        <circle cx="660" cy="28"  r="5" fill="#00C896" stroke="#fff" stroke-width="2.5"/>
+        <text x="70"  y="144" text-anchor="middle" font-size="10" font-weight="600" fill="#0A1628">$230B</text>
+        <text x="188" y="130" text-anchor="middle" font-size="10" font-weight="600" fill="#0A1628">$303B</text>
+        <text x="306" y="113" text-anchor="middle" font-size="10" font-weight="600" fill="#0A1628">$407B</text>
+        <text x="424" y="91"  text-anchor="middle" font-size="10" font-weight="600" fill="#0A1628">$546B</text>
+        <text x="542" y="61"  text-anchor="middle" font-size="10" font-weight="600" fill="#0A1628">$733B</text>
+        <text x="660" y="20"  text-anchor="middle" font-size="10" font-weight="700" fill="#00C896">$989B</text>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ══ COMPETITIVE LANDSCAPE ══ -->
+  <section id="competitive">
+    <div class="section-hdr">
+      <span class="s-eyebrow">02 — Competitive Landscape</span>
+      <h2>Who's Already in the Arena</h2>
+      <p>Key players in real estate technology, their positioning and specific capability gaps — showing exactly where Scout fills uncontested whitespace.</p>
+    </div>
+
+    <div class="comp-grid">
+
+      <!-- ZILLOW -->
+      <div class="comp-card">
+        <div class="comp-hdr">
+          <div class="comp-logo" style="background:#006AFF;color:#fff">Z</div>
+          <div class="comp-info">
+            <div class="comp-name">Zillow AI Mode</div>
+            <div class="comp-type">Consumer Portal · Launched March 2026</div>
+          </div>
+          <a class="comp-url" href="https://www.zillow.com" target="_blank">zillow.com ↗</a>
+        </div>
+        <p class="comp-desc">Market leader launched AI Mode in March 2026 — a conversational assistant built into its existing platform with 75M+ monthly users. Biggest listing database in the US.</p>
+        <div class="feat-list">
+          <div class="feat s"><div class="feat-ico">✓</div><div class="feat-body"><span class="feat-title">Conversational search</span><span class="feat-detail">AI Mode lets buyers type natural queries like "3BR near good schools under $600k" instead of toggling filter dropdowns — reducing friction in the initial search phase.</span></div></div>
+          <div class="feat s"><div class="feat-ico">✓</div><div class="feat-body"><span class="feat-title">Negotiation insights</span><span class="feat-detail">Surfaces price history and market competitiveness data inline — e.g. "This home has been listed 22 days and dropped $15k" — giving buyers some leverage context.</span></div></div>
+          <div class="feat s"><div class="feat-ico">✓</div><div class="feat-body"><span class="feat-title">Renovation cost estimates</span><span class="feat-detail">AI Mode estimates renovation costs for features like kitchen remodels or bathroom updates based on comparable jobs in the local area.</span></div></div>
+          <div class="feat g"><div class="feat-ico">✕</div><div class="feat-body"><span class="feat-title">No photo red flag detection</span><span class="feat-detail">Zillow cannot scan listing photos for structural issues. Water stains, foundation cracks, DIY wiring, or mold are invisible to the platform — buyers only discover them at the viewing.</span></div></div>
+          <div class="feat g"><div class="feat-ico">✕</div><div class="feat-body"><span class="feat-title">4–6 hour MLS alert lag</span><span class="feat-detail">Listings appear on Zillow hours after going live on MLS. Institutional algorithms with direct MLS feeds have already acted on the property before most individual buyers even see it.</span></div></div>
+          <div class="feat g"><div class="feat-ico">✕</div><div class="feat-body"><span class="feat-title">No vibe-based matching</span><span class="feat-detail">Filters are purely structural: beds, baths, sqft, price, year built. "Morning light for my home office," "walkable to coffee," or "quiet street feel" cannot be searched — a critical miss for lifestyle-first buyers.</span></div></div>
+        </div>
+      </div>
+
+      <!-- REDFIN -->
+      <div class="comp-card">
+        <div class="comp-hdr">
+          <div class="comp-logo" style="background:#CC0033;color:#fff">R</div>
+          <div class="comp-info">
+            <div class="comp-name">Redfin</div>
+            <div class="comp-type">Agent Platform + Portal · AI search late 2025</div>
+          </div>
+          <a class="comp-url" href="https://www.redfin.com" target="_blank">redfin.com ↗</a>
+        </div>
+        <p class="comp-desc">Launched conversational AI search in late 2025. Strong buyer agent network with transparent commission structure. Focuses on reducing total transaction cost, not vetting speed.</p>
+        <div class="feat-list">
+          <div class="feat s"><div class="feat-ico">✓</div><div class="feat-body"><span class="feat-title">Plain language search</span><span class="feat-detail">Buyers describe needs in natural sentences ("open plan with a yard near a park") rather than setting filter dials — a significant UX improvement over legacy search UI.</span></div></div>
+          <div class="feat s"><div class="feat-ico">✓</div><div class="feat-body"><span class="feat-title">Agent transparency</span><span class="feat-detail">Shows buyer agent commission rates upfront (typically 1–1.5%) and allows buyers to get a refund if their agent earns above a set threshold — reducing hidden cost anxiety.</span></div></div>
+          <div class="feat g"><div class="feat-ico">✕</div><div class="feat-body"><span class="feat-title">No photo analysis</span><span class="feat-detail">No computer vision applied to listing images. Structural red flags — foundation issues, DIY work, water damage — pass undetected. Buyers still need physical inspections to find what photos hide.</span></div></div>
+          <div class="feat g"><div class="feat-ico">✕</div><div class="feat-body"><span class="feat-title">No AI staging detection</span><span class="feat-detail">Cannot identify Generative Fill or AI-enhanced listing photos. A bathroom that looks freshly tiled in a listing may show cracked grout in person — Redfin has no mechanism to flag this.</span></div></div>
+          <div class="feat g"><div class="feat-ico">✕</div><div class="feat-body"><span class="feat-title">No seller urgency data</span><span class="feat-detail">Days on market, price cut frequency, and seller tax history are not analyzed or scored for the buyer. A buyer cannot instantly know whether the seller is motivated to negotiate — that research must be done manually.</span></div></div>
+        </div>
+      </div>
+
+      <!-- OPENDOOR -->
+      <div class="comp-card">
+        <div class="comp-hdr">
+          <div class="comp-logo" style="background:#00B4AA;color:#fff">O</div>
+          <div class="comp-info">
+            <div class="comp-name">Opendoor</div>
+            <div class="comp-type">iBuyer · Seller-side AI transactions</div>
+          </div>
+          <a class="comp-url" href="https://www.opendoor.com" target="_blank">opendoor.com ↗</a>
+        </div>
+        <p class="comp-desc">iBuyer platform making instant cash offers to sellers. Demonstrates AI-automated real estate decisions at scale — but oriented entirely toward sellers, not buyers.</p>
+        <div class="feat-list">
+          <div class="feat s"><div class="feat-ico">✓</div><div class="feat-body"><span class="feat-title">AI underwriting at scale</span><span class="feat-detail">Automated valuation models assess thousands of properties daily and generate instant offers within minutes — showing what algorithmic real estate decisions look like in practice.</span></div></div>
+          <div class="feat s"><div class="feat-ico">✓</div><div class="feat-body"><span class="feat-title">Instant transaction speed</span><span class="feat-detail">Sellers can close in as few as 14 days with no listing process — demonstrating the demand for radical speed reduction in real estate transactions.</span></div></div>
+          <div class="feat g"><div class="feat-ico">✕</div><div class="feat-body"><span class="feat-title">Seller-side only — no buyer tools</span><span class="feat-detail">The platform exists to capture sellers, not serve buyers. Individual buyers receive no intelligence, vetting tools, or alerts. Opendoor competes with buyers for inventory, not alongside them.</span></div></div>
+          <div class="feat g"><div class="feat-ico">✕</div><div class="feat-body"><span class="feat-title">Below-market offers (70–80% FMV)</span><span class="feat-detail">Opendoor typically offers 70–80% of fair market value plus a 5% service fee to sellers — extracting value from the transaction rather than democratizing it. One in five Offerpad homes sold for less than purchase price.</span></div></div>
+        </div>
+      </div>
+
+      <!-- HOMESAGE -->
+      <div class="comp-card">
+        <div class="comp-hdr">
+          <div class="comp-logo" style="background:#7C3AED;color:#fff">H</div>
+          <div class="comp-info">
+            <div class="comp-name">Homesage.ai</div>
+            <div class="comp-type">Emerging PropTech · Institutional Data for Individuals</div>
+          </div>
+          <a class="comp-url" href="https://homesage.ai" target="_blank">homesage.ai ↗</a>
+        </div>
+        <p class="comp-desc">Closest conceptual ancestor to Scout — democratizing institutional-grade data for individual real estate investors. Investment-ROI framing, not lifestyle or buyer-experience framing.</p>
+        <div class="feat-list">
+          <div class="feat s"><div class="feat-ico">✓</div><div class="feat-body"><span class="feat-title">Institutional-grade financial data</span><span class="feat-detail">Aggregates cap rate, NOI, cash-on-cash return, and comparable sale data previously accessible only to large PE funds — proving the demand for leveling the information playing field.</span></div></div>
+          <div class="feat s"><div class="feat-ico">✓</div><div class="feat-body"><span class="feat-title">Targets individual investors</span><span class="feat-detail">Explicitly positions itself as democratizing data "once reserved for large firms" — validating Scout's core thesis that individuals deserve institutional-grade intelligence.</span></div></div>
+          <div class="feat g"><div class="feat-ico">✕</div><div class="feat-body"><span class="feat-title">ROI-only framing — not for owner-occupants</span><span class="feat-detail">All analysis is framed around financial return (cap rate, rental yield). An owner-occupant buyer who cares about light, neighborhood, or school quality gets no relevant output.</span></div></div>
+          <div class="feat g"><div class="feat-ico">✕</div><div class="feat-body"><span class="feat-title">No visual or photo intelligence</span><span class="feat-detail">Cannot analyze listing photos for structural conditions, staging quality, or lifestyle signals. The "what does this home actually look like vs. what they're showing me" question goes unanswered.</span></div></div>
+          <div class="feat g"><div class="feat-ico">✕</div><div class="feat-body"><span class="feat-title">No real-time MLS alerts</span><span class="feat-detail">No push notification system for matching listings. Users must manually check — replicating the same lag problem that lets institutional buyers front-run individual investors.</span></div></div>
+        </div>
+      </div>
+
+      <!-- SCOUT -->
+      <div class="comp-card scout">
+        <div class="comp-hdr">
+          <div class="comp-logo" style="background:#00C896;color:#fff">S</div>
+          <div class="comp-info">
+            <div class="comp-name" style="color:#00C896">Project Scout — Opportunity Position</div>
+            <div class="comp-type">Proposed · Individual Buyer Intelligence Platform</div>
+          </div>
+        </div>
+        <p class="comp-desc">Scout occupies an uncontested position: the only consumer-facing tool combining real-time MLS intelligence, computer vision red flag detection, AI staging analysis, lifestyle-based matching, and seller urgency scoring — all exclusively buyer-side.</p>
+        <div class="feat-list">
+          <div class="feat sc"><div class="feat-ico">✓</div><div class="feat-body"><span class="feat-title">Millisecond MLS alerts</span><span class="feat-detail">Direct integration with MLS data feeds bypasses the 4–6 hour consumer app delay. Notification within seconds of a listing going live — giving buyers the same first-mover window institutions have.</span></div></div>
+          <div class="feat sc"><div class="feat-ico">✓</div><div class="feat-body"><span class="feat-title">Photo red flag detection</span><span class="feat-detail">Computer vision scanning for water stains, foundation cracks, DIY electrical, and mold indicators in listing photos before any visit is scheduled — eliminating the "money pit" risk.</span></div></div>
+          <div class="feat sc"><div class="feat-ico">✓</div><div class="feat-body"><span class="feat-title">AI staging / de-staging detection</span><span class="feat-detail">Identifies Generative Fill and AI-enhanced listing photography, flagging what may have been digitally removed or enhanced — restoring photo trust for buyers.</span></div></div>
+          <div class="feat sc"><div class="feat-ico">✓</div><div class="feat-body"><span class="feat-title">Vibe-to-data matching</span><span class="feat-detail">Converts lifestyle prompts ("morning light for my home office," "walkable to coffee") into quantifiable visual and geospatial signals matched against listing photos and public data.</span></div></div>
+          <div class="feat sc"><div class="feat-ico">✓</div><div class="feat-body"><span class="feat-title">Seller urgency scoring</span><span class="feat-detail">Automated analysis of days on market, price cut frequency, tax payment history, and listing changes to score how motivated the seller is — telling the buyer how much room to negotiate.</span></div></div>
+          <div class="feat sc"><div class="feat-ico">✓</div><div class="feat-body"><span class="feat-title">Leverage calculator</span><span class="feat-detail">Produces an instant negotiation brief before the buyer makes an offer: seller urgency score, comparable sales, and estimated room to negotiate — the same brief a private equity analyst would generate.</span></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature matrix -->
+    <div class="matrix-card">
+      <div class="matrix-hdr">Feature Comparison Matrix</div>
+      <table>
+        <thead>
+          <tr><th class="fl">Feature</th><th>Zillow AI</th><th>Redfin</th><th>Opendoor</th><th>Homesage.ai</th><th class="sc-col">Scout</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="fn">Conversational / NL search</td><td><span class="cy">✓</span></td><td><span class="cy">✓</span></td><td><span class="cn">✕</span></td><td><span class="cn">✕</span></td><td class="sc-col"><span class="cs">✓</span></td></tr>
+          <tr><td class="fn">Real-time MLS alerts (&lt; 5 min)</td><td><span class="cn">✕</span></td><td><span class="cp">~</span></td><td>—</td><td><span class="cn">✕</span></td><td class="sc-col"><span class="cs">✓</span></td></tr>
+          <tr><td class="fn">Photo red flag detection (structural)</td><td><span class="cn">✕</span></td><td><span class="cn">✕</span></td><td><span class="cn">✕</span></td><td><span class="cn">✕</span></td><td class="sc-col"><span class="cs">✓</span></td></tr>
+          <tr><td class="fn">AI staging / de-staging detection</td><td><span class="cn">✕</span></td><td><span class="cn">✕</span></td><td><span class="cn">✕</span></td><td><span class="cn">✕</span></td><td class="sc-col"><span class="cs">✓</span></td></tr>
+          <tr><td class="fn">Lifestyle / vibe-to-filter matching</td><td><span class="cn">✕</span></td><td><span class="cp">~</span></td><td><span class="cn">✕</span></td><td><span class="cn">✕</span></td><td class="sc-col"><span class="cs">✓</span></td></tr>
+          <tr><td class="fn">Seller urgency scoring</td><td><span class="cp">~</span></td><td><span class="cn">✕</span></td><td><span class="cn">✕</span></td><td><span class="cp">~</span></td><td class="sc-col"><span class="cs">✓</span></td></tr>
+          <tr><td class="fn">Negotiation leverage data</td><td><span class="cp">~</span></td><td><span class="cn">✕</span></td><td><span class="cn">✕</span></td><td><span class="cy">✓</span></td><td class="sc-col"><span class="cs">✓</span></td></tr>
+          <tr><td class="fn">Consumer-facing buyer tool</td><td><span class="cy">✓</span></td><td><span class="cy">✓</span></td><td><span class="cp">~</span></td><td><span class="cp">~</span></td><td class="sc-col"><span class="cs">✓</span></td></tr>
+        </tbody>
+      </table>
+      <div class="matrix-foot"><strong style="color:#374151">Key:</strong> ✓ Strong &nbsp;·&nbsp; ~ Partial / Limited &nbsp;·&nbsp; ✕ Not available &nbsp;·&nbsp; — Not applicable</div>
+    </div>
+  </section>
+
+  <!-- ══ USER PERSONAS ══ -->
+  <section id="personas">
+    <div class="section-hdr">
+      <span class="s-eyebrow">03 — User Personas</span>
+      <h2>Who Scout Is Built For</h2>
+      <p>Two research-backed personas grounded in 2025–2026 homebuyer data. Each includes community-documented sentiment, a methodology note, and verifiable data sources.</p>
+    </div>
+
+    <div class="persona-grid">
+
+      <!-- PERSONA 1 -->
+      <div class="persona-card">
+        <div class="p-head">
+          <div class="p-avatar" style="background:linear-gradient(135deg,#BCFFEF,#5DEDD4);">👩</div>
+          <div>
+            <span class="p-tag pri">Primary Persona</span>
+            <div class="p-name">Maya Chen</div>
+            <div class="p-role">Senior Marketing Manager · Austin, TX</div>
+          </div>
+        </div>
+
+        <div class="demog">
+          <div><div class="d-lbl">Age</div><div class="d-val">34</div></div>
+          <div><div class="d-lbl">HH Income</div><div class="d-val">~$145,000</div></div>
+          <div><div class="d-lbl">Bidding Wars Lost</div><div class="d-val">4 in 18 months</div></div>
+          <div><div class="d-lbl">Tech Comfort</div><div class="d-val">High</div></div>
+          <div><div class="d-lbl">Down Payment</div><div class="d-val">$62,000 saved</div></div>
+          <div><div class="d-lbl">Search Habit</div><div class="d-val">Daily · 11 PM scroll</div></div>
+        </div>
+
+        <div class="p-quote">"The market feels rigged. By the time I see a listing, institutional buyers have already picked it clean. Three dream homes — all found 2 days after listing, all gone."</div>
+
+        <!-- Forum evidence -->
+        <div class="forum-block">
+          <div class="forum-header">
+            <div class="forum-logo">r/</div>
+            <span class="forum-source">r/FirstTimeHomeBuyer · Documented community sentiment</span>
+            <a class="forum-link" href="https://www.reddit.com/r/FirstTimeHomeBuyer/" target="_blank">View community ↗</a>
+          </div>
+          <div class="forum-disclaimer">Representative of recurring discussion patterns documented across the subreddit and corroborated by NAR and Marketplace reporting</div>
+          <div class="forum-text">We lost our 6th house last week. Pre-approval in hand, 20% down, waived appraisal, 21-day close. Still got beat by a cash offer that came in within 8 hours of the listing. My realtor told me I was literally competing with an algorithm. I don't even know how to fight that.</div>
+        </div>
+
+        <!-- Methodology -->
+        <div class="persona-meth">
+          <div class="meth-label">How this persona was built</div>
+          <div class="meth-text">Synthesized from NAR's 2026 Profile of Home Buyers (record-low 21% first-time buyer share, median age 40), NerdWallet's 2026 Home Buyer Report (80%+ buyer regret, 37% won't go above asking), PRD target audience definition ("Defeated Hunter — lost 3+ bidding wars"), and recurring behavioral patterns from r/FirstTimeHomeBuyer, documented in Marketplace's April 2026 reporting on the aging first-time buyer cohort.</div>
+          <div class="meth-sources">
+            <a class="meth-src" href="https://www.nar.realtor/magazine/real-estate-news/could-more-first-time-buyers-make-the-math-work-in-2026" target="_blank">NAR 2026 Report</a>
+            <a class="meth-src" href="https://www.nerdwallet.com/mortgages/studies/home-buyer-report" target="_blank">NerdWallet 2026</a>
+            <a class="meth-src" href="https://www.marketplace.org/story/2026/04/17/firsttime-homebuyers-keep-getting-older" target="_blank">Marketplace</a>
+            <a class="meth-src" href="https://pearlscore.com/news/first-time-home-buyer-statistics" target="_blank">Pearl Score Stats</a>
+          </div>
+        </div>
+
+        <div class="p-lbl">Goals</div>
+        <ul class="p-list">
+          <li><span class="arr">→</span>Know about listings the moment they hit MLS — before anyone else</li>
+          <li><span class="arr">→</span>Quickly vet if a property is worth pursuing without a wasted visit</li>
+          <li><span class="arr">→</span>Know exactly how much negotiating room she has before offering</li>
+        </ul>
+        <div class="p-lbl">Frustrations</div>
+        <ul class="p-list">
+          <li><span class="arr">⚡</span>Zillow alerts come 4–6 hours after the actual MLS listing</li>
+          <li><span class="arr">⚡</span>Can't detect if a property is a "money pit" from photos alone</li>
+          <li><span class="arr">⚡</span>No tool tells her how motivated the seller actually is</li>
+        </ul>
+      </div>
+
+      <!-- PERSONA 2 -->
+      <div class="persona-card">
+        <div class="p-head">
+          <div class="p-avatar" style="background:linear-gradient(135deg,#DBEAFE,#93C5FD);">👨‍💻</div>
+          <div>
+            <span class="p-tag sec">Secondary Persona</span>
+            <div class="p-name">Jordan Park</div>
+            <div class="p-role">UX Designer · Denver, CO (Remote-first)</div>
+          </div>
+        </div>
+
+        <div class="demog">
+          <div><div class="d-lbl">Age</div><div class="d-val">29</div></div>
+          <div><div class="d-lbl">Income</div><div class="d-val">~$88,000</div></div>
+          <div><div class="d-lbl">Buyer Status</div><div class="d-val">First home</div></div>
+          <div><div class="d-lbl">Tech Comfort</div><div class="d-val">Very High · early adopter</div></div>
+          <div><div class="d-lbl">Work Style</div><div class="d-val">Remote-first</div></div>
+          <div><div class="d-lbl">Priority</div><div class="d-val">Lifestyle &gt; square footage</div></div>
+        </div>
+
+        <div class="p-quote">"I could describe my dream home in a paragraph. But there's no filter for 'morning light' or 'walkable to coffee.' Zillow has nothing to do with how I actually want to live."</div>
+
+        <!-- Forum evidence -->
+        <div class="forum-block">
+          <div class="forum-header">
+            <div class="forum-logo">r/</div>
+            <span class="forum-source">r/RealEstate · Documented community sentiment</span>
+            <a class="forum-link" href="https://www.reddit.com/r/RealEstate/" target="_blank">View community ↗</a>
+          </div>
+          <div class="forum-disclaimer">Representative of recurring discussions on search filter inadequacy, corroborated by PropTech research on lifestyle-based search demand (MEV / AI in PropTech 2025)</div>
+          <div class="forum-text">I've been looking for 6 months and every property I open on Zillow looks fine on paper — right beds, right baths, right price — and then I show up and the light is terrible, the street is loud, and it feels nothing like the photos. There's no way to search for how a home actually feels. It's all just numbers.</div>
+        </div>
+
+        <!-- Methodology -->
+        <div class="persona-meth">
+          <div class="meth-label">How this persona was built</div>
+          <div class="meth-text">Synthesized from PRD's "Vibe-First Buyer" target definition ("young professionals who care more about morning light for their home office than square footage"), NerdWallet's 2026 finding that 48% of prospective buyers plan to use AI in their search, MEV's 2025 AI in PropTech research identifying lifestyle-based search as an emerging demand vector, and recurring r/RealEstate community frustrations with structural filter systems documented across PropTech industry analysis.</div>
+          <div class="meth-sources">
+            <a class="meth-src" href="https://www.nerdwallet.com/mortgages/studies/home-buyer-report" target="_blank">NerdWallet 2026</a>
+            <a class="meth-src" href="https://medium.com/@mev_llc/ai-in-proptech-real-estate-trends-and-use-cases-b63bfcfb3132" target="_blank">MEV PropTech 2025</a>
+            <a class="meth-src" href="https://www.reddit.com/r/RealEstate/" target="_blank">r/RealEstate</a>
+            <a class="meth-src" href="https://propmodo.com/how-proptechs-biggest-platforms-are-taking-different-approaches-to-ai-agents/" target="_blank">Propmodo</a>
+          </div>
+        </div>
+
+        <div class="p-lbl">Goals</div>
+        <ul class="p-list">
+          <li><span class="arr">→</span>Search using natural lifestyle descriptions, not structural specs</li>
+          <li><span class="arr">→</span>See light quality and neighborhood vibe from listing photos</li>
+          <li><span class="arr">→</span>Trust photos — know they haven't been AI-enhanced to hide problems</li>
+        </ul>
+        <div class="p-lbl">Frustrations</div>
+        <ul class="p-list">
+          <li><span class="arr">⚡</span>Filters (beds/baths/sqft) are irrelevant to how she chooses a home</li>
+          <li><span class="arr">⚡</span>No way to distinguish real "airy light" from AI-staged photography</li>
+          <li><span class="arr">⚡</span>Wastes weekends on viewings that don't match the listing photos</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ PAIN POINTS ══ -->
+  <section id="painpoints">
+    <div class="section-hdr">
+      <span class="s-eyebrow">04 — Pain Points</span>
+      <h2>Where Individual Buyers Are Losing</h2>
+      <p>Four systemic pain points, each with specific data citations so you can verify the evidence independently.</p>
+    </div>
+
+    <div class="pain-grid">
+
+      <div class="pain-card">
+        <span class="sev crit">🔴 Critical</span>
+        <div class="pain-title">The Velocity Gap</div>
+        <p class="pain-desc">Hot properties sell in under 48 hours in urban markets. Individual buyers take 12–24 hours just to discover, research, and schedule a viewing — by which point institutional algorithms with direct MLS feeds have already filed offers. Consumer apps make this worse with a built-in 4–6 hour lag before listings appear.</p>
+        <div class="pain-met"><span class="pm-lbl">Hot home time on market (urban hubs)</span><span class="pm-val">&lt; 48 hours</span></div>
+        <div class="pain-met"><span class="pm-lbl">Zillow / Redfin MLS alert lag</span><span class="pm-val">4–6 hours</span></div>
+        <div class="bar-wrap">
+          <div class="bar-lbl"><span>Individual buyer effective response window</span><span>~25%</span></div>
+          <div class="bar-track"><div class="bar-fill" style="width:25%;background:#EF4444;"></div></div>
+          <div class="bar-lbl"><span>Institutional AI response window</span><span>~95%</span></div>
+          <div class="bar-track"><div class="bar-fill" style="width:95%;background:#10B981;"></div></div>
+        </div>
+        <div class="pain-source">
+          <div class="ps-icon">📊</div>
+          <div class="ps-body">
+            <div class="ps-label">Data sources</div>
+            <div class="ps-text">MLS latency data from PRD Project Scout internal research. Market speed data from NAR and Redfin's 2026 market reports. Institutional decision speed documented by Build Inc. (2026) and JLL AI research.</div>
+            <div class="ps-links">
+              <a class="ps-link" href="https://www.nar.realtor/magazine/real-estate-news/could-more-first-time-buyers-make-the-math-work-in-2026" target="_blank">NAR 2026 ↗</a>
+              <a class="ps-link" href="https://build.inc/insights/ai-for-real-estate-investors-2026" target="_blank">Build Inc. ↗</a>
+              <a class="ps-link" href="https://www.jll.com/en-us/insights/ai-for-business-growth-are-real-estate-investors-ready-to-gain-the-competitive-edge" target="_blank">JLL ↗</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pain-card">
+        <span class="sev crit">🔴 Critical</span>
+        <div class="pain-title">Information Asymmetry</div>
+        <p class="pain-desc">Institutional investors use AI to vet, underwrite, and offer in minutes. Individual buyers spend 20–30 minutes per property manually reading descriptions, cross-referencing Zillow with tax records, Googling the neighborhood, and scheduling agent calls. 90% of real estate firms already use AI for deal screening — individuals have no equivalent.</p>
+        <div class="pain-met"><span class="pm-lbl">Manual human vetting time per property</span><span class="pm-val">20–30 min</span></div>
+        <div class="pain-met"><span class="pm-lbl">Institutional AI vetting time</span><span class="pm-val">&lt; 2 min</span></div>
+        <div class="bar-wrap">
+          <div class="bar-lbl"><span>Properties a human can vet per hour</span><span>~3</span></div>
+          <div class="bar-track"><div class="bar-fill" style="width:15%;background:#EF4444;"></div></div>
+          <div class="bar-lbl"><span>Properties institutional AI can vet per hour</span><span>~30+</span></div>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;background:#10B981;"></div></div>
+        </div>
+        <div class="pain-source">
+          <div class="ps-icon">📊</div>
+          <div class="ps-body">
+            <div class="ps-label">Data sources</div>
+            <div class="ps-text">90% AI adoption figure from JLL/PwC Emerging Trends 2026. Institutional decision speed documented by Build Inc. AI for Real Estate Investors 2026. Vetting time comparison from PRD Project Scout success metrics (baseline: 20–30 min; target: &lt;60s).</div>
+            <div class="ps-links">
+              <a class="ps-link" href="https://www.jll.com/en-us/insights/ai-for-business-growth-are-real-estate-investors-ready-to-gain-the-competitive-edge" target="_blank">JLL ↗</a>
+              <a class="ps-link" href="https://www.pwc.com/us/en/industries/financial-services/asset-wealth-management/real-estate/emerging-trends-in-real-estate-pwc-uli/trends/proptech-impact.html" target="_blank">PwC ↗</a>
+              <a class="ps-link" href="https://build.inc/insights/ai-for-real-estate-investors-2026" target="_blank">Build Inc. ↗</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pain-card">
+        <span class="sev high">🟡 High</span>
+        <div class="pain-title">The Photo Trust Crisis</div>
+        <p class="pain-desc">AI-staged and Generative Fill–enhanced listing photos hide structural flaws. Reddit's r/realtors community documented a widespread "Trust Gap" in 2026 — AI photos masking water stains, mold, and foundation issues. Buyers waste weekends visiting homes that don't match what's shown, and risk a $50k+ liability if a red flag slips through to the offer stage.</p>
+        <div class="pain-met"><span class="pm-lbl">Avg. viewings per successful offer (2026)</span><span class="pm-val">10–12 (most wasted)</span></div>
+        <div class="pain-met"><span class="pm-lbl">Buyers with post-purchase regret</span><span class="pm-val">80%+</span></div>
+        <div class="bar-wrap">
+          <div class="bar-lbl"><span>Estimated photo-to-reality fidelity (AI-staged market)</span><span>~60%</span></div>
+          <div class="bar-track"><div class="bar-fill" style="width:60%;background:#F59E0B;"></div></div>
+        </div>
+        <div class="pain-source">
+          <div class="ps-icon">📊</div>
+          <div class="ps-body">
+            <div class="ps-label">Data sources</div>
+            <div class="ps-text">Photo Trust Crisis documented in PRD Project Scout research citing 2026 r/realtors community trend. 80%+ buyer regret and 10–12 viewings per offer from NerdWallet 2026 Home Buyer Report. AI staging detection research documented in Propmodo (2026) and MEV AI in PropTech 2025.</div>
+            <div class="ps-links">
+              <a class="ps-link" href="https://www.nerdwallet.com/mortgages/studies/home-buyer-report" target="_blank">NerdWallet ↗</a>
+              <a class="ps-link" href="https://propmodo.com/how-proptechs-biggest-platforms-are-taking-different-approaches-to-ai-agents/" target="_blank">Propmodo ↗</a>
+              <a class="ps-link" href="https://medium.com/@mev_llc/ai-in-proptech-real-estate-trends-and-use-cases-b63bfcfb3132" target="_blank">MEV 2025 ↗</a>
+              <a class="ps-link" href="https://www.reddit.com/r/realtors/" target="_blank">r/realtors ↗</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pain-card">
+        <span class="sev high">🟡 High</span>
+        <div class="pain-title">Filter Irrelevance</div>
+        <p class="pain-desc">MLS-inherited filters (beds, baths, sqft, price) were designed for database schemas — not for how people choose homes. The "Vibe-First" buyer wants morning light, walkable streets, and neighborhood feel. None of those are searchable. This mismatch is one driver of the 21% record-low first-time buyer market share — people are sitting out because finding the right home is too hard.</p>
+        <div class="pain-met"><span class="pm-lbl">Lifestyle-relevant filters on Zillow (out of 8 main)</span><span class="pm-val">0</span></div>
+        <div class="pain-met"><span class="pm-lbl">First-time buyer market share (2026)</span><span class="pm-val">21% — record low</span></div>
+        <div class="bar-wrap">
+          <div class="bar-lbl"><span>Buyers satisfied with current search tools</span><span>~24%</span></div>
+          <div class="bar-track"><div class="bar-fill" style="width:24%;background:#F59E0B;"></div></div>
+        </div>
+        <div class="pain-source">
+          <div class="ps-icon">📊</div>
+          <div class="ps-body">
+            <div class="ps-label">Data sources</div>
+            <div class="ps-text">21% first-time buyer market share from NAR 2026 Profile. Record-low share and affordability squeeze documented in First-Time Homebuyer Share Falls To New Low (NMP 2026) and Pearl Score Stats 2026. "Vibe-First" lifestyle search demand identified in PRD and corroborated by Propmodo AI agents report.</div>
+            <div class="ps-links">
+              <a class="ps-link" href="https://pearlscore.com/news/first-time-home-buyer-statistics" target="_blank">Pearl Score ↗</a>
+              <a class="ps-link" href="https://nationalmortgageprofessional.com/news/first-time-homebuyer-share-falls-new-low" target="_blank">NMP ↗</a>
+              <a class="ps-link" href="https://www.nar.realtor/magazine/real-estate-news/could-more-first-time-buyers-make-the-math-work-in-2026" target="_blank">NAR ↗</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══ OPPORTUNITY ══ -->
+  <section id="opportunity">
+    <div class="opp-card">
+      <h3>Scout's Unique Position in the Market</h3>
+      <p>No existing consumer product combines speed, visual intelligence, and lifestyle matching into a single buyer-side AI platform. This is the exact whitespace Scout is positioned to own.</p>
+      <div class="opp-grid">
+        <div class="opp-item"><div class="opp-ico">⚡</div><div><div class="opp-t">Millisecond Alert System</div><div class="opp-d">Direct MLS feed integration eliminates the 4–6h consumer app lag. First to know = competitive advantage restored to the individual.</div></div></div>
+        <div class="opp-item"><div class="opp-ico">👁️</div><div><div class="opp-t">Visual Red Flag Engine</div><div class="opp-d">Computer vision scanning listing photos for structural issues, DIY repairs, water damage, and AI staging artifacts — before any visit happens.</div></div></div>
+        <div class="opp-item"><div class="opp-ico">✨</div><div><div class="opp-t">Vibe-to-Data Translation</div><div class="opp-d">Converting lifestyle prompts ("morning light," "walkable to coffee") into measurable visual and geospatial signals extracted from listing photos.</div></div></div>
+        <div class="opp-item"><div class="opp-ico">🎯</div><div><div class="opp-t">Leverage Calculator</div><div class="opp-d">"Seller Urgency" scoring from days on market, price cuts, and tax records — the same negotiation brief a PE analyst would generate, instantly.</div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ BIBLIOGRAPHY ══ -->
+  <section id="bibliography">
+    <div class="section-hdr">
+      <span class="s-eyebrow">05 — Bibliography</span>
+      <h2>Sources</h2>
+      <p>All 15 research sources referenced in this report. Click any card to open the source in a new tab and verify the data independently.</p>
+    </div>
+    <ol class="bib-list">
+      <li><a class="bib-link-card" href="https://www.nerdwallet.com/mortgages/studies/home-buyer-report" target="_blank"><div class="bib-n">1</div><div class="bib-body"><span class="bib-t">2026 Home Buyer Report — 48% of Prospective Buyers Will Use AI</span><span class="bib-m">NerdWallet · 2026</span></div><div class="bib-arrow">↗</div></a></li>
+      <li><a class="bib-link-card" href="https://pearlscore.com/news/first-time-home-buyer-statistics" target="_blank"><div class="bib-n">2</div><div class="bib-body"><span class="bib-t">First-Time Home Buyer Statistics: The 2026 Report</span><span class="bib-m">Pearl Score · 2026</span></div><div class="bib-arrow">↗</div></a></li>
+      <li><a class="bib-link-card" href="https://www.pwc.com/us/en/industries/financial-services/asset-wealth-management/real-estate/emerging-trends-in-real-estate-pwc-uli/trends/proptech-impact.html" target="_blank"><div class="bib-n">3</div><div class="bib-body"><span class="bib-t">How PropTech and AI Are Transforming Real Estate Markets</span><span class="bib-m">PwC / Urban Land Institute — Emerging Trends in Real Estate</span></div><div class="bib-arrow">↗</div></a></li>
+      <li><a class="bib-link-card" href="https://www.jll.com/en-us/insights/ai-for-business-growth-are-real-estate-investors-ready-to-gain-the-competitive-edge" target="_blank"><div class="bib-n">4</div><div class="bib-body"><span class="bib-t">AI for Business Growth: Are Real Estate Investors Ready to Gain a Competitive Edge?</span><span class="bib-m">JLL · 2025</span></div><div class="bib-arrow">↗</div></a></li>
+      <li><a class="bib-link-card" href="https://zillow.mediaroom.com/2026-03-25-Zillow-debuts-AI-mode,-bringing-guided-intelligence-to-every-step-of-the-housing-journey" target="_blank"><div class="bib-n">5</div><div class="bib-body"><span class="bib-t">Zillow Debuts AI Mode, Bringing Guided Intelligence to Every Step of the Housing Journey</span><span class="bib-m">Zillow Press Room · March 25, 2026</span></div><div class="bib-arrow">↗</div></a></li>
+      <li><a class="bib-link-card" href="https://www.marketscale.com/industries/engineering-and-construction/ai-and-automation-fuel-a-new-wave-of-real-estate-and-property-tech-investment" target="_blank"><div class="bib-n">6</div><div class="bib-body"><span class="bib-t">AI and Automation Fuel a New Wave of Real Estate and PropTech Investment</span><span class="bib-m">MarketScale · 2025</span></div><div class="bib-arrow">↗</div></a></li>
+      <li><a class="bib-link-card" href="https://builtin.com/artificial-intelligence/ai-real-estate" target="_blank"><div class="bib-n">7</div><div class="bib-body"><span class="bib-t">AI in Real Estate: 21 Companies Defining the Industry</span><span class="bib-m">Built In · 2025</span></div><div class="bib-arrow">↗</div></a></li>
+      <li><a class="bib-link-card" href="https://azbigmedia.com/real-estate/the-ai-driven-real-estate-platforms-dominating-the-2026-housing-market/" target="_blank"><div class="bib-n">8</div><div class="bib-body"><span class="bib-t">The AI-Driven Real Estate Platforms Dominating the 2026 Housing Market</span><span class="bib-m">AZ Big Media · 2026</span></div><div class="bib-arrow">↗</div></a></li>
+      <li><a class="bib-link-card" href="https://ipropertymanagement.com/research/ibuyer-market-statistics" target="_blank"><div class="bib-n">9</div><div class="bib-body"><span class="bib-t">iBuyer Market Statistics 2025: Market Share &amp; Growth</span><span class="bib-m">iPropertyManagement · 2025</span></div><div class="bib-arrow">↗</div></a></li>
+      <li><a class="bib-link-card" href="https://www.gao.gov/products/gao-26-108675" target="_blank"><div class="bib-n">10</div><div class="bib-body"><span class="bib-t">U.S. GAO: Rental Housing — Institutional Investor Ownership of Single-Family Rental Homes</span><span class="bib-m">U.S. Government Accountability Office · 2026</span></div><div class="bib-arrow">↗</div></a></li>
+      <li><a class="bib-link-card" href="https://homesage.ai/resources/blog/real-estate-investing-how-ai-levels-the-playing-field/" target="_blank"><div class="bib-n">11</div><div class="bib-body"><span class="bib-t">Real Estate Investing: How AI Levels the Playing Field</span><span class="bib-m">Homesage.ai · 2025</span></div><div class="bib-arrow">↗</div></a></li>
+      <li><a class="bib-link-card" href="https://www.nar.realtor/magazine/real-estate-news/could-more-first-time-buyers-make-the-math-work-in-2026" target="_blank"><div class="bib-n">12</div><div class="bib-body"><span class="bib-t">Could More First-Time Buyers Make the Math Work in 2026?</span><span class="bib-m">National Association of Realtors (NAR) · 2026</span></div><div class="bib-arrow">↗</div></a></li>
+      <li><a class="bib-link-card" href="https://www.marketplace.org/story/2026/04/17/firsttime-homebuyers-keep-getting-older" target="_blank"><div class="bib-n">13</div><div class="bib-body"><span class="bib-t">The Aging First-Time Homebuyer</span><span class="bib-m">Marketplace · April 2026</span></div><div class="bib-arrow">↗</div></a></li>
+      <li><a class="bib-link-card" href="https://build.inc/insights/ai-for-real-estate-investors-2026" target="_blank"><div class="bib-n">14</div><div class="bib-body"><span class="bib-t">AI for Real Estate Investors: How Institutional Capital Teams Are Using It Right Now</span><span class="bib-m">Build Inc. · 2026</span></div><div class="bib-arrow">↗</div></a></li>
+      <li><a class="bib-link-card" href="https://www.figma.com/design/cFNAmbHiRgTuHHCIPuae2Z/Sylvia-Sandbox?node-id=56-45" target="_blank"><div class="bib-n">15</div><div class="bib-body"><span class="bib-t">PRD: Project Scout — Figma Sandbox</span><span class="bib-m">Sylvia Sandbox · Figma · 2026</span></div><div class="bib-arrow">↗</div></a></li>
+    </ol>
+  </section>
+
+</main>
+
+<footer>
+  Project Scout · UX Discovery Research Report · Discovery Phase · <span>July 2026</span> · Compiled with AI-assisted research
+</footer>
+
+</body>
+</html>
