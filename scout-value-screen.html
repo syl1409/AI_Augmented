@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scout — What this house is worth</title>
+<style>
+  :root {
+    color-scheme: light;
+    --surface-1: #fcfcfb;
+    --page: #f9f9f7;
+    --text-primary: #0b0b0b;
+    --text-secondary: #52514e;
+    --muted: #898781;
+    --grid: #e1e0d9;
+    --axis: #c3c2b7;
+    --border: rgba(11,11,11,0.10);
+    --data-range: #2a78d6;
+    --data-wash: rgba(42,120,214,0.10);
+    --track: rgba(137,135,129,0.14);
+    --action: #0b0b0b;
+    --on-action: #fcfcfb;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --surface-1: #1a1a19;
+      --page: #0d0d0d;
+      --text-primary: #ffffff;
+      --text-secondary: #c3c2b7;
+      --muted: #898781;
+      --grid: #2c2c2a;
+      --axis: #383835;
+      --border: rgba(255,255,255,0.10);
+      --data-range: #3987e5;
+      --data-wash: rgba(57,135,229,0.14);
+      --track: rgba(137,135,129,0.18);
+      --action: #ffffff;
+      --on-action: #1a1a19;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --surface-1: #1a1a19;
+    --page: #0d0d0d;
+    --text-primary: #ffffff;
+    --text-secondary: #c3c2b7;
+    --muted: #898781;
+    --grid: #2c2c2a;
+    --axis: #383835;
+    --border: rgba(255,255,255,0.10);
+    --data-range: #3987e5;
+    --data-wash: rgba(57,135,229,0.14);
+    --track: rgba(137,135,129,0.18);
+    --action: #ffffff;
+    --on-action: #1a1a19;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 32px 20px 56px;
+    background: var(--page);
+    color: var(--text-primary);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; }
+
+  .illus {
+    font-size: 12px; color: var(--muted); text-align: center;
+    margin-bottom: 16px; letter-spacing: 0.01em;
+  }
+
+  .card {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  .pad { padding: 26px 30px; }
+  .divider { height: 1px; background: var(--border); }
+
+  /* ---------- header ---------- */
+  .addr { font-size: 19px; font-weight: 600; letter-spacing: -0.01em; }
+  .meta { font-size: 13.5px; color: var(--text-secondary); margin-top: 3px; }
+
+  /* ---------- the verdict ---------- */
+  .verdict { display: flex; flex-wrap: wrap; gap: 40px; align-items: flex-start; margin-top: 22px; }
+  .block .lbl {
+    font-size: 12px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.07em; color: var(--muted); margin-bottom: 7px;
+  }
+  .asking { font-size: 30px; font-weight: 600; letter-spacing: -0.02em; color: var(--text-secondary); }
+  .hero { font-size: 50px; font-weight: 600; letter-spacing: -0.03em; line-height: 1.02; }
+  .denom { font-size: 13.5px; color: var(--text-secondary); margin-top: 8px; font-variant-numeric: tabular-nums; }
+
+  .gap-note {
+    margin-top: 22px; padding: 13px 15px;
+    background: var(--data-wash); border-radius: 9px;
+    font-size: 14.5px; display: flex; gap: 10px; align-items: baseline;
+  }
+  .gap-note b { font-weight: 600; }
+
+  /* ---------- chart ---------- */
+  .chart-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px; }
+  .chart-title { font-size: 15.5px; font-weight: 600; }
+  .chart-sub { font-size: 13px; color: var(--text-secondary); margin-top: 3px; max-width: 62ch; }
+
+  .plot-outer { margin-top: 26px; }
+  .plot {
+    position: relative; height: 152px;
+    border-left: 1px solid var(--grid); border-right: 1px solid var(--grid);
+  }
+  .band {
+    position: absolute; top: 0; bottom: 0;
+    background: var(--data-wash);
+    border-left: 1px solid var(--data-range); border-right: 1px solid var(--data-range);
+  }
+  .band-tag {
+    position: absolute; top: 6px; font-size: 12px; font-weight: 600;
+    color: var(--text-secondary); white-space: nowrap; transform: translateX(-50%);
+  }
+  .askline { position: absolute; top: 0; bottom: -7px; width: 2px; background: var(--text-primary); }
+  .asktag {
+    position: absolute; top: -22px; font-size: 12px; font-weight: 600;
+    white-space: nowrap; color: var(--text-primary); transform: translateX(-50%);
+  }
+  .dot {
+    position: absolute; width: 12px; height: 12px; border-radius: 50%;
+    background: var(--data-range);
+    box-shadow: 0 0 0 2px var(--surface-1);
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+  }
+  .dot::after { content:""; position:absolute; inset:-9px; border-radius:50%; }
+  .dot:hover, .dot:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--surface-1), 0 0 0 4px var(--action); }
+  .dotlabel {
+    position: absolute; font-size: 11.5px; color: var(--text-secondary);
+    white-space: nowrap; transform: translate(-50%, 0);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .axis { position: relative; height: 30px; border-top: 1px solid var(--axis); margin-top: 0; }
+  .tick { position: absolute; top: 7px; font-size: 11.5px; color: var(--muted); transform: translateX(-50%); font-variant-numeric: tabular-nums; }
+  .tickmark { position: absolute; top: -1px; width: 1px; height: 5px; background: var(--axis); }
+
+  /* ---------- the gap track ---------- */
+  .gaptrack-wrap { margin-top: 30px; }
+  .gaptrack {
+    position: relative; min-height: 54px; border-radius: 9px;
+    background: var(--track);
+    display: flex; align-items: center; flex-wrap: wrap; gap: 11px;
+    padding: 13px 16px;
+  }
+  .gaptrack .gaptrack-txt { flex: 1 1 240px; min-width: 0; }
+  .ring {
+    width: 13px; height: 13px; border-radius: 50%;
+    border: 2px solid var(--muted); background: transparent; flex: none;
+  }
+  .gaptrack-txt { font-size: 13px; color: var(--text-secondary); margin-left: 6px; }
+
+  /* ---------- legend ---------- */
+  .legend { display: flex; flex-wrap: wrap; gap: 20px; margin-top: 20px; font-size: 13px; color: var(--text-secondary); }
+  .lgi { display: flex; align-items: center; gap: 8px; }
+  .sw-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--data-range); flex: none; }
+  .sw-ring { width: 13px; height: 13px; border-radius: 50%; border: 2px solid var(--muted); flex: none; }
+  .sw-line { width: 14px; height: 2px; background: var(--text-primary); flex: none; }
+  .sw-band { width: 14px; height: 12px; background: var(--data-wash); border-left: 1px solid var(--data-range); border-right: 1px solid var(--data-range); flex: none; }
+
+  /* ---------- seller row ---------- */
+  .facts { display: flex; flex-wrap: wrap; gap: 34px; }
+  .fact .fv { font-size: 21px; font-weight: 600; letter-spacing: -0.01em; }
+  .fact .fl { font-size: 12.5px; color: var(--text-secondary); margin-top: 2px; }
+
+  /* ---------- honesty ---------- */
+  h3.sec { font-size: 15.5px; font-weight: 600; margin: 0 0 10px; }
+  ul.why { margin: 0; padding-left: 19px; font-size: 14px; color: var(--text-secondary); }
+  ul.why li { margin-bottom: 6px; }
+  ul.why li:last-child { margin-bottom: 0; }
+
+  .next { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+  .btn {
+    font: inherit; font-size: 14px; font-weight: 600;
+    padding: 10px 16px; border-radius: 8px; cursor: pointer;
+    border: 1px solid var(--border); background: transparent; color: var(--text-primary);
+  }
+  .btn.btn-primary { background: var(--action); border-color: var(--action); color: var(--on-action); }
+  .btn:focus-visible { outline: 2px solid var(--action); outline-offset: 2px; }
+
+  /* ---------- table view ---------- */
+  .tv-toggle {
+    font: inherit; font-size: 13px; background: none; border: none; padding: 0;
+    color: var(--action); cursor: pointer; text-decoration: underline; text-underline-offset: 2px;
+  }
+  table { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 13.5px; }
+  th, td { text-align: left; padding: 8px 10px 8px 0; border-bottom: 1px solid var(--border); }
+  th { font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 600; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; padding-right: 0; }
+  th.num { text-align: right; padding-right: 0; }
+  td.unk { color: var(--muted); font-style: italic; }
+  [hidden] { display: none !important; }
+
+  /* ---------- tooltip ---------- */
+  #tip {
+    position: fixed; z-index: 50; pointer-events: none; opacity: 0;
+    transition: opacity 90ms linear;
+    background: var(--text-primary); color: var(--surface-1);
+    font-size: 12.5px; line-height: 1.45;
+    padding: 8px 11px; border-radius: 7px; max-width: 240px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.22);
+  }
+  #tip b { font-weight: 600; }
+  #tip .tprice { font-variant-numeric: tabular-nums; }
+
+  .foot { font-size: 12px; color: var(--muted); margin-top: 20px; text-align: center; }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  @media (max-width: 660px) {
+    .hero { font-size: 34px; }
+    .pad { padding: 22px 18px; }
+    .verdict { gap: 24px; }
+    .legend { gap: 12px 20px; }
+    .gaptrack .gaptrack-txt { flex: 1 1 100%; margin-left: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="illus">Illustrative concept — fictional property, sample data. Project Scout.</p>
+
+  <div class="card">
+
+    <!-- HEADER + VERDICT -->
+    <div class="pad">
+      <div class="addr">4412 Bryan Parkway, Dallas, TX 75204</div>
+      <div class="meta" id="vMeta"></div>
+
+      <div class="verdict">
+        <div class="block">
+          <div class="lbl">Seller is asking</div>
+          <div class="asking" id="vAsk"></div>
+        </div>
+        <div class="block">
+          <div class="lbl">What it's probably worth</div>
+          <div class="hero" id="vHero"></div>
+          <div class="denom" id="vDenom"></div>
+        </div>
+      </div>
+
+      <div class="gap-note">
+        <span aria-hidden="true">&#9650;</span>
+        <span>Asking price is <b id="vGap"></b> our estimated range. In Texas, sale prices are not public &mdash; so this range is built from the sales we could confirm, and we show you which ones we couldn't.</span>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- CHART -->
+    <div class="pad">
+      <div class="chart-head">
+        <div>
+          <div class="chart-title">What comparable homes actually sold for</div>
+          <div class="chart-sub" id="vFilter"></div>
+        </div>
+        <button class="tv-toggle" id="tvBtn" aria-expanded="false" aria-controls="tableView">Show as table</button>
+      </div>
+
+      <div class="plot-outer">
+        <div class="plot" id="plot"></div>
+        <div class="axis" id="axis"></div>
+      </div>
+
+      <div class="gaptrack-wrap">
+        <div class="gaptrack" id="gaptrack" role="img"
+             aria-label="Six comparable homes sold but their prices were never disclosed, so they cannot be placed on the price scale.">
+          <span class="gaptrack-txt" style="margin-left:0"><b id="vUndisc"></b> Their prices were never disclosed, so they can't be placed on this scale at all.</span>
+        </div>
+      </div>
+
+      <div class="legend">
+        <span class="lgi"><span class="sw-dot"></span> <span id="vLegV"></span></span>
+        <span class="lgi"><span class="sw-ring"></span> <span id="vLegU"></span></span>
+        <span class="lgi"><span class="sw-band"></span> Our estimated range</span>
+        <span class="lgi"><span class="sw-line"></span> Asking price</span>
+      </div>
+
+      <div id="tableView" hidden>
+        <table>
+          <caption class="chart-sub" style="text-align:left;margin:16px 0 0" id="vCap"></caption>
+          <thead>
+            <tr>
+              <th scope="col">Address</th>
+              <th scope="col">Sold</th>
+              <th scope="col">Sq ft</th>
+              <th scope="col">Distance</th>
+              <th scope="col" class="num">Sale price</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- SELLER BEHAVIOUR -->
+    <div class="pad">
+      <h3 class="sec">What the seller has done so far</h3>
+      <div class="facts">
+        <div class="fact"><div class="fv" id="vDays"></div><div class="fl">on the market</div></div>
+        <div class="fact"><div class="fv" id="vCuts"></div><div class="fl" id="vCutDetail"></div></div>
+        <div class="fact"><div class="fv" id="vOrig"></div><div class="fl">original asking price</div></div>
+        <div class="fact"><div class="fv" id="vSupply"></div><div class="fl">supply in this market</div></div>
+      </div>
+      <p class="chart-sub" style="margin-top:14px;max-width:70ch">
+        These are the seller's own published decisions. We don't guess at why someone is selling,
+        and we won't tell you anything about them personally.
+      </p>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- HONESTY -->
+    <div class="pad">
+      <h3 class="sec">Why we're not more precise than this</h3>
+      <ul class="why">
+        <li id="vWhy1"></li>
+        <li id="vWhy2"></li>
+        <li>We haven't been inside this house. Our range assumes average condition for its age. If the kitchen was redone last year, it's worth more than we're saying.</li>
+        <li id="vWhy4"></li>
+      </ul>
+
+      <div class="next">
+        <button class="btn btn-primary" id="vSeeBtn"></button>
+        <button class="btn">Book an inspection before you offer</button>
+        <button class="btn">Tell us this looks wrong</button>
+      </div>
+    </div>
+
+  </div>
+
+  <p class="foot">Scout is not a real estate agent, an appraiser, or a home inspector. This is an estimate, not a valuation.</p>
+</div>
+
+<div id="tip" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  // ---- illustrative data ----
+  var verified = [
+    { addr: "4318 Live Oak St",   sold: "Jun 2026", price: 402000, sqft: 1840, dist: "0.3 mi" },
+    { addr: "2905 Bryan St",      sold: "May 2026", price: 395500, sqft: 1790, dist: "0.5 mi", conc: true },
+    { addr: "4507 Reiger Ave",    sold: "Jun 2026", price: 388000, sqft: 1720, dist: "0.4 mi" },
+    { addr: "3812 Junius St",     sold: "Apr 2026", price: 410000, sqft: 1910, dist: "0.7 mi" },
+    { addr: "4620 Victor St",     sold: "Jul 2026", price: 379000, sqft: 1680, dist: "0.6 mi" },
+    { addr: "3324 Worth St",      sold: "May 2026", price: 398000, sqft: 1805, dist: "0.4 mi", conc: true },
+    { addr: "4211 Swiss Ave",     sold: "Jun 2026", price: 415000, sqft: 1950, dist: "0.8 mi" },
+    { addr: "2718 Peabody Ave",   sold: "Mar 2026", price: 384500, sqft: 1750, dist: "0.9 mi" }
+  ];
+  var undisclosed = [
+    { addr: "4402 Gaston Ave",  sold: "Jun 2026", sqft: 1880, dist: "0.4 mi", why: "Price never reported to the MLS" },
+    { addr: "3915 Munger Ave",  sold: "May 2026", sqft: 1725, dist: "0.6 mi", why: "Sold off-market, no MLS record" },
+    { addr: "4715 Sycamore St", sold: "Jul 2026", sqft: 1960, dist: "0.7 mi", why: "Builder sale, price not disclosed" },
+    { addr: "2612 Cliff St",    sold: "Apr 2026", sqft: 1690, dist: "0.9 mi", why: "Withdrawn, then sold privately" },
+    { addr: "4108 Gurley Ave",  sold: "Jun 2026", sqft: 1820, dist: "0.5 mi", why: "Price withheld by listing broker" },
+    { addr: "3527 Willow St",   sold: "May 2026", sqft: 1770, dist: "0.8 mi", why: "Estate sale, never listed" }
+  ];
+
+  // ---- the listing, as data ----
+  var listing = {
+    beds: 3, baths: 2, sqft: 1860, built: 1948, daysOnMarket: 68,
+    originalAsk: 440000,
+    cuts: [{ amount: 15000, on: "12 July" }],
+    monthsSupply: 4.4
+  };
+
+  // the comparable query, as issued. Not inferred back from the rows it returned.
+  var compFilter = { radiusMi: 1, sqftLo: 1650, sqftHi: 1975, months: 5 };
+
+  // ---- method inputs (versioned, never rendered) ----
+  var METHOD = "range-v1.2";
+  var STEP = 20000;              // axis tick interval
+  var WIDTH_AT_FULL = 6000;      // ASM: range width if every comparable were verified
+  var NARROW_PCT = 3, WIDE_PCT = 6;   // register thresholds, share of midpoint
+
+  var LO = 391000, HI = 408000;  // model output for this property
+  var ASK = listing.cuts.reduce(function (a, c) { return a - c.amount; }, listing.originalAsk);
+
+  var allComps = verified.concat(undisclosed);
+  var prices = verified.map(function (d) { return d.price; });
+  var lowBound  = Math.min(LO, Math.min.apply(null, prices), ASK);
+  var highBound = Math.max(HI, Math.max.apply(null, prices), ASK);
+  var MIN = Math.floor((lowBound - STEP / 2) / STEP) * STEP;
+  var MAX = Math.ceil((highBound + STEP / 2) / STEP) * STEP;
+
+  var pct = function (v) { return ((v - MIN) / (MAX - MIN)) * 100; };
+  var usd = function (v) { return "$" + v.toLocaleString("en-US"); };
+  var short = function (v) { return "$" + Math.round(v / 1000) + "k"; };
+
+  var plot = document.getElementById("plot");
+  var axis = document.getElementById("axis");
+
+  // ---- estimated range band ----
+  var band = document.createElement("div");
+  band.className = "band";
+  band.style.left = pct(LO) + "%";
+  band.style.width = (pct(HI) - pct(LO)) + "%";
+  plot.appendChild(band);
+
+  var bandTag = document.createElement("div");
+  bandTag.className = "band-tag";
+  bandTag.style.left = ((pct(LO) + pct(HI)) / 2) + "%";
+  bandTag.textContent = "Our range";
+  plot.appendChild(bandTag);
+
+  // ---- asking price reference line ----
+  var ask = document.createElement("div");
+  ask.className = "askline";
+  ask.style.left = pct(ASK) + "%";
+  plot.appendChild(ask);
+
+  var askTag = document.createElement("div");
+  askTag.className = "asktag";
+  askTag.style.left = pct(ASK) + "%";
+  askTag.textContent = "Asking " + usd(ASK);
+  askTag.style.transform = "translateX(-88%)";
+  plot.appendChild(askTag);
+
+  // ---- greedy row assignment so near-neighbours never overlap ----
+  var sorted = verified.slice().sort(function (a, b) { return a.price - b.price; });
+  var rows = [];              // each row = array of x-percent values already placed
+  var MIN_SEP = 7.5;          // percent of plot width
+  sorted.forEach(function (d) {
+    var x = pct(d.price), r = 0;
+    while (true) {
+      if (!rows[r]) { rows[r] = []; }
+      var clash = rows[r].some(function (px) { return Math.abs(px - x) < MIN_SEP; });
+      if (!clash) { rows[r].push(x); d._row = r; d._x = x; break; }
+      r++;
+    }
+  });
+  var rowCount = rows.length;
+  var TOP = 58, BOTTOM = 124;
+  var rowY = function (r) {
+    return rowCount === 1 ? (TOP + BOTTOM) / 2 : TOP + (r * (BOTTOM - TOP)) / (rowCount - 1);
+  };
+
+  var lowest = sorted[0], highest = sorted[sorted.length - 1];
+
+  sorted.forEach(function (d) {
+    var dot = document.createElement("button");
+    dot.className = "dot";
+    dot.type = "button";
+    dot.style.left = d._x + "%";
+    dot.style.top = rowY(d._row) + "px";
+    dot.setAttribute("aria-label", d.addr + ", sold " + d.sold + " for " + usd(d.price) + ", " + d.sqft + " square feet, " + d.dist + " away");
+    dot.addEventListener("mouseenter", function (e) { showTip(e, d); });
+    dot.addEventListener("focus", function (e) { showTip(e, d); });
+    dot.addEventListener("mousemove", moveTip);
+    dot.addEventListener("mouseleave", hideTip);
+    dot.addEventListener("blur", hideTip);
+    plot.appendChild(dot);
+
+    // label only the two extremes — the axis carries the rest.
+    // always place above the mark so nothing collides with the axis below.
+    if (d === lowest || d === highest) {
+      var lab = document.createElement("div");
+      lab.className = "dotlabel";
+      lab.textContent = short(d.price);
+      lab.style.left = d._x + "%";
+      lab.style.top = (rowY(d._row) - 24) + "px";
+      plot.appendChild(lab);
+    }
+  });
+
+  // ---- axis ----
+  for (var v = MIN; v <= MAX; v += STEP) {
+    var t = document.createElement("div");
+    t.className = "tick";
+    t.style.left = pct(v) + "%";
+    t.textContent = short(v);
+    axis.appendChild(t);
+    var m = document.createElement("div");
+    m.className = "tickmark";
+    m.style.left = pct(v) + "%";
+    axis.appendChild(m);
+  }
+
+  // ---- the six undisclosed, as rings on their own track (no price = no position) ----
+  var track = document.getElementById("gaptrack");
+  undisclosed.forEach(function (d) {
+    var ring = document.createElement("button");
+    ring.className = "ring";
+    ring.type = "button";
+    ring.style.padding = "0";
+    ring.style.cursor = "pointer";
+    ring.setAttribute("aria-label", d.addr + ", sold " + d.sold + ", price not disclosed. " + d.why);
+    ring.addEventListener("mouseenter", function (e) { showTip(e, d, true); });
+    ring.addEventListener("focus", function (e) { showTip(e, d, true); });
+    ring.addEventListener("mousemove", moveTip);
+    ring.addEventListener("mouseleave", hideTip);
+    ring.addEventListener("blur", hideTip);
+    track.insertBefore(ring, track.firstChild);
+  });
+
+  // ---- tooltip ----
+  var tip = document.getElementById("tip");
+  function showTip(e, d, isUnknown) {
+    tip.innerHTML = isUnknown
+      ? "<b>" + d.addr + "</b><br>Sold " + d.sold + " · " + d.sqft.toLocaleString() + " sq ft · " + d.dist
+        + "<br><span style='opacity:.75'>" + d.why + "</span>"
+      : "<b>" + d.addr + "</b><br><span class='tprice'>" + usd(d.price) + "</span> · " + d.sold
+        + "<br><span style='opacity:.75'>" + d.sqft.toLocaleString() + " sq ft · " + d.dist + " away</span>";
+    tip.style.opacity = "1";
+    moveTip(e);
+  }
+  function moveTip(e) {
+    var x = (e.clientX || 0) + 14, y = (e.clientY || 0) + 14;
+    var r = tip.getBoundingClientRect();
+    if (x + r.width > window.innerWidth - 12) { x = e.clientX - r.width - 14; }
+    if (y + r.height > window.innerHeight - 12) { y = e.clientY - r.height - 14; }
+    tip.style.left = x + "px";
+    tip.style.top = y + "px";
+  }
+  function hideTip() { tip.style.opacity = "0"; }
+
+  // ---- table view ----
+  var tbody = document.getElementById("tbody");
+  sorted.slice().reverse().forEach(function (d) {
+    var tr = document.createElement("tr");
+    tr.innerHTML = "<td>" + d.addr + "</td><td>" + d.sold + "</td><td>" + d.sqft.toLocaleString()
+      + "</td><td>" + d.dist + "</td><td class='num'>" + usd(d.price) + "</td>";
+    tbody.appendChild(tr);
+  });
+  undisclosed.forEach(function (d) {
+    var tr = document.createElement("tr");
+    tr.innerHTML = "<td>" + d.addr + "</td><td>" + d.sold + "</td><td>" + d.sqft.toLocaleString()
+      + "</td><td>" + d.dist + "</td><td class='num unk'>Not disclosed</td>";
+    tbody.appendChild(tr);
+  });
+
+  // ---------- computed copy. Rule 11: no number below is typed into the markup. ----------
+  var nV = verified.length, nU = undisclosed.length, nAll = allComps.length;
+  var width = HI - LO, mid = (HI + LO) / 2;
+  var widthPct = (width / mid) * 100;
+  // register is an internal routing field. It is deliberately NOT rendered next to the
+  // price: a word beside a number reads as a confidence label, and the type rule bans those.
+  var register = widthPct < NARROW_PCT ? "Narrow" : (widthPct > WIDE_PCT ? "Wide" : "Moderate");
+  var perUnverified = nU ? (width - WIDTH_AT_FULL) / nU : 0;
+  var toNarrow = 0;
+  for (var k = 1; k <= nU; k++) {
+    if (((WIDTH_AT_FULL + perUnverified * (nU - k)) / mid) * 100 < NARROW_PCT) { toNarrow = k; break; }
+  }
+
+  var months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  var mIdx = function (str) {
+    var q = str.split(" ");
+    return parseInt(q[1], 10) * 12 + months.indexOf(q[0]);
+  };
+  var soldIdx = allComps.map(function (d) { return mIdx(d.sold); });
+  var monthSpan = Math.max.apply(null, soldIdx) - Math.min.apply(null, soldIdx) + 1;
+  var sqfts = allComps.map(function (d) { return d.sqft; });
+  var maxDist = Math.max.apply(null, allComps.map(function (d) { return parseFloat(d.dist); }));
+  var nConc = verified.filter(function (d) { return d.conc; }).length;
+
+  var words = ["no","one","two","three","four","five","six","seven","eight","nine","ten",
+               "eleven","twelve","thirteen","fourteen"];
+  var word = function (n) { return words[n] !== undefined ? words[n] : String(n); };
+  var plural = function (n, one, many) { return n === 1 ? one : many; };
+  var set = function (id, txt) { document.getElementById(id).textContent = txt; };
+
+  set("vMeta", listing.beds + " bed \u00b7 " + listing.baths + " bath \u00b7 "
+    + listing.sqft.toLocaleString() + " sq ft \u00b7 built " + listing.built
+    + " \u00b7 listed " + listing.daysOnMarket + " days ago");
+
+  set("vAsk", usd(ASK));
+  set("vHero", usd(LO) + "\u2013" + usd(HI));
+  set("vDenom", nV + " of " + nAll + " nearby sales have a published price");
+
+  var gapLo = Math.abs(ASK - HI), gapHi = Math.abs(ASK - LO);
+  set("vGap", usd(Math.min(gapLo, gapHi)) + " to " + usd(Math.max(gapLo, gapHi))
+    + (ASK > HI ? " above" : ASK < LO ? " below" : " inside"));
+
+  set("vFilter", "Homes within " + compFilter.radiusMi + " mile"
+    + plural(compFilter.radiusMi, "", "s") + ", " + compFilter.sqftLo.toLocaleString()
+    + "\u2013" + compFilter.sqftHi.toLocaleString() + " sq ft, sold in the last "
+    + compFilter.months + " months.");
+
+  // build guard: if a returned comparable falls outside the stated query, the sentence above
+  // is a false description of the method, not a rounding difference.
+  allComps.forEach(function (d) {
+    if (d.sqft < compFilter.sqftLo || d.sqft > compFilter.sqftHi
+        || parseFloat(d.dist) > compFilter.radiusMi) {
+      throw new Error("comparable outside the stated filter: " + d.addr);
+    }
+  });
+  if (monthSpan > compFilter.months) {
+    throw new Error("comparable older than the stated window: " + monthSpan + " months");
+  }
+
+  set("vUndisc", nU + " more " + plural(nU, "home", "homes") + " sold nearby.");
+  document.getElementById("gaptrack").setAttribute("aria-label",
+    nU + " comparable homes sold but their prices were never disclosed, so they cannot be placed on the price scale.");
+
+  set("vLegV", "Verified sale price (" + nV + ")");
+  set("vLegU", "Sold, price not disclosed (" + nU + ")");
+  set("vCap", "All " + nAll + " comparable homes considered");
+
+  set("vDays", listing.daysOnMarket + " days");
+  set("vCuts", listing.cuts.length + " price " + plural(listing.cuts.length, "cut", "cuts"));
+  set("vCutDetail", listing.cuts.map(function (c) {
+    return "\u2212" + usd(c.amount) + " on " + c.on; }).join(", "));
+  set("vOrig", usd(listing.originalAsk));
+  set("vSupply", listing.monthsSupply + " months");
+
+  var openSentence = function (n) { return word(n).charAt(0).toUpperCase() + word(n).slice(1); };
+  set("vWhy1", openSentence(nU) + " of the " + nAll + " comparable homes sold with no disclosed"
+    + " price, so they're missing from our range entirely. Texas doesn't require sale prices"
+    + " to be made public.");
+  set("vWhy2", openSentence(nConc) + " of the " + nV + " verified "
+    + plural(nConc, "sale", "sales") + " included seller-paid closing costs we can see but"
+    + " can't value exactly.");
+  set("vWhy4", "A wider range means less certainty, not a wider negotiation. If we could verify"
+    + " all " + nAll + ", this range would narrow to roughly " + usd(WIDTH_AT_FULL) + "."
+    + (toNarrow ? " Verifying " + toNarrow + " more would already make it a narrow one." : ""));
+
+  document.getElementById("vSeeBtn").textContent = "See the " + nV + " verified sales";
+
+  var tvBtn = document.getElementById("tvBtn");
+  var tv = document.getElementById("tableView");
+  tvBtn.addEventListener("click", function () {
+    var open = tv.hasAttribute("hidden");
+    if (open) { tv.removeAttribute("hidden"); } else { tv.setAttribute("hidden", ""); }
+    tvBtn.setAttribute("aria-expanded", String(open));
+    tvBtn.textContent = open ? "Hide table" : "Show as table";
+  });
+})();
+</script>
+</body>
+</html>
