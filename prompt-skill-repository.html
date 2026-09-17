@@ -201,7 +201,7 @@
     </div>
     <div class="nav-item" data-id="opp" onclick="selectExp('opp', this)">
       <span class="nav-item-icon">🗺️</span>
-      <span class="nav-item-text"><span class="nav-item-title">AI Opportunity Map</span></span>
+      <span class="nav-item-text"><span class="nav-item-title">AI Opportunity Checker</span></span>
       <span class="nav-item-badge">02</span>
     </div>
     <div class="nav-item" data-id="discovery" onclick="selectExp('discovery', this)">
@@ -209,19 +209,19 @@
       <span class="nav-item-text"><span class="nav-item-title">UX Discovery Research</span></span>
       <span class="nav-item-badge">03</span>
     </div>
-    <div class="nav-item" data-id="jtbd" onclick="selectExp('jtbd', this)">
-      <span class="nav-item-icon">🎯</span>
-      <span class="nav-item-text"><span class="nav-item-title">JTBD MVP Scoping</span></span>
+    <div class="nav-item" data-id="benchmark" onclick="selectExp('benchmark', this)">
+      <span class="nav-item-icon">📊</span>
+      <span class="nav-item-text"><span class="nav-item-title">Competitive Benchmark</span></span>
       <span class="nav-item-badge">04</span>
     </div>
-    <div class="nav-item" data-id="prototype" onclick="selectExp('prototype', this)">
-      <span class="nav-item-icon">📱</span>
-      <span class="nav-item-text"><span class="nav-item-title">App Prototype (HTML)</span></span>
+    <div class="nav-item" data-id="jtbd" onclick="selectExp('jtbd', this)">
+      <span class="nav-item-icon">🎯</span>
+      <span class="nav-item-text"><span class="nav-item-title">Jobs to Be Done</span></span>
       <span class="nav-item-badge">05</span>
     </div>
-    <div class="nav-item" data-id="ada" onclick="selectExp('ada', this)">
-      <span class="nav-item-icon">♿</span>
-      <span class="nav-item-text"><span class="nav-item-title">ADA Accessibility Audit</span></span>
+    <div class="nav-item" data-id="blueprint" onclick="selectExp('blueprint', this)">
+      <span class="nav-item-icon">📋</span>
+      <span class="nav-item-text"><span class="nav-item-title">Service Blueprint</span></span>
       <span class="nav-item-badge">06</span>
     </div>
     <div class="nav-item" data-id="brand" onclick="selectExp('brand', this)">
@@ -229,10 +229,25 @@
       <span class="nav-item-text"><span class="nav-item-title">Brand System (Figma)</span></span>
       <span class="nav-item-badge">07</span>
     </div>
+    <div class="nav-item" data-id="prototype" onclick="selectExp('prototype', this)">
+      <span class="nav-item-icon">📱</span>
+      <span class="nav-item-text"><span class="nav-item-title">Clickable Prototypes</span></span>
+      <span class="nav-item-badge">08</span>
+    </div>
+    <div class="nav-item" data-id="ada" onclick="selectExp('ada', this)">
+      <span class="nav-item-icon">♿</span>
+      <span class="nav-item-text"><span class="nav-item-title">ADA Accessibility Audit</span></span>
+      <span class="nav-item-badge">09</span>
+    </div>
+    <div class="nav-item" data-id="pipeline" onclick="selectExp('pipeline', this)">
+      <span class="nav-item-icon">⚙️</span>
+      <span class="nav-item-text"><span class="nav-item-title">Autonomous Pipeline</span></span>
+      <span class="nav-item-badge">10</span>
+    </div>
   </nav>
 
   <div class="sidebar-footer">
-    <div class="sidebar-count"><span>7</span> workflows · <span>7</span> skills · <span>3</span> Gems</div>
+    <div class="sidebar-count"><span>10</span> workflows · <span>6</span> skills installed</div>
   </div>
 </aside>
 
@@ -473,8 +488,8 @@ INPUT: [Upload screenshot] OR [Paste URL] OR [Paste Figma frame link] OR [Descri
     gemDesc: 'Runs a WCAG 2.1 AA audit on any UI screen and returns an annotated HTML report.',
     gemTags: ['Claude Sonnet', 'Cowork skill', 'HTML output', 'WCAG 2.1'],
     skillName: 'ada-audit',
-    skillDesc: 'Runs a full WCAG 2.1 AA accessibility audit on any UI screen. Works with screenshots, URLs, Figma frames, or text descriptions. Outputs a self-contained HTML file with numbered annotation pins and fix cards.',
-    skillTags: ['Accessibility', 'WCAG 2.1', 'HTML output', 'Any input type'],
+    skillDesc: 'Installed skill. Audits any UI screen for WCAG 2.1 AA issues. Accepts screenshot, URL, Figma frame link, or text description. Outputs a self-contained HTML file with the screen recreated, numbered annotation pins, and a side panel with issue cards split into Design Issues and Development Issues accordions.',
+    skillTags: ['Accessibility', 'WCAG 2.1 AA', 'HTML output', '✅ Installed skill'],
     exampleIcon: '♿', exampleOutput: 'ada',
   },
   brand: {
@@ -515,6 +530,98 @@ INPUT: [Figma file URL] + Brand brief: primary color [HEX], secondary [HEX], fon
     skillDesc: 'Builds a complete brand design system directly in Figma via MCP — color styles, text styles, and component frames in one session. Requires Figma MCP connector.',
     skillTags: ['Figma', 'Brand system', 'Design tokens', 'MCP connector'],
     exampleIcon: '🎨', exampleOutput: 'brand',
+  },
+  benchmark: {
+    title: 'Competitive Benchmark',
+    whenToUse: 'You need to map the competitive landscape — scores real apps across UX and feature dimensions and shows where your product has whitespace to lead.',
+    tool: 'Claude / Cowork', toolIcon: '🤖',
+    inputLabel: 'PRD + list of dimensions to compare',
+    prompt: `You are a senior UX researcher and competitive analyst. Given a product PRD and comparison dimensions, generate a competitive benchmark report as a self-contained HTML file.
+
+The report must include:
+1. Overview (product being benchmarked, market context, 3–5 competitors selected)
+2. Scored comparison matrix (each competitor vs. each dimension, rated 1–5 with evidence)
+3. UX pattern analysis (common interaction patterns, conventions, standout differentiators)
+4. Positioning summary (where the product can lead, match, or skip)
+5. Citations (all data points sourced and linked)
+
+Design the HTML as a clean professional report with score bars and a color-coded matrix.
+
+OUTPUT: A complete, self-contained HTML file ready to open in a browser.
+
+INPUT: [Paste or attach PRD] + Dimensions: [list dimensions to score]`,
+    gemName: 'Benchmark Gem', gemUrl: 'https://gemini.google.com/gem/placeholder-benchmark',
+    gemDesc: 'Researches 3–5 real competitors, scores them across your chosen dimensions, and generates a positioning summary with whitespace opportunities.',
+    gemTags: ['Claude Sonnet', 'Web search', 'HTML output', 'Scored matrix'],
+    skillName: 'competitive-benchmark',
+    skillDesc: 'Generates a competitive HTML benchmark for any product vs. 3–5 real apps — scored matrix across UX and feature dimensions, pattern analysis, and positioning summary. All data web-sourced with citations.',
+    skillTags: ['Competitive analysis', 'HTML output', 'Web search', 'Scoring matrix'],
+    exampleIcon: '📊', exampleOutput: 'benchmark',
+  },
+  blueprint: {
+    title: 'Service Blueprint',
+    whenToUse: 'You have JTBD priorities and personas and need to map the full experience across swimlanes — links every user action to front-stage, back-stage AI, and support systems.',
+    tool: 'Claude / Cowork', toolIcon: '🤖',
+    inputLabel: 'JTBD document + persona descriptions',
+    prompt: `You are a service design expert. Given a JTBD document and persona descriptions, generate a complete service blueprint as a self-contained HTML file.
+
+Map the full experience across 6 swimlanes:
+1. Physical Evidence — what users see and touch at each phase
+2. Customer Actions — what users do
+3. Front of Stage — visible AI/system interactions
+4. Line of Visibility — boundary between user-facing and back-end
+5. Back of Stage (AI) — AI processing and logic (tag each step [AI])
+6. Support Processes — infrastructure, data sources, compliance
+
+Map across 5 phases that match the product's user journey.
+
+For each cell:
+- Color-code by persona (pink for primary, blue for secondary)
+- Add priority badges (P0 / P1 / P2) where relevant
+- Reference JTBD job numbers inline
+
+OUTPUT: A complete, self-contained HTML file with a color-coded table layout.
+
+INPUT: [Attach JTBD document] + Persona names and roles: [list]`,
+    gemName: 'Blueprint Gem', gemUrl: 'https://gemini.google.com/gem/placeholder-blueprint',
+    gemDesc: 'Maps the full product experience across 6 swimlanes from a JTBD doc, linking AI steps to support processes.',
+    gemTags: ['Claude Sonnet', 'HTML output', 'JTBD input', 'Service design'],
+    skillName: 'service-blueprint',
+    skillDesc: 'Maps a full service experience across 6 swimlanes (Physical Evidence → Support Processes) from a JTBD doc. Outputs a color-coded HTML table with persona tags, priority badges, and AI step markers.',
+    skillTags: ['Service design', 'HTML output', 'JTBD input', 'Shostack methodology'],
+    exampleIcon: '📋', exampleOutput: 'blueprint',
+  },
+  pipeline: {
+    title: 'Autonomous Pipeline',
+    whenToUse: 'You have a project brief or meeting notes and want a complete research + validation package without steering each step — 3 chained skills run in sequence and deliver without additional prompting.',
+    tool: 'Claude + 3 Skills', toolIcon: '⚙️',
+    inputLabel: 'Meeting notes or project brief (plain text only)',
+    prompt: `INPUT: Paste your project brief or meeting notes. No other input is needed at any stage.
+
+PIPELINE SEQUENCE:
+
+Skill 1 — UX Discovery Research
+Generates a full cited HTML report: market size (TAM/SAM/SOM), 3 competitors, 2 personas, 5+ pain points. All claims cited. No assumptions without a source.
+
+Skill 2 — Brief / PRD Audit (brief-prd-audit)
+Runs on the brief + Skill 1 output.
+Phase 1: Extracts every market claim as a falsifiable hypothesis and tests it:
+  SUPPORTED / CONTESTED / UNSUPPORTED / UNVERIFIABLE
+Phase 2: Finds every user-facing output the product will show (scores, signals, badges) and writes a display spec for each based on Phase 1 verdicts.
+
+Skill 3 — UX Platform Analysis
+Runs on both prior outputs. Audits 3–5 comparable platforms for UX patterns and whitespace relevant to the validated claims.
+
+OUTPUT: Three deliverables — HTML research report + claim-by-claim display spec + UX platform analysis — without additional prompting.
+
+INPUT: [Paste project brief or meeting notes]`,
+    gemName: 'Skills Used', gemUrl: null,
+    gemDesc: '3 chained Claude skills: UX Discovery Research (exp. 03) → Brief / PRD Audit (claim verification + display spec) → UX Platform Analysis. The Scout project was built end-to-end using this pipeline.',
+    gemTags: ['3 chained skills', 'No intermediate input', 'HTML + display spec output'],
+    skillName: 'brief-prd-audit',
+    skillDesc: 'Installed skill — the core of the pipeline. Two-phase audit on any brief or PRD: Phase 1 red-teams every market claim (SUPPORTED / CONTESTED / UNSUPPORTED / UNVERIFIABLE). Phase 2 finds every user-facing output and writes a display spec for each, based on Phase 1 verdicts. One input, full audit out.',
+    skillTags: ['Claim verification', 'Display spec', 'Phase 1 + Phase 2', '✅ Installed skill'],
+    exampleIcon: '⚙️', exampleOutput: 'pipeline',
   },
 };
 
@@ -598,11 +705,7 @@ function renderDetail(id) {
                 </div>
               </div>
               <div style="display:flex;flex-direction:column;gap:8px;justify-content:flex-end;min-width:130px">
-                <a class="btn btn-blue" href="${e.gemUrl}" target="_blank">Open Gem ↗</a>
-                <button class="btn btn-ghost" id="copyGemBtn_${id}" onclick="copyGemUrl('${id}')">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                  Copy URL
-                </button>
+                ${e.gemUrl ? `<a class="btn btn-blue" href="${e.gemUrl}" target="_blank">Open Gem ↗</a><button class="btn btn-ghost" id="copyGemBtn_${id}" onclick="copyGemUrl('${id}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy URL</button>` : `<span style="font-size:11px;color:var(--g4);text-align:center;padding:8px 0">Runs in Claude —<br>no external link</span>`}
               </div>
             </div>
           </div>
@@ -647,7 +750,8 @@ function renderDetail(id) {
 
 function buildSkillMd(id) {
   const e = experiments[id];
-  return `# ${e.skillName}\n\nSkill for: ${e.title}\nTool: ${e.tool}\n\n## Description\n${e.skillDesc}\n\n## When to Use\n${e.whenToUse}\n\n## Tags\n${e.skillTags.join(', ')}\n\n## Input\n${e.inputLabel}\n\n## Gem\nName: ${e.gemName}\nURL: ${e.gemUrl}\n\n## Prompt\n\`\`\`\n${e.prompt}\n\`\`\`\n`;
+  const gemLine = e.gemUrl ? `Name: ${e.gemName}\nURL: ${e.gemUrl}` : `Name: ${e.gemName}\n(No external Gem — runs entirely in Claude/Cowork)`;
+  return `---\nname: "${e.skillName}"\ndescription: "${e.skillDesc.replace(/"/g,"'")}"\n---\n\n# ${e.title}\n\nTool: ${e.tool}\n\n## When to Use\n${e.whenToUse}\n\n## Input\n${e.inputLabel}\n\n## Tags\n${e.skillTags.join(', ')}\n\n## Workflow\n${e.gemDesc}\n\n## Prompt\n\`\`\`\n${e.prompt}\n\`\`\`\n`;
 }
 
 // ── Copy with affordance ───────────────────────────────────────────────────
@@ -918,6 +1022,115 @@ const exampleOutputs = {
         </div>
         <div style="font-size:11px;color:#0D0F1A;line-height:1.5">${desc}</div>
       </div>`).join('')}
+    </div>`
+  },
+  benchmark: {
+    title: 'Competitive Benchmark', badge: 'HTML report output · Claude',
+    html: `<div style="font-family:system-ui,sans-serif;padding:20px">
+      ${SAMPLE_BANNER}
+      <div style="background:#0D0F1A;border-radius:12px;padding:14px 18px;margin-bottom:14px">
+        <div style="font-size:10px;font-weight:700;color:#2B52FF;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px">Competitive Benchmark</div>
+        <div style="font-size:15px;font-weight:800;color:#fff">FitCoach — AI Workout App</div>
+        <div style="font-size:11px;color:#9BA3BC;margin-top:3px">4 competitors · 6 dimensions · web-sourced data</div>
+      </div>
+      <div style="background:#fff;border:1px solid #ECEEF5;border-radius:10px;overflow:hidden;margin-bottom:12px">
+        <div style="font-size:10px;font-weight:700;color:#9BA3BC;text-transform:uppercase;letter-spacing:.08em;padding:10px 14px;border-bottom:1px solid #ECEEF5">Scored Matrix (1–5)</div>
+        <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:11px">
+            <thead><tr style="background:#F7F8FC">
+              <th style="padding:8px 12px;text-align:left;color:#0D0F1A;font-weight:700;border-bottom:1px solid #ECEEF5">Dimension</th>
+              ${['Peloton','Nike TC','Fitbod','FitCoach'].map(c=>`<th style="padding:8px 10px;text-align:center;color:#4A5068;font-weight:700;border-bottom:1px solid #ECEEF5">${c}</th>`).join('')}
+            </tr></thead>
+            <tbody>
+              ${[['AI Personalisation','3','2','4','5'],['Onboarding friction','2','3','3','4'],['Social features','5','4','2','2'],['Offline support','2','3','5','4'],['Content library','5','4','3','3'],['Pricing clarity','2','3','4','5']].map(([dim,...scores])=>`
+              <tr style="border-bottom:1px solid #F7F8FC">
+                <td style="padding:7px 12px;color:#0D0F1A;font-weight:600">${dim}</td>
+                ${scores.map((s,i)=>{const c=i===3?'#2B52FF':'#9BA3BC';const bg=i===3?'#EEF1FF':'transparent';return `<td style="padding:7px 10px;text-align:center;background:${bg}"><span style="font-weight:700;color:${c}">${s}</span><div style="height:3px;background:#F7F8FC;border-radius:2px;margin-top:3px"><div style="height:100%;width:${parseInt(s)*20}%;background:${c};border-radius:2px"></div></div></td>`}).join('')}
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div style="background:#EEF1FF;border:1px solid #D5DEFF;border-radius:10px;padding:12px 14px">
+        <div style="font-size:10px;font-weight:700;color:#1A3EE8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Positioning Whitespace</div>
+        ${[['Lead','AI personalisation + pricing clarity — competitors weak here'],['Match','Offline support — table stakes, parity needed'],['Skip','Social features — Peloton owns this; high cost to compete']].map(([l,d])=>`
+        <div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:6px">
+          <span style="background:#2B52FF;color:#fff;font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;flex-shrink:0">${l}</span>
+          <span style="font-size:11px;color:#4A5068">${d}</span>
+        </div>`).join('')}
+      </div>
+    </div>`
+  },
+  blueprint: {
+    title: 'Service Blueprint', badge: 'HTML table output · Claude',
+    html: `<div style="font-family:system-ui,sans-serif;padding:20px">
+      ${SAMPLE_BANNER}
+      <div style="background:#0D0F1A;border-radius:12px;padding:14px 18px;margin-bottom:14px">
+        <div style="font-size:10px;font-weight:700;color:#2B52FF;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px">Service Blueprint</div>
+        <div style="font-size:15px;font-weight:800;color:#fff">HomeChef — Meal Planning</div>
+        <div style="font-size:11px;color:#9BA3BC;margin-top:3px">6 swimlanes · 4 phases · 2 personas · AI steps tagged</div>
+      </div>
+      <div style="overflow-x:auto">
+        <table style="border-collapse:collapse;font-size:10px;width:100%;min-width:580px">
+          <thead><tr>
+            <th style="background:#1F2338;color:#9BA3BC;padding:7px 10px;text-align:left;font-size:9px;font-weight:700;letter-spacing:.08em;border:1px solid #2E3350;width:110px">SWIMLANE</th>
+            ${['Discover','Search','Evaluate','Book'].map(p=>`<th style="background:#1F2338;color:#fff;padding:7px 10px;text-align:center;font-weight:700;border:1px solid #2E3350">${p}</th>`).join('')}
+          </tr></thead>
+          <tbody>
+            ${[
+              ['Physical Evidence','#F3F4F6','#374151',['App store listing','Search results page','Property cards','Offer confirmation']],
+              ['Customer Actions','#EEF1FF','#1A3EE8',['Downloads app, creates account','Enters criteria & filters','Reviews AI match score','Submits offer via agent']],
+              ['Front of Stage','#E6FAF2','#006B40',['Onboarding quiz [AI]','Real-time results [AI]','Match score + display spec','Offer range suggestion [AI]']],
+              ['Back of Stage (AI)','#0D0F1A','#9BA3BC',['Preference model build','Listing scoring pipeline','Claim verification pass','Comparable sales model']],
+              ['Support Processes','#F7F8FC','#9BA3BC',['MLS data feed · Auth','Search index · Cache','Audit log · UNSUPPORTED flags','Legal review · Compliance']],
+            ].map(([lane,bg,tc,cells])=>`
+            <tr>
+              <td style="background:${bg};color:${tc};padding:7px 10px;font-weight:700;font-size:9px;border:1px solid #E5E7EB;text-transform:uppercase;letter-spacing:.06em">${lane}</td>
+              ${cells.map(c=>`<td style="background:${bg};color:${tc};padding:7px 10px;border:1px solid #E5E7EB;vertical-align:top;line-height:1.4">${c}</td>`).join('')}
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+        <span style="background:#FFD6EA;color:#CC0F75;font-size:10px;font-weight:700;padding:3px 9px;border-radius:5px">● Maya (primary)</span>
+        <span style="background:#DBEAFE;color:#1E40AF;font-size:10px;font-weight:700;padding:3px 9px;border-radius:5px">● Jordan (secondary)</span>
+        <span style="background:#1F2338;color:#9BA3BC;font-size:10px;font-weight:700;padding:3px 9px;border-radius:5px">[AI] step</span>
+      </div>
+    </div>`
+  },
+  pipeline: {
+    title: 'Autonomous Pipeline', badge: 'Verdict table + display spec · Claude',
+    html: `<div style="font-family:system-ui,sans-serif;padding:20px">
+      ${SAMPLE_BANNER}
+      <div style="background:#0D0F1A;border-radius:12px;padding:14px 18px;margin-bottom:14px">
+        <div style="font-size:10px;font-weight:700;color:#2B52FF;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px">Brief / PRD Audit — Phase 1 Output</div>
+        <div style="font-size:15px;font-weight:800;color:#fff">FitCoach Brief</div>
+        <div style="font-size:11px;color:#9BA3BC;margin-top:3px">8 hypotheses tested · 2 unsupported · 1 unverifiable</div>
+      </div>
+      <div style="font-size:10px;font-weight:700;color:#9BA3BC;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Verdict Table</div>
+      ${[
+        ['H1','AI can personalise workouts better than static plans','SUPPORTED','#00CC7A','#E6FAF2','Personalisation improves adherence (JMIR, 2023)'],
+        ['H2','65% of gym-goers abandon plans within 8 weeks','CONTESTED','#FF8C42','#FFF4ED','Stat attributed to Peloton blog — interested party'],
+        ['H3','AI can detect correct exercise form from phone camera','UNSUPPORTED','#FF3B5C','#FFF0F3','Requires depth sensor; accuracy drops below 60% on 2D'],
+        ['H4','Users want AI to set their rest periods automatically','UNVERIFIABLE','#9BA3BC','#F7F8FC','Not derivable from any data source in the product'],
+      ].map(([id,claim,verdict,vc,vbg,note])=>`
+      <div style="background:${vbg};border-radius:10px;padding:10px 14px;margin-bottom:8px;border-left:3px solid ${vc}">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:4px">
+          <div style="font-size:10px;font-weight:700;color:#9BA3BC">${id}</div>
+          <span style="background:${vc};color:#fff;font-size:9px;font-weight:800;padding:2px 8px;border-radius:4px;flex-shrink:0">${verdict}</span>
+        </div>
+        <div style="font-size:12px;font-weight:700;color:#0D0F1A;margin-bottom:3px">${claim}</div>
+        <div style="font-size:11px;color:#4A5068">${note}</div>
+      </div>`).join('')}
+      <div style="font-size:10px;font-weight:700;color:#9BA3BC;text-transform:uppercase;letter-spacing:.08em;margin:14px 0 8px">Phase 2 Display Spec (excerpt)</div>
+      <div style="background:#fff;border:1px solid #ECEEF5;border-radius:10px;padding:12px 14px">
+        <div style="font-size:11px;font-weight:700;color:#0D0F1A;margin-bottom:2px">Form Detection Badge — UNSUPPORTED</div>
+        <div style="font-size:10px;color:#9BA3BC;margin-bottom:6px">Treatment: Off-scale · Never show as low-confidence value</div>
+        <div style="background:#FFF0F3;border-radius:7px;padding:8px 10px;font-size:11px;color:#991B1B;border-left:3px solid #FF3B5C">
+          <strong>Never say:</strong> "Form: Good" or "Form check: 72%"<br>
+          <strong>Say instead:</strong> "Form feedback requires a device with depth sensing — not available on this phone."
+        </div>
+      </div>
     </div>`
   },
   brand: {
