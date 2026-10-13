@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2024年に夫とギリシャとルーマニアへ行きました</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@500;700;900&display=swap');
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      user-select: none;
+    }
+    
+    .hotspot-pulse {
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.8); }
+      70% { box-shadow: 0 0 0 16px rgba(239, 68, 68, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col items-center justify-center overflow-hidden p-4 relative">
+
+  <!-- Popover Global Flotante Superior -->
+  <div id="global-popover" class="hidden absolute top-6 z-50 bg-slate-900/95 backdrop-blur-md border-2 border-blue-500 rounded-2xl px-8 py-4 shadow-2xl text-center max-w-2xl w-[90%] transition-all">
+    <p id="global-popover-text" class="text-2xl md:text-3xl font-extrabold text-white"></p>
+  </div>
+
+  <!-- Main Wrapper with External Navigation Buttons -->
+  <div class="relative w-full max-w-6xl flex items-center justify-center gap-4">
+    
+    <!-- Previous Button (Outside Box) -->
+    <button onclick="changeSlide(-1)" class="bg-slate-900 hover:bg-blue-600 text-white w-14 h-14 rounded-full flex items-center justify-center border-2 border-slate-700 transition-all duration-200 shadow-2xl active:scale-95 cursor-pointer shrink-0 z-50">
+      <i class="fa-solid fa-chevron-left text-xl pointer-events-none"></i>
+    </button>
+
+    <!-- Presentation Slide Container -->
+    <div class="w-full aspect-[16/9] min-h-[500px] bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden relative shadow-2xl flex items-center justify-center">
+      
+      <!-- Slide 1: Portada -->
+      <div class="slide-item active w-full h-full relative flex items-center justify-center">
+        <img src="portada.jpeg" alt="Portada" class="w-full h-full object-cover">
+        <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent flex flex-col items-center justify-end p-8 md:p-16 text-center">
+          <h2 class="text-3xl md:text-5xl font-black text-white leading-tight max-w-4xl drop-shadow-lg">
+            2024年に夫とギリシャとルーマニアへ行きました
+          </h2>
+        </div>
+      </div>
+
+      <!-- Slide 2: Celular -->
+      <div class="slide-item hidden w-full h-full relative bg-black flex items-center justify-center">
+        <img src="celu.jpeg" alt="Celu" class="max-h-full max-w-full object-contain">
+        
+        <button onclick="abrirTexto(event, '赤いTシャツを着ている男の人はスマホを見ています。')" 
+                class="absolute top-[58%] left-[84%] -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-red-600 hover:bg-red-500 text-white rounded-full flex items-center justify-center border-2 border-white shadow-2xl hotspot-pulse transition-transform active:scale-90 z-40 cursor-pointer">
+          <i class="fa-solid fa-mobile-screen text-lg pointer-events-none"></i>
+        </button>
+      </div>
+
+      <!-- Slide 3: Partenon -->
+      <div class="slide-item hidden w-full h-full relative bg-black flex items-center justify-center">
+        <img src="partenon.jpeg" alt="Partenon" class="max-h-full max-w-full object-contain">
+        
+        <button onclick="abrirTexto(event, 'この人たちはパルテノンの写真を撮っています。')" 
+                class="absolute top-[70%] left-[18%] -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-red-600 hover:bg-red-500 text-white rounded-full flex items-center justify-center border-2 border-white shadow-2xl hotspot-pulse transition-transform active:scale-90 z-40 cursor-pointer">
+          <i class="fa-solid fa-camera text-lg pointer-events-none"></i>
+        </button>
+
+        <button onclick="abrirTexto(event, 'この人たちは 話しています。')" 
+                class="absolute top-[75%] left-[75%] -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-blue-600 hover:bg-blue-500 text-white rounded-full flex items-center justify-center border-2 border-white shadow-2xl hotspot-pulse transition-transform active:scale-90 z-40 cursor-pointer">
+          <i class="fa-solid fa-person-walking text-lg pointer-events-none"></i>
+        </button>
+      </div>
+
+      <!-- Slide 4: Dansu -->
+      <div class="slide-item hidden w-full h-full relative bg-black flex items-center justify-center">
+        <img src="dansu.jpeg" alt="Dansu" class="max-h-full max-w-full object-contain">
+        
+        <button onclick="abrirTexto(event, 'この人たちはダンスしています。')" 
+                class="absolute top-[45%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-red-600 hover:bg-red-500 text-white rounded-full flex items-center justify-center border-2 border-white shadow-2xl hotspot-pulse transition-transform active:scale-90 z-40 cursor-pointer">
+          <i class="fa-solid fa-music text-lg pointer-events-none"></i>
+        </button>
+      </div>
+
+      <!-- Slide 5: Sentar -->
+      <div class="slide-item hidden w-full h-full relative bg-black flex items-center justify-center">
+        <img src="sentar.jpeg" alt="Sentar" class="max-h-full max-w-full object-contain">
+        
+        <button onclick="abrirTexto(event, '二人は座っています。')" 
+                class="absolute top-[65%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-red-600 hover:bg-red-500 text-white rounded-full flex items-center justify-center border-2 border-white shadow-2xl hotspot-pulse transition-transform active:scale-90 z-40 cursor-pointer">
+          <i class="fa-solid fa-chair text-lg pointer-events-none"></i>
+        </button>
+      </div>
+
+      <!-- Slide 6: Tomar -->
+      <div class="slide-item hidden w-full h-full relative bg-black flex items-center justify-center">
+        <img src="tomar.jpeg" alt="Tomar" class="max-h-full max-w-full object-contain">
+        
+        <button onclick="abrirTexto(event, '夫はビールを飲んでいます。')" 
+                class="absolute top-[38%] left-[52%] -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-red-600 hover:bg-red-500 text-white rounded-full flex items-center justify-center border-2 border-white shadow-2xl hotspot-pulse transition-transform active:scale-90 z-40 cursor-pointer">
+          <i class="fa-solid fa-beer-mug-empty text-lg pointer-events-none"></i>
+        </button>
+      </div>
+
+      <!-- Slide 7: Cantar -->
+      <div class="slide-item hidden w-full h-full relative bg-black flex items-center justify-center">
+        <img src="cantar.jpeg" alt="Cantar" class="max-h-full max-w-full object-contain">
+        
+        <button onclick="abrirTexto(event, '男の人は歌を歌っています。')" 
+                class="absolute top-[35%] left-[45%] -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-red-600 hover:bg-red-500 text-white rounded-full flex items-center justify-center border-2 border-white shadow-2xl hotspot-pulse transition-transform active:scale-90 z-40 cursor-pointer">
+          <i class="fa-solid fa-microphone text-lg pointer-events-none"></i>
+        </button>
+      </div>
+
+      <!-- Slide 8: Carro -->
+      <div class="slide-item hidden w-full h-full relative bg-black flex items-center justify-center">
+        <img src="carro.jpeg" alt="Carro" class="max-h-full max-w-full object-contain">
+        
+        <button onclick="abrirTexto(event, 'この人はきいろい自動車を運転しています。')" 
+                class="absolute top-[48%] left-[58%] -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-red-600 hover:bg-red-500 text-white rounded-full flex items-center justify-center border-2 border-white shadow-2xl hotspot-pulse transition-transform active:scale-90 z-40 cursor-pointer">
+          <i class="fa-solid fa-car text-lg pointer-events-none"></i>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Next Button (Outside Box) -->
+    <button onclick="changeSlide(1)" class="bg-slate-900 hover:bg-blue-600 text-white w-14 h-14 rounded-full flex items-center justify-center border-2 border-slate-700 transition-all duration-200 shadow-2xl active:scale-95 cursor-pointer shrink-0 z-50">
+      <i class="fa-solid fa-chevron-right text-xl pointer-events-none"></i>
+    </button>
+
+  </div>
+
+  <script>
+    let currentIndex = 0;
+    const slides = document.querySelectorAll('.slide-item');
+    const globalPopover = document.getElementById('global-popover');
+    const globalPopoverText = document.getElementById('global-popover-text');
+    let activeText = null;
+
+    function updateSlides() {
+      slides.forEach((slide, index) => {
+        if (index === currentIndex) {
+          slide.classList.remove('hidden');
+          slide.classList.add('flex');
+        } else {
+          slide.classList.add('hidden');
+          slide.classList.remove('flex');
+        }
+      });
+      hidePopover();
+    }
+
+    function changeSlide(direction) {
+      currentIndex = (currentIndex + direction + slides.length) % slides.length;
+      updateSlides();
+    }
+
+    function abrirTexto(event, text) {
+      if (event) {
+        event.stopPropagation();
+      }
+      
+      if (!globalPopover.classList.contains('hidden') && activeText === text) {
+        hidePopover();
+        return;
+      }
+
+      globalPopoverText.textContent = text;
+      globalPopover.classList.remove('hidden');
+      activeText = text;
+    }
+
+    function hidePopover() {
+      globalPopover.classList.add('hidden');
+      activeText = null;
+    }
+
+    document.addEventListener('click', () => {
+      hidePopover();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') changeSlide(1);
+      if (e.key === 'ArrowLeft') changeSlide(-1);
+      if (e.key === 'Escape') hidePopover();
+    });
+  </script>
+</body>
+</html>
